@@ -11,7 +11,7 @@ const StartingPage = () => {
 
   React.useEffect(() => {
     setTimeout(() => {
-      dispatch(alertActions.changeAlert({ type: undefined, message: "" }));
+      dispatch(alertActions.clearAlert());
     }, 10000);
   }, []);
 
@@ -28,7 +28,7 @@ const StartingPage = () => {
           <Alert severity={alertData.type}>{alertData.message}</Alert>
         )}
         <br />
-        <Typography variant="h3">Welcome to our page!</Typography>
+        <Typography variant="h3">Volleyball tournaments!</Typography>
       </Grid>
     </Layout>
   );

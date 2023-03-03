@@ -22,7 +22,6 @@ const LoginForm = () => {
 
     login(email, password)
       .then((res) => {
-        console.log(res);
         setUserData(dispatch, res.accessToken, res.refreshToken, {
           userName: res.userName,
           email: res.userEmail,
@@ -68,6 +67,7 @@ const LoginForm = () => {
             label="Username"
             variant="outlined"
             fullWidth
+            required
           />
           <br />
           <br />
@@ -80,6 +80,7 @@ const LoginForm = () => {
             label="Password"
             variant="outlined"
             fullWidth
+            required
           />
           <br />
           <br />

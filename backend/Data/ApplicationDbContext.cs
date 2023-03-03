@@ -1,5 +1,5 @@
 ﻿using Backend.Auth.Model;
-using Backend.Data.Entities;
+using Backend.Data.Entities.Team;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

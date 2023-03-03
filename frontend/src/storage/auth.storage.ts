@@ -62,6 +62,15 @@ export const setUserData = (
   );
 };
 
+export const clearUserData = (dispatch: AppDispatch) => {
+  localStorage.removeItem("user");
+  dispatch(
+    authActions.changeUser({
+      user: null,
+    })
+  );
+};
+
 export const updateUserAccessToken = (accessToken: string) => {
   const user = JSON.parse(localStorage.getItem("user") ?? "");
   user.accessToken = accessToken;

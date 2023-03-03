@@ -20,6 +20,10 @@ const alertSlice = createSlice({
       state.type = newType;
       state.message = newMessage;
     },
+    clearAlert(state) {
+      state.type = undefined;
+      state.message = "";
+    }
   },
 });
 

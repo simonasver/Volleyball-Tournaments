@@ -1,4 +1,4 @@
-import { setUserData } from "../storage/auth.storage";
+import { clearUserData } from "../storage/auth.storage";
 import { AppDispatch } from "../store";
 import api from "./api";
 
@@ -11,14 +11,16 @@ export const login = async (username: string, password: string) => {
 };
 
 export const register = async (
-  email: string,
   username: string,
+  fullname: string,
+  email: string,
   password: string
 ) => {
-  const res = await api.post("/users", {
-    email,
-    username,
-    password,
+  const res = await api.post("/Auth/register", {
+    UserName: username,
+    FullName: fullname,
+    Email: email,
+    Password: password,
   });
   return res.data;
 };
@@ -41,7 +43,7 @@ export const logout = async (
   } catch (e) {
     return Promise.reject(e);
   } finally {
-    setUserData(dispatch, undefined, undefined, undefined);
+    clearUserData(dispatch);
   }
 };
 

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Backend.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
@@ -20,6 +19,7 @@ namespace Backend.Controllers
             _jwtTokenService = jwtTokenService;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<ApplicationUser>> Register(RegisterDto userRegisterDto)
         {
@@ -33,7 +33,7 @@ namespace Backend.Controllers
             {
                 Email = userRegisterDto.Email,
                 UserName = userRegisterDto.UserName,
-                FullName = userRegisterDto.UserName,
+                FullName = userRegisterDto.FullName != null ? userRegisterDto.FullName : userRegisterDto.UserName,
                 RegisterDate = DateTime.Now,
                 LastLoginDate = DateTime.Now
             };
@@ -55,19 +55,20 @@ namespace Backend.Controllers
             return CreatedAtAction(nameof(Register), newUserDto);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDtoRequest userLoginDto)
         {
             var user = await _userManager.FindByNameAsync(userLoginDto.UserName);
             if (user == null)
             {
-                return BadRequest("ApplicationUser name or password is invalid");
+                return BadRequest("User Name or password is invalid");
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
             if (!isPasswordValid)
             {
-                return BadRequest("ApplicationUser name or password is invalid");
+                return BadRequest("User Name or password is invalid");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -84,16 +85,12 @@ namespace Backend.Controllers
             return Ok(new LoginDtoResponse(accessToken, refreshToken.RefreshToken, user.UserName, user.Email, roles));
         }
 
+        [AllowAnonymous]
         [HttpPut("refresh")]
         public async Task<IActionResult> Refresh(TokenDto tokenDto)
         {
-            if (tokenDto == null)
-            {
-                return BadRequest();
-            }
-
-            string? accessToken = tokenDto.AccessToken;
-            string? refreshToken = tokenDto.RefreshToken;
+            string accessToken = tokenDto.AccessToken;
+            string refreshToken = tokenDto.RefreshToken;
 
             var principal = _jwtTokenService.GetPrincipalFromExpiredToken(accessToken);
             if (principal == null)
@@ -101,7 +98,12 @@ namespace Backend.Controllers
                 return BadRequest();
             }
 
-            string username = principal.Identity.Name;
+            string? username = principal.Identity?.Name;
+
+            if (username == null)
+            {
+                return BadRequest();
+            }
 
             var user = await _userManager.FindByNameAsync(username);
 
@@ -123,11 +125,11 @@ namespace Backend.Controllers
             return CreatedAtAction(nameof(Refresh), new TokenDto(newAccessToken, newRefreshToken.RefreshToken));
         }
 
-        [Authorize(Policy = PolicyNames.AccountOwner)]
+        [Authorize]
         [HttpDelete("logout")]
         public async Task<IActionResult> Logout()
         {
-            var userName = HttpContext.User.Identity.Name;
+            var userName = HttpContext.User.Identity?.Name;
             var user = await _userManager.FindByNameAsync(userName);
 
             if (user == null)

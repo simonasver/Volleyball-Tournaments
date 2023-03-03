@@ -13,11 +13,11 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-var FrontEndOrigins = "_frontEndOrigins";
+var frontEndOrigins = "_frontEndOrigins";
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(FrontEndOrigins, policy =>
+    options.AddPolicy(frontEndOrigins, policy =>
     {
         policy.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
     });
@@ -32,7 +32,14 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 5;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = true;
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -60,11 +67,9 @@ builder.Services.AddScoped<AuthDbSeeder>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(PolicyNames.ResourceOwner, policy => policy.Requirements.Add(new ResourceOwnerRequirement()));
-    options.AddPolicy(PolicyNames.AccountOwner, policy => policy.Requirements.Add(new AccountOwnerRequirement()));
 });
 
-builder.Services.AddTransient<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
-builder.Services.AddTransient<IAuthorizationHandler, AccountOwnerAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
 
 var app = builder.Build();
 
@@ -79,7 +84,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseCors(FrontEndOrigins);
+app.UseCors(frontEndOrigins);
 
 var dbSeeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<AuthDbSeeder>();
 await dbSeeder.SeedAsync();

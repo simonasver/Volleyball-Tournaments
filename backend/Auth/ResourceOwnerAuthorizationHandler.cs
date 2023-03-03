@@ -9,7 +9,7 @@ namespace Backend.Auth
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ResourceOwnerRequirement requirement, IUserOwnedResource resource)
         {
-            if (context.User.IsInRole(ApplicationUserRoles.Admin) || context.User.FindFirstValue(JwtRegisteredClaimNames.Sub) == resource.OwnerId)
+            if (context.User.IsInRole(ApplicationUserRoles.Admin) || context.User.FindFirstValue(JwtRegisteredClaimNames.Sub) == resource.UserId)
             {
                 context.Succeed(requirement);
             }

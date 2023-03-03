@@ -4,9 +4,9 @@ namespace Backend.Data.Dtos.Auth
 {
     public class LoginDtoRequest
     {
-        [Required(ErrorMessage = "ApplicationUser Name is required")]
+        [Required(ErrorMessage = "User Name is required")]
         public string UserName { get; set; }
-        [Required(ErrorMessage = "Email Address is required")]
+        [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
     }
 
