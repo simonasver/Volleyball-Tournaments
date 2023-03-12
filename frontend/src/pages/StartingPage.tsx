@@ -10,9 +10,13 @@ const StartingPage = () => {
   const alertData = useAppSelector((state) => state.alert);
 
   React.useEffect(() => {
-    setTimeout(() => {
+    const clearAlertTimeout = setTimeout(() => {
       dispatch(alertActions.clearAlert());
     }, 10000);
+    return () => {
+      clearTimeout(clearAlertTimeout);
+      dispatch(alertActions.clearAlert());
+    };
   }, []);
 
   return (

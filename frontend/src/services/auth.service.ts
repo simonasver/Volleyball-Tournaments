@@ -1,12 +1,11 @@
-import { clearUserData } from "../storage/auth.storage";
 import { AppDispatch } from "../store";
+import { authActions } from "../store/auth-slice";
 import api from "./api";
 
 export const login = async (username: string, password: string) => {
-  const res = await api.post("/Auth/login", {
-    UserName: username,
-    Password: password,
-  });
+  const res = await api.get(
+    "/Token?UserName=" + username + "&Password=" + password
+  );
   return res.data;
 };
 
@@ -16,7 +15,7 @@ export const register = async (
   email: string,
   password: string
 ) => {
-  const res = await api.post("/Auth/register", {
+  const res = await api.post("/User", {
     UserName: username,
     FullName: fullname,
     Email: email,
@@ -26,28 +25,21 @@ export const register = async (
 };
 
 export const refresh = async (token: string) => {
-  const res = await api.put("/tokens", {
+  const res = await api.put("/Token", {
     token,
   });
   return res.data;
 };
 
 export const logout = async (
-  token: string,
-  userId: string,
   dispatch: AppDispatch
 ) => {
   try {
-    const res = await api.delete(`/tokens/${token}/users/${userId}`);
+    const res = await api.delete(`/Token`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);
   } finally {
-    clearUserData(dispatch);
+    dispatch(authActions.clearUser());
   }
-};
-
-export const getUserId = async (userName: string) => {
-  const res = await api.get(`/users/${userName}/userIds`);
-  return res.data;
 };

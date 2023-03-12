@@ -1,9 +1,19 @@
+import { Store } from "@reduxjs/toolkit";
 import axios from "axios";
-import { getUserData, updateUserAccessToken } from "../storage/auth.storage";
+import { RootState } from "../store";
+import { authActions, ITokens } from "../store/auth-slice";
+
+let store: Store<RootState>;
+
+export const injectStore = (storeToInject: Store<RootState>) => {
+  store = storeToInject;
+};
+
+// const apiUrl = "https://goldfish-app-ibq9e.ondigitalocean.app/api";
+const apiUrl = "https://localhost:7067/api";
 
 const instance = axios.create({
-  // baseURL: "https://goldfish-app-ibq9e.ondigitalocean.app/api",
-  baseURL: "https://localhost:7067/api",
+  baseURL: apiUrl,
   headers: {
     "Content-Type": "application/json",
   },
@@ -11,7 +21,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const token = getUserData()?.accessToken;
+    const token = store.getState().auth.tokens?.accessToken || undefined;
     if (token) {
       if (config.headers) {
         config.headers["Authorization"] = "Bearer " + token;
@@ -29,30 +39,34 @@ instance.interceptors.response.use(
     return res;
   },
   async (err) => {
-    const originalConfig = err.config;
+    if(axios.isCancel(err)){
+      return Promise.reject(err);
+    }
 
+    const originalConfig = err.config;
     if (
-      !(originalConfig.url === "/tokens" && originalConfig.method === "put") &&
+      !(originalConfig.url === "/Token" && originalConfig.method === "put") &&
       err.response
     ) {
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
 
         try {
-          const rs = await instance.put("/tokens", {
-            token: getUserData()?.refreshToken,
+          const tokens = store.getState().auth.tokens as ITokens;
+          const res = await instance.put("/Token", {
+            AccessToken: tokens.accessToken,
+            RefreshToken: tokens.refreshToken,
           });
 
-          const { accessToken } = rs.data;
-          updateUserAccessToken(accessToken);
-
+          console.log(res.data);
+          store.dispatch(authActions.changeTokens(res.data));
           return instance(originalConfig);
         } catch (_error) {
+          store.dispatch(authActions.clearUser());
           return Promise.reject(_error);
         }
       }
     }
-
     return Promise.reject(err);
   }
 );

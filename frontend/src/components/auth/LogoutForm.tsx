@@ -1,25 +1,23 @@
-import { Alert } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hooks";
 import { logout } from "../../services/auth.service";
+import Loader from "../layout/Loader";
 
 const LogoutForm = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   React.useEffect(() => {
-    logout("", "", dispatch)
-      .then((res) => {
-        console.log(res);
-      })
+    logout(dispatch)
+      .then()
       .catch((e) => {
-        console.log(e?.response?.data);
+        console.log(e);
       })
       .finally(() => {
         navigate("/", { replace: true });
       });
   }, []);
-  return <Alert severity="info">Logging out</Alert>;
+  return <Loader />;
 };
 
 export default LogoutForm;

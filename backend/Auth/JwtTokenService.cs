@@ -40,7 +40,7 @@ namespace Backend.Auth
             (
                 issuer: _issuer,
                 audience: _audience,
-                expires: DateTime.UtcNow.AddMinutes(_accessTokenValidityInMinutes ?? 0),
+                expires: DateTime.UtcNow.AddMinutes(_accessTokenValidityInMinutes ?? 1),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(_authSigningKey, SecurityAlgorithms.HmacSha256)
             );
@@ -57,7 +57,7 @@ namespace Backend.Auth
             }
 
             var refreshToken = Convert.ToBase64String(randomNumber);
-            var refreshTokenExpiration = DateTime.Now.AddDays(_refreshTokenValidityInDays ?? 0);
+            var refreshTokenExpiration = DateTime.Now.AddDays(_refreshTokenValidityInDays ?? 1);
 
             return new RefreshTokenDto(refreshToken, refreshTokenExpiration);
         }

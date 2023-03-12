@@ -6,13 +6,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hooks";
 import { login } from "../../services/auth.service";
-import { setUserData } from "../../storage/auth.storage";
 import { alertActions } from "../../store/alert-slice";
+import { authActions } from "../../store/auth-slice";
 
 const LoginForm = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState("");
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -22,12 +22,21 @@ const LoginForm = () => {
 
     login(email, password)
       .then((res) => {
-        setUserData(dispatch, res.accessToken, res.refreshToken, {
-          userName: res.userName,
-          email: res.userEmail,
-          roles: res.userRoles,
-        });
-        setError(null);
+        setError("");
+        console.log(res);
+        dispatch(authActions.changeTokens({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        }));
+        dispatch(
+          authActions.changeUser({
+            id: res.userId,
+            userName: res.userName,
+            email: res.userEmail,
+            fullName: res.fullName,
+            profilePictureUrl: res.profilePictureUrl,
+          })
+        );
         dispatch(
           alertActions.changeAlert({
             type: "success",
@@ -37,63 +46,67 @@ const LoginForm = () => {
         navigate("/", { replace: true });
       })
       .catch((e) => {
-        console.log(e?.response?.data);
-        setError(e?.response?.data);
+        console.log(e);
+        if (e.response) {
+          setError(e.response.data.message || "Error");
+        } else if (e.request) {
+          setError("Connection error");
+        } else {
+          setError("Error");
+        }
       });
   };
 
   return (
-    <>
+    <Grid item xs={3}>
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
           <br />
         </>
       )}
-      <Grid item xs={3}>
-        <Typography variant="h5">Login</Typography>
+      <Typography variant="h5">Login</Typography>
+      <br />
+      <Typography variant="subtitle2">
+        Please enter your username and password!
+      </Typography>
+      <br />
+      <form onSubmit={onLoginSubmit}>
+        <TextField
+          value={email}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+          type="text"
+          label="Username"
+          variant="outlined"
+          fullWidth
+          required
+        />
         <br />
-        <Typography variant="subtitle2">
-          Please enter your username and password!
-        </Typography>
         <br />
-        <form onSubmit={onLoginSubmit}>
-          <TextField
-            value={email}
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-            type="text"
-            label="Username"
-            variant="outlined"
-            fullWidth
-            required
-          />
-          <br />
-          <br />
-          <TextField
-            value={password}
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
-            type="password"
-            label="Password"
-            variant="outlined"
-            fullWidth
-            required
-          />
-          <br />
-          <br />
-          <Button variant="contained" type="submit" fullWidth>
-            Login
-          </Button>
-        </form>
+        <TextField
+          value={password}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+          type="password"
+          label="Password"
+          variant="outlined"
+          fullWidth
+          required
+        />
         <br />
-        <Link variant="subtitle1" href="/register" underline="hover">
-          Do not have an account? Register!
-        </Link>
-      </Grid>
-    </>
+        <br />
+        <Button variant="contained" type="submit" fullWidth>
+          Login
+        </Button>
+      </form>
+      <br />
+      <Link variant="subtitle1" href="/register" underline="hover">
+        Do not have an account? Register!
+      </Link>
+    </Grid>
   );
 };
 

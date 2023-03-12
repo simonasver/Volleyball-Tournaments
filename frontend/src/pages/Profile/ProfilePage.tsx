@@ -1,17 +1,17 @@
 import { Grid } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import LoginForm from "../../components/auth/LoginForm";
 import Layout from "../../components/layout/Layout";
+import Profile from "../../components/profile/Profile";
 import { useAppSelector } from "../../hooks";
 
-const LoginPage = () => {
+const ProfilePage = () => {
   const navigate = useNavigate();
 
   const user = useAppSelector((state) => state.auth.user);
 
   React.useEffect(() => {
-    if(user) {
+    if (!user) {
       navigate("/", { replace: true });
     }
   }, []);
@@ -25,10 +25,10 @@ const LoginPage = () => {
         alignItems="center"
         justifyContent="center"
       >
-        <LoginForm />
+        <Profile />
       </Grid>
     </Layout>
   );
 };
 
-export default LoginPage;
+export default ProfilePage;

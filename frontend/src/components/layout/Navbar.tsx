@@ -7,33 +7,24 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
-import AdbIcon from "@mui/icons-material/Adb";
+import SportsVolleyballIcon from "@mui/icons-material/SportsVolleyball";
 import { Avatar, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { authActions } from "../../store/auth-slice";
-import { getUserData } from "../../storage/auth.storage";
+import { useAppSelector } from "../../hooks";
 
 const Navbar = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const user = useAppSelector((state) => state.auth.user);
 
-  React.useEffect(() => {
-    dispatch(
-      authActions.changeUser({
-        user: getUserData(),
-      })
-    );
-  }, [dispatch]);
+  const title = "Volleyball";
 
   const navMenuItems = [
     { title: "Home", href: "/" },
     { title: "Help", href: "/asdf" },
   ];
   const profileMenuItems = [
-    { title: "Profile", href: "/" },
+    { title: "Profile", href: "/profile" },
     { title: "Logout", href: "/logout" },
   ];
 
@@ -70,6 +61,9 @@ const Navbar = () => {
       <AppBar sx={{ boxShadow: 0 }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
+            <SportsVolleyballIcon
+              sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}
+            />
             <Typography
               variant="h6"
               noWrap
@@ -85,7 +79,7 @@ const Navbar = () => {
                 textDecoration: "none",
               }}
             >
-              LOGO
+              {title}
             </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -119,7 +113,9 @@ const Navbar = () => {
                 ))}
               </Menu>
             </Box>
-            <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+            <SportsVolleyballIcon
+              sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}
+            />
             <Typography
               variant="h5"
               noWrap
@@ -136,7 +132,7 @@ const Navbar = () => {
                 textDecoration: "none",
               }}
             >
-              LOGO
+              {title}
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {navMenuItems.map((item) => (
@@ -151,9 +147,9 @@ const Navbar = () => {
             </Box>
             {user && (
               <Box sx={{ flexGrow: 0 }}>
-                <Tooltip title="Profile">
+                <Tooltip title={user.fullName}>
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Asdf" src="" />
+                    <Avatar alt={user.fullName} src={user.profilePictureUrl} />
                   </IconButton>
                 </Tooltip>
                 <Menu

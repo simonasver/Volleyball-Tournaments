@@ -35,90 +35,96 @@ const RegisterForm = () => {
         setAlert(successfulElement);
       })
       .catch((e) => {
-        console.log(e?.response?.data);
+        let errorMessage: string;
+        console.log(e);
+        if (e.response) {
+          errorMessage = e.response.data.message || "Error";
+        } else if (e.request) {
+          errorMessage = "Connection error";
+        } else {
+          errorMessage = "Error";
+        }
         setAlertType("error");
-        const errorElement = <Typography>{e?.response?.data}</Typography>
+        const errorElement = <Typography>{errorMessage}</Typography>;
         setAlert(errorElement);
       });
   };
 
   return (
-    <>
+    <Grid item xs={3}>
       {alert && (
         <>
           <Alert severity={alertType}>{alert}</Alert>
           <br />
         </>
       )}
-      <Grid item xs={3}>
-        <Typography variant="h5">Register</Typography>
+      <Typography variant="h5">Register</Typography>
+      <br />
+      <Typography variant="subtitle2">
+        Please enter your username, email and password!
+      </Typography>
+      <br />
+      <form onSubmit={onLoginSubmit}>
+        <TextField
+          value={username}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUsername(e.target.value)
+          }
+          type="text"
+          label="Username"
+          variant="outlined"
+          fullWidth
+          required
+        />
         <br />
-        <Typography variant="subtitle2">
-          Please enter your username, email and password!
-        </Typography>
         <br />
-        <form onSubmit={onLoginSubmit}>
-          <TextField
-            value={username}
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setUsername(e.target.value)
-            }
-            type="text"
-            label="Username"
-            variant="outlined"
-            fullWidth
-            required
-          />
-          <br />
-          <br />
-          <TextField
-            value={fullname}
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFullname(e.target.value)
-            }
-            type="text"
-            label="Full name"
-            variant="outlined"
-            fullWidth
-          />
-          <br />
-          <br />
-          <TextField
-            value={email}
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-            type="text"
-            label="Email"
-            variant="outlined"
-            fullWidth
-            required
-          />
-          <br />
-          <br />
-          <TextField
-            value={password}
-            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
-            type="password"
-            label="Password"
-            variant="outlined"
-            fullWidth
-            required
-          />
-          <br />
-          <br />
-          <Button variant="contained" type="submit" fullWidth>
-            Login
-          </Button>
-        </form>
+        <TextField
+          value={fullname}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFullname(e.target.value)
+          }
+          type="text"
+          label="Full name"
+          variant="outlined"
+          fullWidth
+        />
         <br />
-        <Link variant="subtitle1" href="/login" underline="hover">
-          Already have an account? Login!
-        </Link>
-      </Grid>
-    </>
+        <br />
+        <TextField
+          value={email}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+          type="text"
+          label="Email"
+          variant="outlined"
+          fullWidth
+          required
+        />
+        <br />
+        <br />
+        <TextField
+          value={password}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+          type="password"
+          label="Password"
+          variant="outlined"
+          fullWidth
+          required
+        />
+        <br />
+        <br />
+        <Button variant="contained" type="submit" fullWidth>
+          Login
+        </Button>
+      </form>
+      <br />
+      <Link variant="subtitle1" href="/login" underline="hover">
+        Already have an account? Login!
+      </Link>
+    </Grid>
   );
 };
 
