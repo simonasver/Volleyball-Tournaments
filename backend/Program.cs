@@ -3,7 +3,9 @@ using System.Text;
 using Backend.Auth;
 using Backend.Auth.Model;
 using Backend.Data;
-using Backend.Interfaces;
+using Backend.Interfaces.Repositories;
+using Backend.Interfaces.Services;
+using Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -62,6 +64,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
+builder.Services.AddTransient<ITeamRepository, ITeamRepository>();
 builder.Services.AddScoped<AuthDbSeeder>();
 
 builder.Services.AddAuthorization(options =>

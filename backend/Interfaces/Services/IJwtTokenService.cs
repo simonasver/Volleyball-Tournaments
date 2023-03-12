@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Backend.Data.Dtos.Auth;
 
-namespace Backend.Interfaces
+namespace Backend.Interfaces.Services
 {
     public interface IJwtTokenService
     {

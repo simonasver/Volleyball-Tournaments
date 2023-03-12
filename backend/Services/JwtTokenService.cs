@@ -3,11 +3,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Backend.Data.Dtos.Auth;
-using Backend.Interfaces;
+using Backend.Interfaces.Services;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Backend.Auth
+namespace Backend.Services
 {
     public class JwtTokenService : IJwtTokenService
     {

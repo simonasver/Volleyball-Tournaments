@@ -1,6 +1,7 @@
 ﻿using Backend.Auth.Model;
 using Backend.Data.Dtos.Auth;
 using Backend.Interfaces;
+using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
