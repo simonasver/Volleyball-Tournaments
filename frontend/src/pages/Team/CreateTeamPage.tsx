@@ -2,7 +2,7 @@ import { Grid } from "@mui/material";
 import Layout from "../../components/layout/Layout";
 import CreateTeamForm from "../../components/team/CreateTeamForm";
 
-const AllTeamsPage = () => {
+const CreateTeamPage = () => {
   return (
     <Layout>
       <Grid
@@ -18,4 +18,4 @@ const AllTeamsPage = () => {
   );
 };
 
-export default AllTeamsPage;
+export default CreateTeamPage;

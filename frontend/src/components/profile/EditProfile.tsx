@@ -30,7 +30,7 @@ const EditProfile = () => {
           setProfilePicture(res.profilePictureUrl);
         })
         .catch((e) => {
-          if(!axios.isCancel(e)){
+          if (!axios.isCancel(e)) {
             console.log(e);
             if (e.response) {
               setError(e.response.data.message || "Error");
@@ -76,7 +76,7 @@ const EditProfile = () => {
   };
 
   return (
-    <Grid item xs={3}>
+    <Grid item sx={{ width: { xs: "100%", md: "50%" }}}>
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
@@ -84,6 +84,18 @@ const EditProfile = () => {
         </>
       )}
       <>
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+        >
+          <Grid item>
+            <BackButton />
+          </Grid>
+        </Grid>
+        <br />
         <Typography variant="h5">Edit profile</Typography>
         <br />
         <Typography variant="subtitle2">
@@ -120,13 +132,14 @@ const EditProfile = () => {
             spacing={1}
             direction="row"
             alignItems="center"
-            justifyContent="space-between"
+            justifyContent="flex-start"
           >
-            <Grid item xs={5}>
-              <BackButton />
-            </Grid>
-            <Grid item xs={4}>
-              <Button variant="contained" type="submit">
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{ width: { xs: "100%", md: "inherit" } }}
+              >
                 Save
               </Button>
             </Grid>

@@ -24,10 +24,12 @@ const LoginForm = () => {
       .then((res) => {
         setError("");
         console.log(res);
-        dispatch(authActions.changeTokens({
-          accessToken: res.accessToken,
-          refreshToken: res.refreshToken,
-        }));
+        dispatch(
+          authActions.changeTokens({
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          })
+        );
         dispatch(
           authActions.changeUser({
             id: res.userId,
@@ -58,7 +60,7 @@ const LoginForm = () => {
   };
 
   return (
-    <Grid item xs={3}>
+    <Grid item sx={{ width: { xs: "100%", md: "50%" } }}>
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
@@ -98,12 +100,26 @@ const LoginForm = () => {
         />
         <br />
         <br />
-        <Button variant="contained" type="submit" fullWidth>
-          Login
-        </Button>
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+        >
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{ width: { xs: "100%", md: "inherit" } }}
+            >
+              Login
+            </Button>
+          </Grid>
+        </Grid>
       </form>
       <br />
-      <Link variant="subtitle1" href="/register" underline="hover">
+      <Link variant="subtitle1" href="/register" underline="hover" onClick={() => navigate("/register")}>
         Do not have an account? Register!
       </Link>
     </Grid>

@@ -3,6 +3,7 @@ using System.Text;
 using Backend.Auth;
 using Backend.Auth.Model;
 using Backend.Data;
+using Backend.Data.Repositories;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Backend.Services;
@@ -64,7 +65,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
-builder.Services.AddTransient<ITeamRepository, ITeamRepository>();
+builder.Services.AddTransient<ITeamRepository, TeamRepository>();
 builder.Services.AddScoped<AuthDbSeeder>();
 
 builder.Services.AddAuthorization(options =>

@@ -3,9 +3,12 @@ import Alert from "@mui/material/Alert/Alert";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { register } from "../../services/auth.service";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
+
   const [alertType, setAlertType] = React.useState<
     "success" | "info" | "warning" | "error"
   >("error");
@@ -27,7 +30,7 @@ const RegisterForm = () => {
           <>
             <Typography>Successfully created an account!</Typography>
             <Divider />
-            <Link href="/login" underline="hover">
+            <Link href="/login" underline="hover" onClick={() => navigate("/login", { replace: true })}>
               You can now login
             </Link>
           </>
@@ -51,7 +54,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <Grid item xs={3}>
+    <Grid item sx={{ width: { xs: "100%", md: "50%" } }}>
       {alert && (
         <>
           <Alert severity={alertType}>{alert}</Alert>
@@ -116,12 +119,26 @@ const RegisterForm = () => {
         />
         <br />
         <br />
-        <Button variant="contained" type="submit" fullWidth>
-          Login
-        </Button>
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+        >
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{ width: { xs: "100%", md: "inherit" } }}
+            >
+              Register
+            </Button>
+          </Grid>
+        </Grid>
       </form>
       <br />
-      <Link variant="subtitle1" href="/login" underline="hover">
+      <Link variant="subtitle1" href="/login" underline="hover" onClick={() => navigate("/login")}>
         Already have an account? Login!
       </Link>
     </Grid>

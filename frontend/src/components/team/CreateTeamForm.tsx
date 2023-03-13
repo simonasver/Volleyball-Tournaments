@@ -24,6 +24,9 @@ const CreateTeamForm = () => {
       <Typography variant="subtitle2">
         Enter your new team information!
       </Typography>
+      <Typography variant="subtitle2">
+        You can add players later.
+      </Typography>
       <br />
       <form onSubmit={onCreateTeamSubmit}>
         <TextField

@@ -6,6 +6,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import EditProfilePage from "./pages/Profile/EditProfilePage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import StartingPage from "./pages/StartingPage";
+import CreateTeamPage from "./pages/Team/CreateTeamPage";
+import MyTeamsPage from "./pages/Team/MyTeamsPage";
 
 function App() {
   return (
@@ -18,6 +20,9 @@ function App() {
 
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/editprofile" element={<EditProfilePage />} />
+
+      <Route path="/myteams" element={<MyTeamsPage />} />
+      <Route path="/createteam" element={<CreateTeamPage />} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

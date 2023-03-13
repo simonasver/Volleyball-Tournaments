@@ -184,7 +184,7 @@ const Navbar = () => {
                 </Button>
                 <Button
                   key="register"
-                  sx={{ my: 2, color: "white" }}
+                  sx={{ my: 2, color: "white", display: { xs: "none", md: "inline-flex" } }}
                   onClick={() => navigate("/register")}
                 >
                   Register

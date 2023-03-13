@@ -43,7 +43,7 @@ const Profile = () => {
           );
         })
         .catch((e) => {
-          if(!axios.isCancel(e)){
+          if (!axios.isCancel(e)) {
             console.log(e);
             if (e.response) {
               setError(e.response.data.message || "Error");
@@ -66,13 +66,25 @@ const Profile = () => {
   };
 
   return (
-    <Grid item xs={3}>
+    <Grid item sx={{ width: { xs: "100%", md: "50%" }}}>
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
           <br />
         </>
       )}
+      <Grid
+        container
+        spacing={1}
+        direction="row"
+        alignItems="center"
+        justifyContent="flex-start"
+      >
+        <Grid item>
+          <BackButton />
+        </Grid>
+      </Grid>
+      <br />
       {isLoading && <Loader />}
       {!isLoading && user && (
         <>
@@ -91,7 +103,7 @@ const Profile = () => {
               <Avatar
                 alt={user.fullName}
                 src={user.profilePictureUrl}
-                sx={{ width: 100, height: 100 }}
+                sx={{ width: { xs: 100, md: 200 }, height: { xs: 100, md: 200 } }}
               />
             </Grid>
           </Grid>
@@ -151,13 +163,15 @@ const Profile = () => {
             spacing={1}
             direction="row"
             alignItems="center"
-            justifyContent="space-between"
+            justifyContent="flex-start"
           >
-            <Grid item xs={5}>
-              <BackButton />
-            </Grid>
-            <Grid item xs={5}>
-              <Button onClick={onClickHandler} variant="contained">
+            <Grid item xs={12}>
+              <Button
+                variant="outlined"
+                type="submit"
+                sx={{ width: { xs: "100%", md: "inherit" } }}
+                onClick={onClickHandler}
+              >
                 Edit profile
               </Button>
             </Grid>

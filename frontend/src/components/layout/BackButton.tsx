@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const BackButton = () => {
     const navigate = useNavigate();
-    return <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>Back</Button>;
+    return <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>Back</Button>;
 };
 
 export default BackButton;
