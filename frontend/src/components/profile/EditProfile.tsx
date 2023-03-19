@@ -2,7 +2,7 @@ import { Alert, Button, Grid, TextField, Typography } from "@mui/material";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../utils/hooks";
 import { editUser, getUser } from "../../services/user.service";
 import { authActions } from "../../store/auth-slice";
 import BackButton from "../layout/BackButton";
@@ -33,7 +33,7 @@ const EditProfile = () => {
           if (!axios.isCancel(e)) {
             console.log(e);
             if (e.response) {
-              setError(e.response.data.message || "Error");
+              setError(e.response.data || "Error");
             } else if (e.request) {
               setError("Connection error");
             } else {
@@ -64,19 +64,21 @@ const EditProfile = () => {
         navigate("/profile", { replace: true });
       })
       .catch((e) => {
-        console.log(e);
-        if (e.response) {
-          setError(e.response.data.message || "Error");
-        } else if (e.request) {
-          setError("Connection error");
-        } else {
-          setError("Error");
+        if (!axios.isCancel(e)) {
+          console.log(e);
+          if (e.response) {
+            setError(e.response.data || "Error");
+          } else if (e.request) {
+            setError("Connection error");
+          } else {
+            setError("Error");
+          }
         }
       });
   };
 
   return (
-    <Grid item sx={{ width: { xs: "100%", md: "50%" }}}>
+    <Grid item sx={{ width: { xs: "100%", md: "50%" } }}>
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
@@ -109,7 +111,7 @@ const EditProfile = () => {
               setProfilePicture(e.target.value)
             }
             type="url"
-            label="Profile picture"
+            label="Profile picture (url)"
             variant="outlined"
             fullWidth
           />

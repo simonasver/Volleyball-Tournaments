@@ -4,9 +4,10 @@ namespace Backend.Interfaces.Repositories;
 
 public interface ITeamRepository
 {
-    Task<IEnumerable<Team>> GetAll();
-    Task<Team?> Get(string id);
-    Task<Team> Create(Team team);
-    Task<Team> Put(Team team);
-    Task Delete(string id);
+    Task<IEnumerable<Team>> GetAllAsync();
+    Task<IEnumerable<Team>> GetAllOwnedByUserAsync(string id);
+    Task<Team?> GetAsync(Guid id);
+    Task<Team> CreateAsync(Team team);
+    Task<Team> UpdateAsync(Team team);
+    Task DeleteAsync(Guid id);
 }

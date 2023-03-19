@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getUser } from "../../services/user.service";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import BackButton from "../layout/BackButton";
 import Loader from "../layout/Loader";
 import { authActions } from "../../store/auth-slice";
@@ -31,7 +31,6 @@ const Profile = () => {
     } else {
       getUser(user.id, abortController.signal)
         .then((res) => {
-          console.log(res);
           dispatch(
             authActions.changeUser({
               ...user,
@@ -46,7 +45,7 @@ const Profile = () => {
           if (!axios.isCancel(e)) {
             console.log(e);
             if (e.response) {
-              setError(e.response.data.message || "Error");
+              setError(e.response.data || "Error");
             } else if (e.request) {
               setError("Connection error");
             } else {
@@ -66,7 +65,7 @@ const Profile = () => {
   };
 
   return (
-    <Grid item sx={{ width: { xs: "100%", md: "50%" }}}>
+    <Grid item sx={{ width: { xs: "100%", md: "50%" } }}>
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
@@ -103,7 +102,10 @@ const Profile = () => {
               <Avatar
                 alt={user.fullName}
                 src={user.profilePictureUrl}
-                sx={{ width: { xs: 100, md: 200 }, height: { xs: 100, md: 200 } }}
+                sx={{
+                  width: { xs: 100, md: 200 },
+                  height: { xs: 100, md: 200 },
+                }}
               />
             </Grid>
           </Grid>

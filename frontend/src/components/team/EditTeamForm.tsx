@@ -1,13 +1,15 @@
 import React from "react";
 import { Alert, Button, Grid, TextField, Typography } from "@mui/material";
 import BackButton from "../layout/BackButton";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
-import { useNavigate } from "react-router-dom";
-import { addTeam } from "../../services/team.service";
+import { editTeam, getTeam } from "../../services/team.service";
 import axios from "axios";
 
-const CreateTeamForm = () => {
+const EditTeamForm = () => {
+  const { teamId } = useParams();
   const navigate = useNavigate();
+
   const [error, setError] = React.useState("");
 
   const [teamName, setTeamName] = React.useState("");
@@ -17,14 +19,39 @@ const CreateTeamForm = () => {
   const user = useAppSelector((state) => state.auth.user);
 
   React.useEffect(() => {
+    if (!teamId) {
+      return navigate("/", { replace: true });
+    }
     if (!user) {
       return navigate("/", { replace: true });
     }
+    getTeam(teamId)
+      .then((res) => {
+        setError("");
+        setTeamName(res.title);
+        setTeamPicture(res.pictureUrl);
+        setTeamDescription(res.description);
+      })
+      .catch((e) => {
+        if (!axios.isCancel(e)) {
+          console.log(e);
+          if (e.response) {
+            setError(e.response.data || "Error");
+          } else if (e.request) {
+            setError("Connection error");
+          } else {
+            setError("Error");
+          }
+        }
+      });
   }, []);
 
-  const onCreateTeamSubmit = (event: React.FormEvent) => {
+  const onEditTeamSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    addTeam(teamName, teamPicture, teamDescription)
+    if (!teamId) {
+      return navigate("/", { replace: true });
+    }
+    editTeam(teamId, teamName, teamPicture, teamDescription)
       .then(() => {
         navigate("/myteams", { replace: true });
       })
@@ -62,14 +89,11 @@ const CreateTeamForm = () => {
         </Grid>
       </Grid>
       <br />
-      <Typography variant="h5">Create Team</Typography>
+      <Typography variant="h5">Edit Team</Typography>
       <br />
-      <Typography variant="subtitle2">
-        Enter your new team information!
-      </Typography>
-      <Typography variant="subtitle2">You can add players later.</Typography>
+      <Typography variant="subtitle2">Change your team information!</Typography>
       <br />
-      <form onSubmit={onCreateTeamSubmit}>
+      <form onSubmit={onEditTeamSubmit}>
         <TextField
           value={teamName}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -113,7 +137,7 @@ const CreateTeamForm = () => {
             type="submit"
             sx={{ width: { xs: "100%", md: "inherit" } }}
           >
-            Create
+            Save
           </Button>
         </Grid>
       </form>
@@ -122,4 +146,4 @@ const CreateTeamForm = () => {
   );
 };
 
-export default CreateTeamForm;
+export default EditTeamForm;

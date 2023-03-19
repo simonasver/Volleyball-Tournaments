@@ -4,7 +4,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../hooks";
+import { useAppDispatch } from "../../utils/hooks";
 import { login } from "../../services/auth.service";
 import { alertActions } from "../../store/alert-slice";
 import { authActions } from "../../store/auth-slice";
@@ -37,6 +37,7 @@ const LoginForm = () => {
             email: res.userEmail,
             fullName: res.fullName,
             profilePictureUrl: res.profilePictureUrl,
+            roles: res.roles,
           })
         );
         dispatch(
@@ -50,7 +51,7 @@ const LoginForm = () => {
       .catch((e) => {
         console.log(e);
         if (e.response) {
-          setError(e.response.data.message || "Error");
+          setError(e.response.data || "Error");
         } else if (e.request) {
           setError("Connection error");
         } else {

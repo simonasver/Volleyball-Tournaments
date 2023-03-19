@@ -2,12 +2,15 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/Auth/LoginPage";
 import LogoutPage from "./pages/Auth/LogoutPage";
 import RegisterPage from "./pages/Auth/RegisterPage";
+import EmptyPage from "./pages/EmptyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import EditProfilePage from "./pages/Profile/EditProfilePage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import StartingPage from "./pages/StartingPage";
 import CreateTeamPage from "./pages/Team/CreateTeamPage";
+import EditTeamPage from "./pages/Team/EditTeamPage";
 import MyTeamsPage from "./pages/Team/MyTeamsPage";
+import TeamPage from "./pages/Team/TeamPage";
 
 function App() {
   return (
@@ -22,8 +25,11 @@ function App() {
       <Route path="/editprofile" element={<EditProfilePage />} />
 
       <Route path="/myteams" element={<MyTeamsPage />} />
+      <Route path="/team/:teamId" element={<TeamPage />} />
       <Route path="/createteam" element={<CreateTeamPage />} />
+      <Route path="/editteam/:teamId" element={<EditTeamPage />} />
 
+      <Route path="/empty" element={<EmptyPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

@@ -36,6 +36,7 @@ namespace Backend.Data
             var newAdminUser = new ApplicationUser()
             {
                 UserName = "admin",
+                FullName = "Admin admin",
                 Email = "admin@admin.com"
             };
 

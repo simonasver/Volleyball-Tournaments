@@ -1,17 +1,16 @@
-import { Grid, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import Alert from "@mui/material/Alert";
+import { Stack } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import StartingButton from "../components/starting/StartingButton";
-import StartingButtonRow from "../components/starting/StartingButtonRow";
-import { useAppDispatch, useAppSelector } from "../hooks";
+import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { alertActions } from "../store/alert-slice";
 
 const StartingPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  
+
   const alertData = useAppSelector((state) => state.alert);
 
   const user = useAppSelector((state) => state.auth.user);
@@ -50,23 +49,87 @@ const StartingPage = () => {
           <br />
           <br />
         </Grid>
+        {!user && (
+          <>
+            <Grid item>
+              <Typography variant="h6">
+                To access more features, login:
+              </Typography>
+              <br />
+            </Grid>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                sx={{
+                  size: { xs: "small", md: "medium" },
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+              <Button
+                variant="contained"
+                sx={{
+                  size: { xs: "small", md: "medium" },
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                onClick={() => navigate("/register")}
+              >
+                Register
+              </Button>
+            </Stack>
+            <br />
+          </>
+        )}
         <Grid item>
           <Typography variant="h6">Useful links:</Typography>
           <br />
         </Grid>
-        <Grid item>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            sx={{
+              size: { xs: "small", md: "medium" },
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            onClick={() => undefined}
+          >
+            Tournaments
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              size: { xs: "small", md: "medium" },
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+            onClick={() => undefined}
+          >
+            Games
+          </Button>
           {user && (
-            <StartingButtonRow>
-              <StartingButton title="My teams" onClick={() => { navigate("/myteams"); }}/>
-              <StartingButton title="My tournaments" />
-              <StartingButton title="My games" />
-            </StartingButtonRow>
+            <Button
+              variant="contained"
+              sx={{
+                size: { xs: "small", md: "medium" },
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+              onClick={() => navigate("/myteams")}
+            >
+              Teams
+            </Button>
           )}
-          <StartingButtonRow>
-            <StartingButton title="Public tournaments" />
-            <StartingButton title="Public games" />
-          </StartingButtonRow>
-        </Grid>
+        </Stack>
       </Grid>
     </Layout>
   );

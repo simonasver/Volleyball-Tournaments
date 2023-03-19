@@ -1,7 +1,7 @@
 import { Store } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../store";
-import { authActions, ITokens } from "../store/auth-slice";
+import { authActions, Tokens } from "../store/auth-slice";
 
 let store: Store<RootState>;
 
@@ -52,7 +52,7 @@ instance.interceptors.response.use(
         originalConfig._retry = true;
 
         try {
-          const tokens = store.getState().auth.tokens as ITokens;
+          const tokens = store.getState().auth.tokens as Tokens;
           const res = await instance.put("/Token", {
             AccessToken: tokens.accessToken,
             RefreshToken: tokens.refreshToken,

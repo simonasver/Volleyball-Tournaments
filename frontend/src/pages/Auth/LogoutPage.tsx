@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import LogoutForm from "../../components/auth/LogoutForm";
 import Layout from "../../components/layout/Layout";
-import { useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../utils/hooks";
 
 const LogoutPage = () => {
   const navigate = useNavigate();

@@ -21,8 +21,8 @@ namespace Backend.Controllers.Auth
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult<string>> Login([FromQuery] LoginDtoRequest userLoginDto)
+        [HttpPost]
+        public async Task<ActionResult<string>> Login([FromBody] LoginDtoRequest userLoginDto)
         {
             var user = await _userManager.FindByNameAsync(userLoginDto.UserName);
             if (user == null)

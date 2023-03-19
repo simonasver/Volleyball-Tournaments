@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Backend.Auth;
 using Backend.Auth.Model;
 using Backend.Data;
@@ -28,7 +30,12 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.WriteIndented = true;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

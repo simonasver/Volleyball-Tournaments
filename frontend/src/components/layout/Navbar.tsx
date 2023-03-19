@@ -10,7 +10,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SportsVolleyballIcon from "@mui/icons-material/SportsVolleyball";
 import { Avatar, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../utils/hooks";
 
 const Navbar = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../hooks";
+import { useAppDispatch } from "../../utils/hooks";
 import { logout } from "../../services/auth.service";
 import Loader from "../layout/Loader";
 

@@ -41,7 +41,7 @@ const RegisterForm = () => {
         let errorMessage: string;
         console.log(e);
         if (e.response) {
-          errorMessage = e.response.data.message || "Error";
+          errorMessage = e.response.data || "Error";
         } else if (e.request) {
           errorMessage = "Connection error";
         } else {

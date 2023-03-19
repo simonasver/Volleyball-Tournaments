@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import EditProfile from "../../components/profile/EditProfile";
-import { useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../utils/hooks";
 
 const EditProfilePage = () => {
   const navigate = useNavigate();

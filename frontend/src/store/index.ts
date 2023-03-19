@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import alertSlice from "./alert-slice";
 
-import authSlice, { IUser } from "./auth-slice";
+import authSlice, { User } from "./auth-slice";
 
 function getTokensFromLocalStorage() {
   const persistedTokensJSON = localStorage.getItem("tokens");
@@ -15,7 +15,7 @@ function getTokensFromLocalStorage() {
   }
 }
 
-function getUserObjectFromLocalStorage(): IUser | undefined {
+function getUserObjectFromLocalStorage(): User | undefined {
   const persistedUserJSON = localStorage.getItem("user");
   if (!persistedUserJSON) return undefined;
   try {
@@ -28,7 +28,7 @@ function getUserObjectFromLocalStorage(): IUser | undefined {
 }
 
 const persistedTokens: { accessToken: string, refreshToken: string } | undefined = getTokensFromLocalStorage();
-const persistedUser: IUser | undefined = getUserObjectFromLocalStorage();
+const persistedUser: User | undefined = getUserObjectFromLocalStorage();
 
 const store = configureStore({
   reducer: { alert: alertSlice.reducer, auth: authSlice.reducer },

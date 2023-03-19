@@ -1,11 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export interface ITokens {
+export interface Tokens {
   accessToken: string;
   refreshToken: string;
 }
 
-export interface IUser {
+export interface User {
   id: string;
   userName: string;
   email: string;
@@ -13,11 +13,12 @@ export interface IUser {
   profilePictureUrl?: string;
   registerDate?: string;
   lastLoginDate?: string;
+  roles: string[];
 }
 
 interface AuthState {
-  tokens: ITokens | undefined;
-  user: IUser | undefined;
+  tokens: Tokens | undefined;
+  user: User | undefined;
 }
 
 const initialState: AuthState = {
@@ -29,12 +30,10 @@ const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    changeTokens(state, action: PayloadAction<ITokens>) {
+    changeTokens(state, action: PayloadAction<Tokens>) {
       state.tokens = action.payload;
-      console.log("new tokens");
-      console.log(action.payload);
     },
-    changeUser(state, action: PayloadAction<IUser>) {
+    changeUser(state, action: PayloadAction<User>) {
       state.user = action.payload;
     },
     clearUser(state) {

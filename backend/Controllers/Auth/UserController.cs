@@ -25,7 +25,12 @@ public class UserController : ControllerBase
         var user = await _userManager.FindByNameAsync(userRegisterDto.UserName);
         if (user != null)
         {
-            return BadRequest("Request invalid");
+            return BadRequest("This user already exists");
+        }
+
+        if (await _userManager.FindByEmailAsync(userRegisterDto.Email) != null)
+        {
+            return BadRequest("This email is already in use");
         }
 
         var newUser = new ApplicationUser
