@@ -58,7 +58,10 @@ const TeamBigCard = (props: TeamSmallCardProps) => {
 
   const closeModal = () => {
     setAddPlayerInput("");
+    setAddPlayerError("");
     setRemovePlayerInput("");
+    setRemovePlayerError("");
+    setDeleteTeamError("");
     setModalStatus(Modal.None);
   };
 

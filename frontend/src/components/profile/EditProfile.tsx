@@ -94,7 +94,7 @@ const EditProfile = () => {
           justifyContent="flex-start"
         >
           <Grid item>
-            <BackButton />
+            <BackButton title="Profile" address="/profile" />
           </Grid>
         </Grid>
         <br />

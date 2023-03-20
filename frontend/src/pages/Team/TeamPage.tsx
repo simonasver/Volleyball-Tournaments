@@ -55,7 +55,7 @@ const MyTeamsPage = () => {
             justifyContent="flex-start"
           >
             <Grid item>
-              <BackButton />
+              <BackButton title="My teams" address="/myteams" />
             </Grid>
           </Grid>
           <br />

@@ -60,7 +60,7 @@ const MyTeamsPage = () => {
             justifyContent="space-between"
           >
             <Grid item>
-              <BackButton />
+              <BackButton address="/" />
             </Grid>
             {isAdmin(user) && (
               <Grid item>
