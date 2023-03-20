@@ -7,6 +7,7 @@ import { editUser, getUser } from "../../services/user.service";
 import { authActions } from "../../store/auth-slice";
 import BackButton from "../layout/BackButton";
 import axios from "axios";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -64,16 +65,8 @@ const EditProfile = () => {
         navigate("/profile", { replace: true });
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setError(e.response.data || "Error");
-          } else if (e.request) {
-            setError("Connection error");
-          } else {
-            setError("Error");
-          }
-        }
+        console.log(e);
+        setError(errorMessageFromAxiosError(e));
       });
   };
 

@@ -23,8 +23,8 @@ import {
   deleteTeam,
   removePlayerFromTeam,
 } from "../../services/team.service";
-import axios from "axios";
 import { TeamPlayer } from "../../utils/types";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 interface TeamSmallCardProps {
   id: string;
@@ -74,16 +74,8 @@ const TeamBigCard = (props: TeamSmallCardProps) => {
         navigate(0);
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setAddPlayerError(e.response.data || "Error");
-          } else if (e.request) {
-            setAddPlayerError("Connection error");
-          } else {
-            setAddPlayerError("Error");
-          }
-        }
+        console.log(e);
+        setAddPlayerError(errorMessageFromAxiosError(e));
       });
   };
 
@@ -96,16 +88,8 @@ const TeamBigCard = (props: TeamSmallCardProps) => {
         navigate(0);
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setAddPlayerError(e.response.data || "Error");
-          } else if (e.request) {
-            setAddPlayerError("Connection error");
-          } else {
-            setAddPlayerError("Error");
-          }
-        }
+        console.log(e);
+        setRemovePlayerError(errorMessageFromAxiosError(e));
       });
   };
 
@@ -115,16 +99,8 @@ const TeamBigCard = (props: TeamSmallCardProps) => {
         navigate("/myteams", { replace: true });
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setDeleteTeamError(e.response.data || "Error");
-          } else if (e.request) {
-            setDeleteTeamError("Connection error");
-          } else {
-            setDeleteTeamError("Error");
-          }
-        }
+        console.log(e);
+        setDeleteTeamError(errorMessageFromAxiosError(e));
       });
   };
 

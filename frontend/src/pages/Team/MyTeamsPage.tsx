@@ -6,9 +6,8 @@ import Layout from "../../components/layout/Layout";
 import TeamSmallCard from "../../components/team/TeamSmallCard";
 import { getUserTeams } from "../../services/team.service";
 import { useAppSelector } from "../../utils/hooks";
-import { isAdmin } from "../../utils/helpers";
+import { errorMessageFromAxiosError, isAdmin } from "../../utils/helpers";
 import { Team } from "../../utils/types";
-import axios from "axios";
 
 const MyTeamsPage = () => {
   const navigate = useNavigate();
@@ -29,16 +28,8 @@ const MyTeamsPage = () => {
         setTeams(res);
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setError(e.response.data || "Error");
-          } else if (e.request) {
-            setError("Connection error");
-          } else {
-            setError("Error");
-          }
-        }
+        console.log(e);
+        setError(errorMessageFromAxiosError(e));
       });
   }, []);
 

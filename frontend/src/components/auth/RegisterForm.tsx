@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { register } from "../../services/auth.service";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -38,15 +39,7 @@ const RegisterForm = () => {
         setAlert(successfulElement);
       })
       .catch((e) => {
-        let errorMessage: string;
-        console.log(e);
-        if (e.response) {
-          errorMessage = e.response.data || "Error";
-        } else if (e.request) {
-          errorMessage = "Connection error";
-        } else {
-          errorMessage = "Error";
-        }
+        const errorMessage = errorMessageFromAxiosError(e);
         setAlertType("error");
         const errorElement = <Typography>{errorMessage}</Typography>;
         setAlert(errorElement);

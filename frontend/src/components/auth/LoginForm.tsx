@@ -8,6 +8,7 @@ import { useAppDispatch } from "../../utils/hooks";
 import { login } from "../../services/auth.service";
 import { alertActions } from "../../store/alert-slice";
 import { authActions } from "../../store/auth-slice";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const LoginForm = () => {
   const dispatch = useAppDispatch();
@@ -50,13 +51,7 @@ const LoginForm = () => {
       })
       .catch((e) => {
         console.log(e);
-        if (e.response) {
-          setError(e.response.data || "Error");
-        } else if (e.request) {
-          setError("Connection error");
-        } else {
-          setError("Error");
-        }
+        setError(errorMessageFromAxiosError(e));
       });
   };
 

@@ -6,6 +6,7 @@ import TeamBigCard from "../../components/team/TeamBigCard";
 import BackButton from "../../components/layout/BackButton";
 import { getTeam } from "../../services/team.service";
 import { Team } from "../../utils/types";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const MyTeamsPage = () => {
   const { teamId } = useParams();
@@ -23,17 +24,10 @@ const MyTeamsPage = () => {
       .then((res) => {
         setError("");
         setTeam(res);
-        console.log(res);
       })
       .catch((e) => {
         console.log(e);
-        if (e.response) {
-          setError(e.response.data || "Error");
-        } else if (e.request) {
-          setError("Connection error");
-        } else {
-          setError("Error");
-        }
+        setError(errorMessageFromAxiosError(e));
       });
   }, []);
 

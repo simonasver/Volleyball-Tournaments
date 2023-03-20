@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
 import { editTeam, getTeam } from "../../services/team.service";
 import axios from "axios";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const EditTeamForm = () => {
   const { teamId } = useParams();
@@ -56,16 +57,8 @@ const EditTeamForm = () => {
         navigate("/myteams", { replace: true });
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setError(e.response.data || "Error");
-          } else if (e.request) {
-            setError("Connection error");
-          } else {
-            setError("Error");
-          }
-        }
+        console.log(e);
+        setError(errorMessageFromAxiosError(e));
       });
   };
 

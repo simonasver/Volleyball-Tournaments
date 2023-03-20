@@ -3,15 +3,15 @@ import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 interface BackButtonProps {
+    address: string;
     title?: string;
-    address?: string;
 }
 
 const BackButton = (props: BackButtonProps) => {
     const { title, address } = props;
 
     const navigate = useNavigate();
-    return <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => address ? navigate(address) : navigate(-1)}>{title ? title : "Back"}</Button>;
+    return <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate(address)}>{title ? title : "Back"}</Button>;
 };
 
 export default BackButton;

@@ -4,7 +4,7 @@ import BackButton from "../layout/BackButton";
 import { useAppSelector } from "../../utils/hooks";
 import { useNavigate } from "react-router-dom";
 import { addTeam } from "../../services/team.service";
-import axios from "axios";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const CreateTeamForm = () => {
   const navigate = useNavigate();
@@ -29,16 +29,8 @@ const CreateTeamForm = () => {
         navigate("/myteams", { replace: true });
       })
       .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setError(e.response.data || "Error");
-          } else if (e.request) {
-            setError("Connection error");
-          } else {
-            setError("Error");
-          }
-        }
+        console.log(e);
+        setError(errorMessageFromAxiosError(e));
       });
   };
 

@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import BackButton from "../layout/BackButton";
 import Loader from "../layout/Loader";
 import { authActions } from "../../store/auth-slice";
-import axios from "axios";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -42,16 +42,8 @@ const Profile = () => {
           );
         })
         .catch((e) => {
-          if (!axios.isCancel(e)) {
-            console.log(e);
-            if (e.response) {
-              setError(e.response.data || "Error");
-            } else if (e.request) {
-              setError("Connection error");
-            } else {
-              setError("Error");
-            }
-          }
+          console.log(e);
+          setError(errorMessageFromAxiosError(e));
         })
         .finally(() => setIsLoading(false));
     }
@@ -80,7 +72,7 @@ const Profile = () => {
         justifyContent="flex-start"
       >
         <Grid item>
-          <BackButton />
+          <BackButton address="/" />
         </Grid>
       </Grid>
       <br />
