@@ -23,7 +23,10 @@ const AddPlayerModal = (props: AddPlayerModalProps) => {
     props;
 
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog
+      open
+      onClose={onClose}
+    >
       <DialogTitle>Add player</DialogTitle>
       <DialogContent>
         {errorMessage && (

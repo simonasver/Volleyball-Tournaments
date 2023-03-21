@@ -20,31 +20,33 @@ const EditTeamForm = () => {
   const user = useAppSelector((state) => state.auth.user);
 
   React.useEffect(() => {
+    const abortController = new AbortController();
     if (!teamId) {
       return navigate("/", { replace: true });
-    }
-    if (!user) {
+    } else if (!user) {
       return navigate("/", { replace: true });
-    }
-    getTeam(teamId)
-      .then((res) => {
-        setError("");
-        setTeamName(res.title);
-        setTeamPicture(res.pictureUrl);
-        setTeamDescription(res.description);
-      })
-      .catch((e) => {
-        if (!axios.isCancel(e)) {
-          console.log(e);
-          if (e.response) {
-            setError(e.response.data || "Error");
-          } else if (e.request) {
-            setError("Connection error");
-          } else {
-            setError("Error");
+    } else {
+      getTeam(teamId, abortController.signal)
+        .then((res) => {
+          setError("");
+          setTeamName(res.title);
+          setTeamPicture(res.pictureUrl);
+          setTeamDescription(res.description);
+        })
+        .catch((e) => {
+          if (!axios.isCancel(e)) {
+            console.log(e);
+            if (e.response) {
+              setError(e.response.data || "Error");
+            } else if (e.request) {
+              setError("Connection error");
+            } else {
+              setError("Error");
+            }
           }
-        }
-      });
+        });
+    }
+    return () => abortController.abort();
   }, []);
 
   const onEditTeamSubmit = (event: React.FormEvent) => {

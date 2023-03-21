@@ -5,13 +5,13 @@ export const getTeams = async () => {
   return res.data;
 };
 
-export const getUserTeams = async (userId: string) => {
-  const res = await api.get(`/User/${userId}/Team`);
+export const getUserTeams = async (userId: string, signal?: AbortSignal) => {
+  const res = await api.get(`/User/${userId}/Team`, { signal: signal });
   return res.data;
 };
 
-export const getTeam = async (teamId: string) => {
-  const res = await api.get(`/Team/${teamId}`);
+export const getTeam = async (teamId: string, signal?: AbortSignal) => {
+  const res = await api.get(`/Team/${teamId}`, { signal: signal });
   return res.data;
 };
 

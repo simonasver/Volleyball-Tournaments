@@ -18,19 +18,21 @@ const MyTeamsPage = () => {
   const user = useAppSelector((state) => state.auth.user);
 
   React.useEffect(() => {
+    const abortController = new AbortController();
     if(!user) {
       navigate("/", { replace: true });
+    } else {
+      getUserTeams(user.id, abortController.signal)
+        .then((res) => {
+          setError("");
+          setTeams(res);
+        })
+        .catch((e) => {
+          console.log(e);
+          setError(errorMessageFromAxiosError(e));
+        });
     }
-
-    getUserTeams(user?.id ?? "")
-      .then((res) => {
-        setError("");
-        setTeams(res);
-      })
-      .catch((e) => {
-        console.log(e);
-        setError(errorMessageFromAxiosError(e));
-      });
+    return () => abortController.abort();
   }, []);
 
   return (
