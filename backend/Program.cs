@@ -73,6 +73,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 builder.Services.AddTransient<ITeamRepository, TeamRepository>();
+builder.Services.AddTransient<IGameRepository, GameRepository>();
+builder.Services.AddTransient<ISetRepository, SetRepository>();
 builder.Services.AddScoped<AuthDbSeeder>();
 
 builder.Services.AddAuthorization(options =>

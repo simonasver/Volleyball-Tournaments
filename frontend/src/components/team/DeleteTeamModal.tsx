@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Typography,
 } from "@mui/material";
 
 interface DeleteTeamModalProps {
@@ -18,7 +19,7 @@ const DeleteTeamModal = (props: DeleteTeamModalProps) => {
   const { errorMessage, onSubmit, onClose } = props;
 
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog open onClose={onClose} fullWidth>
       <DialogTitle>Delete team</DialogTitle>
       <DialogContent>
         {errorMessage && (
@@ -28,7 +29,9 @@ const DeleteTeamModal = (props: DeleteTeamModalProps) => {
           </>
         )}
         <DialogContentText>
-          Are you sure you want to permanently delete this team and all of its players?
+          Are you sure you want to permanently delete this team and all of its
+          players?
+          <Typography variant="subtitle2">Team information in games will remain</Typography>
         </DialogContentText>
       </DialogContent>
       <DialogActions>

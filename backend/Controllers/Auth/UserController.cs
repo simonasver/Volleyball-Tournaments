@@ -85,7 +85,7 @@ public class UserController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        return Ok(new GetUserDto(user.ProfilePictureUrl, user.UserName, user.FullName, user.Email, user.RegisterDate, user.LastLoginDate, roles));
+        return Ok(new GetUserDto(user.ProfilePictureUrl ?? "", user.UserName, user.FullName, user.Email, user.RegisterDate, user.LastLoginDate, roles));
 
     }
     

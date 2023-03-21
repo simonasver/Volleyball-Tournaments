@@ -48,7 +48,7 @@ export const deleteTeam = async (teamId: string) => {
 };
 
 export const addPlayerToTeam = async (teamId: string, playerName: string) => {
-  const res = await api.post(`/Team/${teamId}/Player`, {
+  const res = await api.patch(`/Team/${teamId}/Player`, {
     Name: playerName,
   });
   return res.data;

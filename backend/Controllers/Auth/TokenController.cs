@@ -47,7 +47,7 @@ namespace Backend.Controllers.Auth
 
             await _userManager.UpdateAsync(user);
 
-            return Ok(new LoginDtoResponse(accessToken, refreshToken.RefreshToken, user.Id, user.ProfilePictureUrl ?? "", user.UserName, user.FullName, user.Email, roles));
+            return CreatedAtAction(nameof(Login), new LoginDtoResponse(accessToken, refreshToken.RefreshToken, user.Id, user.ProfilePictureUrl ?? "", user.UserName, user.FullName, user.Email, roles));
         }
 
         [AllowAnonymous]
@@ -87,7 +87,7 @@ namespace Backend.Controllers.Auth
             
             await _userManager.UpdateAsync(user);
 
-            return CreatedAtAction(nameof(Refresh), new TokenDto(newAccessToken, newRefreshToken.RefreshToken));
+            return Ok(new TokenDto(newAccessToken, newRefreshToken.RefreshToken));
         }
 
         [Authorize]

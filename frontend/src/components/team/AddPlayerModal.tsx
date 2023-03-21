@@ -26,6 +26,7 @@ const AddPlayerModal = (props: AddPlayerModalProps) => {
     <Dialog
       open
       onClose={onClose}
+      fullWidth
     >
       <DialogTitle>Add player</DialogTitle>
       <DialogContent>

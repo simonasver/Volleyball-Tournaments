@@ -45,7 +45,7 @@ const RemovePlayerModal = (props: RemovePlayerModalProps) => {
   } = props;
 
   return (
-    <Dialog open onClose={onClose}>
+    <Dialog open onClose={onClose} fullWidth>
       <DialogTitle>Remove players</DialogTitle>
       <DialogContent>
         {errorMessage && (
@@ -54,15 +54,17 @@ const RemovePlayerModal = (props: RemovePlayerModalProps) => {
             <br />
           </>
         )}
-        <DialogContentText>Select player to remove from the team</DialogContentText>
+        <DialogContentText>
+          Select player to remove from the team
+        </DialogContentText>
         <br />
         <FormControl fullWidth>
           <InputLabel>Player to remove</InputLabel>
           <Select
             value={removePlayerInput}
             label="Player to remove"
-            onChange={
-              (e: SelectChangeEvent<string>) => onRemovePlayerInputChange(e.target.value)
+            onChange={(e: SelectChangeEvent<string>) =>
+              onRemovePlayerInputChange(e.target.value)
             }
           >
             {players.map((item) => (

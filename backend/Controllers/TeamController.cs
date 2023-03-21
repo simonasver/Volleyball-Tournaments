@@ -160,9 +160,9 @@ namespace Backend.Controllers
                 team.Description = editTeamDto.Description;
             }
             
-            var updatedTeam = await _teamRepository.UpdateAsync(team);
+            await _teamRepository.UpdateAsync(team);
             
-            return Ok(updatedTeam.Id);
+            return NoContent();
         }
         
         [Authorize]
@@ -198,11 +198,11 @@ namespace Backend.Controllers
 
             await _teamRepository.DeleteAsync(teamIdGuid);
 
-            return Ok();
+            return NoContent();
         }
 
         [Authorize]
-        [HttpPost("/api/[controller]/{teamId}/Player")]
+        [HttpPatch("/api/[controller]/{teamId}/Player")]
         public async Task<IActionResult> AddPlayer(string teamId, [FromBody] AddTeamPlayerDto addTeamPlayerDto)
         {
             Guid teamIdGuid;
@@ -244,7 +244,7 @@ namespace Backend.Controllers
 
             await _teamRepository.UpdateAsync(team);
             
-            return Ok();
+            return NoContent();
         }
 
         [Authorize]
@@ -301,7 +301,7 @@ namespace Backend.Controllers
                 BadRequest("Player doesn't exist");
             }
 
-            return Ok();
+            return NoContent();
         }
     }
 }
