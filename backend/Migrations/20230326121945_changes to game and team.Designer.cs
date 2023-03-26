@@ -3,6 +3,7 @@ using System;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230326121945_changes to game and team")]
+    partial class changestogameandteam
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,9 +129,6 @@ namespace WebApplication1.Migrations
                     b.Property<DateTime>("LastEditDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("MaxSets")
-                        .HasColumnType("int");
-
                     b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -144,6 +144,9 @@ namespace WebApplication1.Migrations
 
                     b.Property<Guid?>("SecondTeamId")
                         .HasColumnType("char(36)");
+
+                    b.Property<int>("SetsToWin")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime(6)");

@@ -2,40 +2,40 @@ import React from "react";
 import { Alert, Grid } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
-import TeamBigCard from "../../components/team/TeamBigCard";
 import BackButton from "../../components/layout/BackButton";
-import { getTeam } from "../../services/team.service";
-import { Team } from "../../utils/types";
+import { Game } from "../../utils/types";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import Loader from "../../components/layout/Loader";
+import GameBigCard from "../../components/game/GameBigCard";
+import { getGame } from "../../services/game.service";
 
-const TeamPage = () => {
-  const { teamId } = useParams();
+const GamePage = () => {
+  const { gameId } = useParams();
   const navigate = useNavigate();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
-  const [team, setTeam] = React.useState<Team>();
+  const [game, setGame] = React.useState<Game>();
 
   React.useEffect(() => {
     const abortController = new AbortController();
-    if (!teamId) {
+    if (!gameId) {
       return navigate("/", { replace: true });
     } else {
-      getTeam(teamId, abortController.signal)
+      getGame(gameId, abortController.signal)
         .then((res) => {
           setError("");
-          setTeam(res);
+          setGame(res);
           setIsLoading(false);
         })
         .catch((e) => {
           console.log(e);
           const errorMessage = errorMessageFromAxiosError(e);
           setError(errorMessage);
-          if(errorMessage){
+          if (errorMessage) {
             setIsLoading(false);
           }
-        })
+        });
     }
     return () => abortController.abort();
   }, []);
@@ -58,7 +58,7 @@ const TeamPage = () => {
             justifyContent="flex-start"
           >
             <Grid item>
-              <BackButton title="My teams" address="/myteams" />
+              <BackButton title="All games" address="/games" />
             </Grid>
           </Grid>
           <br />
@@ -68,15 +68,14 @@ const TeamPage = () => {
               <br />
             </>
           )}
-          <Loader isOpen={isLoading}/>
-          {!isLoading && team && (
-            <TeamBigCard
-              id={team.id}
-              title={team.title}
-              imageUrl={team.pictureUrl}
-              description={team.description}
-              createDate={new Date(team.createDate).toDateString()}
-              players={team.players}
+          <Loader isOpen={isLoading} />
+          {!isLoading && game && (
+            <GameBigCard
+              id={game.id}
+              title={game.title}
+              description={game.description}
+              createDate={new Date(game.createDate).toDateString()}
+              status={game.status}
             />
           )}
         </Grid>
@@ -85,4 +84,4 @@ const TeamPage = () => {
   );
 };
 
-export default TeamPage;
+export default GamePage;

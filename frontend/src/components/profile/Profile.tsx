@@ -20,7 +20,7 @@ const Profile = () => {
   const dispatch = useAppDispatch();
 
   const [error, setError] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -31,6 +31,7 @@ const Profile = () => {
     } else {
       getUser(user.id, abortController.signal)
         .then((res) => {
+          console.log(res);
           dispatch(
             authActions.changeUser({
               ...user,
@@ -38,14 +39,19 @@ const Profile = () => {
               profilePictureUrl: res.profilePictureUrl,
               registerDate: new Date(res.registerDate).toDateString(),
               lastLoginDate: new Date(res.lastLoginDate).toDateString(),
+              roles: res.userRoles,
             })
           );
+          setIsLoading(false);
         })
         .catch((e) => {
           console.log(e);
-          setError(errorMessageFromAxiosError(e));
+          const errorMessage = errorMessageFromAxiosError(e);
+          setError(errorMessage);
+          if(errorMessage){
+            setIsLoading(false);
+          }
         })
-        .finally(() => setIsLoading(false));
     }
     return () => {
       abortController.abort();
@@ -76,7 +82,7 @@ const Profile = () => {
         </Grid>
       </Grid>
       <br />
-      {isLoading && <Loader />}
+      <Loader isOpen={isLoading}/>
       {!isLoading && user && (
         <>
           <Typography variant="h5">Profile</Typography>

@@ -99,7 +99,7 @@ const StartingPage = () => {
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
-            onClick={() => undefined}
+            onClick={() => navigate("/tournaments")}
           >
             Tournaments
           </Button>
@@ -111,7 +111,7 @@ const StartingPage = () => {
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
-            onClick={() => undefined}
+            onClick={() => navigate("/games")}
           >
             Games
           </Button>

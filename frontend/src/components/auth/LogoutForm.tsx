@@ -17,7 +17,7 @@ const LogoutForm = () => {
         navigate("/", { replace: true });
       });
   }, []);
-  return <Loader />;
+  return <Loader isOpen={true}/>;
 };
 
 export default LogoutForm;

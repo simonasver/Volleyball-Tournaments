@@ -4,8 +4,16 @@ import { User } from "../store/auth-slice";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function errorMessageFromAxiosError(e: any): string {
   if (!axios.isCancel(e)) {
+    if(e.message === "Network Error"){
+      return "Connection error";
+    }
+
     if (e.response) {
-      return e.response.data || "Error";
+      if(e.response.status === 500) {
+        return "Error";
+      } else {
+        return e.response.data.title || e.response.data.message || e.response.data || "Error";
+      }
     } else if (e.request) {
       return "Connection error";
     } else {
@@ -18,5 +26,5 @@ export function errorMessageFromAxiosError(e: any): string {
 
 export function isAdmin(user: User | undefined): boolean {
   if (user === undefined) return false;
-  return user.roles?.includes("admin") ?? false;
+  return user.roles?.includes("Admin") ?? false;
 }

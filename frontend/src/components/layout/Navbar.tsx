@@ -25,6 +25,9 @@ const Navbar = () => {
   ];
   const profileMenuItems = [
     { title: "Profile", href: "/profile" },
+    { title: "My teams", href: "/myteams" },
+    { title: "My games", href: "/mygames" },
+    { title: "My tournaments", href: "/mytournaments" },
     { title: "Logout", href: "/logout" },
   ];
 

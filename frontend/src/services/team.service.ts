@@ -1,7 +1,7 @@
 import api from "./api";
 
-export const getTeams = async () => {
-  const res = await api.get("/Team");
+export const getTeams = async (signal?: AbortSignal) => {
+  const res = await api.get("/Team", { signal: signal });
   return res.data;
 };
 

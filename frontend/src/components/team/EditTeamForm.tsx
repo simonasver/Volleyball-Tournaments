@@ -4,14 +4,15 @@ import BackButton from "../layout/BackButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
 import { editTeam, getTeam } from "../../services/team.service";
-import axios from "axios";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import Loader from "../layout/Loader";
 
 const EditTeamForm = () => {
   const { teamId } = useParams();
   const navigate = useNavigate();
 
   const [error, setError] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const [teamName, setTeamName] = React.useState("");
   const [teamPicture, setTeamPicture] = React.useState("");
@@ -32,19 +33,16 @@ const EditTeamForm = () => {
           setTeamName(res.title);
           setTeamPicture(res.pictureUrl);
           setTeamDescription(res.description);
+          setIsLoading(false);
         })
         .catch((e) => {
-          if (!axios.isCancel(e)) {
-            console.log(e);
-            if (e.response) {
-              setError(e.response.data || "Error");
-            } else if (e.request) {
-              setError("Connection error");
-            } else {
-              setError("Error");
-            }
+          console.log(e);
+          const errorMessage = errorMessageFromAxiosError(e);
+          setError(errorMessage);
+          if(errorMessage){
+            setIsLoading(false);
           }
-        });
+        })
     }
     return () => abortController.abort();
   }, []);
@@ -83,6 +81,7 @@ const EditTeamForm = () => {
           <BackButton address={`/team/${teamId}`} />
         </Grid>
       </Grid>
+      <Loader isOpen={isLoading}/>
       <br />
       <Typography variant="h5">Edit Team</Typography>
       <br />

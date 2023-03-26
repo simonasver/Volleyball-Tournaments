@@ -20,11 +20,6 @@ public class TeamRepository : ITeamRepository
         return await _dbContext.Teams.ToListAsync();
     }
 
-    public async Task<IEnumerable<Team>> GetAllOwnedByUserAsync(string userId)
-    {
-        return await _dbContext.Teams.Where(x => x.OwnerId == userId).ToListAsync();
-    }
-
     public async Task<Team?> GetAsync(Guid teamId)
     {
         return await _dbContext.Teams.Include(x => x.Players).FirstOrDefaultAsync(x => x.Id == teamId);

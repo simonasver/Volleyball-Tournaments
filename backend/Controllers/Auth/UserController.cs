@@ -71,7 +71,7 @@ public class UserController : ControllerBase
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return NotFound();
+            return Forbid();
         }
 
         // Only if it's user owned resource or user is admin

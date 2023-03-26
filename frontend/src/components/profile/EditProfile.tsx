@@ -6,14 +6,15 @@ import { useAppSelector } from "../../utils/hooks";
 import { editUser, getUser } from "../../services/user.service";
 import { authActions } from "../../store/auth-slice";
 import BackButton from "../layout/BackButton";
-import axios from "axios";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import Loader from "../layout/Loader";
 
 const EditProfile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [error, setError] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -29,19 +30,16 @@ const EditProfile = () => {
         .then((res) => {
           setFullName(res.fullName);
           setProfilePicture(res.profilePictureUrl);
+          setIsLoading(false);
         })
         .catch((e) => {
-          if (!axios.isCancel(e)) {
             console.log(e);
-            if (e.response) {
-              setError(e.response.data || "Error");
-            } else if (e.request) {
-              setError("Connection error");
-            } else {
-              setError("Error");
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if(errorMessage){
+              setIsLoading(false);
             }
-          }
-        });
+        })
     }
     return () => {
       abortController.abort();
@@ -86,6 +84,7 @@ const EditProfile = () => {
           alignItems="center"
           justifyContent="flex-start"
         >
+          <Loader isOpen={isLoading}/>
           <Grid item>
             <BackButton title="Profile" address="/profile" />
           </Grid>

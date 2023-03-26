@@ -8,7 +8,7 @@ public class Set
     public ICollection<SetPlayer> Players { get; set; }
     public int FirstTeamScore { get; set; }
     public int SecondTeamScore { get; set; }
-    public bool IsStarted { get; set; }
+    public GameStatus Status { get; set; }
     public DateTime StartDate { get; set; }
     public GameTeam Winner { get; set; }
     public DateTime FinishDate { get; set; }

@@ -104,7 +104,7 @@ namespace Backend.Controllers.Auth
 
             if (user == null)
             {
-                return BadRequest();
+                return Forbid();
             }
 
             user.RefreshToken = null;

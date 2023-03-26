@@ -2,6 +2,13 @@
 
 namespace Backend.Data.Entities.Game;
 
+public enum GameStatus
+{
+    New,
+    Started,
+    Finished
+}
+
 public class Game
 {
     public Guid Id { get; set; }
@@ -9,24 +16,25 @@ public class Game
     public string? Description { get; set; }
     public int PointsToWin { get; set; }
     public int PointDifferenceToWin { get; set; }
-    public int SetsToWin { get; set; }
+    public int MaxSets { get; set; }
+    public int PlayersPerTeam { get; set; }
     
-    public GameTeam FirstTeam { get; set; }
-    public GameTeam Secondteam { get; set; }
+    public GameTeam? FirstTeam { get; set; }
+    public GameTeam? SecondTeam { get; set; }
     public ICollection<Set> Sets { get; set; }
     
     public bool IsPrivate { get; set; }
-    public bool CreationDate { get; set; }
-    public bool LastEditDate { get; set; }
-    public bool IsStarted { get; set; }
-    public DateTime StartDate { get; set; }
+    public DateTime CreateDate { get; set; }
+    public DateTime LastEditDate { get; set; }
+    public GameStatus Status { get; set; }
+    public DateTime? StartDate { get; set; }
     public GameTeam? Winner { get; set; }
-    public DateTime FinishDate { get; set; }
+    public DateTime? FinishDate { get; set; }
     
     public ICollection<Team.Team> RequestedTeams { get; set; }
     public ICollection<Team.Team> BlockedTeams { get; set; }
     
-    public Guid OwnerId { get; set; }
+    public string OwnerId { get; set; }
     public ApplicationUser Owner { get; set; }
 }
 

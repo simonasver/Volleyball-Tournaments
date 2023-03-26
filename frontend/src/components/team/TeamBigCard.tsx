@@ -26,7 +26,7 @@ import {
 import { TeamPlayer } from "../../utils/types";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 
-interface TeamSmallCardProps {
+interface TeamBigCardProps {
   id: string;
   title: string;
   imageUrl?: string;
@@ -42,7 +42,7 @@ enum Modal {
   Delete = 3,
 }
 
-const TeamBigCard = (props: TeamSmallCardProps) => {
+const TeamBigCard = (props: TeamBigCardProps) => {
   const { id, title, imageUrl, description, createDate, players } = props;
 
   const navigate = useNavigate();
@@ -124,7 +124,7 @@ const TeamBigCard = (props: TeamSmallCardProps) => {
                 • {item.name}
               </Typography>
             ))}
-          {!players && <Typography>No players yet. Add some!</Typography>}
+          {!players || (players && players.length === 0) && <Typography>No players yet. Add some!</Typography>}
         </CardContent>
         <CardActions>
           <Box sx={{ flexGrow: 1 }}>

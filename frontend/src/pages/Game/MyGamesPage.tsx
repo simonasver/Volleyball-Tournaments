@@ -3,19 +3,20 @@ import { Alert, Button, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import BackButton from "../../components/layout/BackButton";
 import Layout from "../../components/layout/Layout";
-import TeamSmallCard from "../../components/team/TeamSmallCard";
-import { getUserTeams } from "../../services/team.service";
-import { useAppSelector } from "../../utils/hooks";
-import { errorMessageFromAxiosError, isAdmin } from "../../utils/helpers";
-import { Team } from "../../utils/types";
 import Loader from "../../components/layout/Loader";
+import { Game } from "../../utils/types";
+import GameSmallCard from "../../components/game/GameSmallCard";
+import { useAppSelector } from "../../utils/hooks";
+import { getUserGames } from "../../services/game.service";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
 
-const MyTeamsPage = () => {
+const MyGamesPage = () => {
   const navigate = useNavigate();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
-  const [teams, setTeams] = React.useState<Team[]>();
+
+  const [games, setGames] = React.useState<Game[]>();
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -24,22 +25,22 @@ const MyTeamsPage = () => {
     if (!user) {
       return navigate("/", { replace: true });
     } else {
-      getUserTeams(user.id, abortController.signal)
+      getUserGames(user.id, abortController.signal)
         .then((res) => {
-          setError("");
           console.log(res);
-          setTeams(res);
+          setGames(res);
           setIsLoading(false);
         })
         .catch((e) => {
-          console.log(e);
+          console.error(e);
           const errorMessage = errorMessageFromAxiosError(e);
           setError(errorMessage);
-          if(errorMessage){
+          if (errorMessage) {
             setIsLoading(false);
           }
-        })
+        });
     }
+
     return () => abortController.abort();
   }, []);
 
@@ -61,21 +62,16 @@ const MyTeamsPage = () => {
             justifyContent="space-between"
           >
             <Grid item>
-              <BackButton address="/" />
+              <BackButton title="All games" address="/games" />
             </Grid>
-            {isAdmin(user) && (
-              <Grid item>
-                <Button variant="outlined" onClick={() => navigate("/teams")}>All teams</Button>
-              </Grid>
-            )}
             <Grid item>
               <Button
                 variant="contained"
                 onClick={() => {
-                  navigate("/createteam");
+                  navigate("/creategame");
                 }}
               >
-                Create team
+                Create game
               </Button>
             </Grid>
           </Grid>
@@ -88,32 +84,31 @@ const MyTeamsPage = () => {
             <br />
           </>
         )}
-        <Typography variant="h3">My teams</Typography>
+        <Typography variant="h3">My games</Typography>
         <br />
         <Loader isOpen={isLoading} />
         {!isLoading &&
-          teams &&
-          teams.map((item) => (
+          games &&
+          games.map((item) => (
             <>
-              <TeamSmallCard
+              <GameSmallCard
                 key={item.id}
+                id={item.id}
                 title={item.title}
-                imageUrl={item.pictureUrl}
                 description={item.description}
-                onButtonPress={() => navigate(`/team/${item.id}`)}
                 createDate={new Date(item.createDate).toDateString()}
+                status={item.status}
+                onButtonPress={() => navigate("/game/" + item.id)}
               />
               <br />
             </>
           ))}
-        {!isLoading && (!teams || (teams && teams.length === 0)) && (
-          <Typography variant="h6">
-            You have no teams yet. Create one!
-          </Typography>
+        {!isLoading && (!games || (games && games.length === 0)) && (
+          <Typography variant="h6">There are no yet. Create one!</Typography>
         )}
       </Grid>
     </Layout>
   );
 };
 
-export default MyTeamsPage;
+export default MyGamesPage;

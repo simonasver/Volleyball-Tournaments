@@ -8,7 +8,7 @@ namespace Backend.Data.Entities.Team
         public string Title { get; set; }
         public string? PictureUrl { get; set; }
         public string? Description { get; set; }
-        public DateTime CreationDate { get; set; }
+        public DateTime CreateDate { get; set; }
         public DateTime LastEditDate { get; set; }
         public ICollection<TeamPlayer> Players { get; set; }
         

@@ -12,15 +12,15 @@ namespace Backend.Controllers
     [Route("api/[controller]")]
     public class TeamController : ControllerBase
     {
-        private readonly ITeamRepository _teamRepository;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ITeamRepository _teamRepository;
 
-        public TeamController(ITeamRepository teamRepository, UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService)
+        public TeamController(IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ITeamRepository teamRepository)
         {
-            _teamRepository = teamRepository;
-            _userManager = userManager;
             _authorizationService = authorizationService;
+            _userManager = userManager;
+            _teamRepository = teamRepository;
         }
 
         [Authorize(Roles = ApplicationUserRoles.Admin)]
@@ -45,7 +45,7 @@ namespace Backend.Controllers
             
             if (user == null)
             {
-                return NotFound();
+                return Forbid();
             }
             
             // Only if it's user owned resource or user is admin
@@ -57,25 +57,17 @@ namespace Backend.Controllers
                 }
             }
 
-            var teams = await _teamRepository.GetAllOwnedByUserAsync(user.Id);
+            var teams = await _teamRepository.GetAllAsync();
+            var userTeams = teams.Where(x => x.OwnerId == user.Id).ToList();
 
-            return Ok(teams);
+            return Ok(userTeams);
         }
         
         [AllowAnonymous]
         [HttpGet("/api/[controller]/{teamId}")]
-        public async Task<IActionResult> Get(string teamId)
+        public async Task<IActionResult> Get(Guid teamId)
         {
-            Guid teamIdGuid;
-            try
-            {
-                teamIdGuid = new Guid(teamId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
-            var team = await _teamRepository.GetAsync(teamIdGuid);
+            var team = await _teamRepository.GetAsync(teamId);
 
             if (team == null)
             {
@@ -98,16 +90,18 @@ namespace Backend.Controllers
             
             if (user == null)
             {
-                return NotFound();
+                return Forbid();
             }
             
-            var team = new Team();
-            team.Title = addTeamDto.Title;
-            team.PictureUrl = addTeamDto.PictureUrl;
-            team.Description = addTeamDto.Description;
-            team.CreationDate = DateTime.Now;
-            team.LastEditDate = DateTime.Now;
-            team.OwnerId = user.Id;
+            var team = new Team
+            {
+                Title = addTeamDto.Title,
+                PictureUrl = addTeamDto.PictureUrl,
+                Description = addTeamDto.Description,
+                CreateDate = DateTime.Now,
+                LastEditDate = DateTime.Now,
+                OwnerId = user.Id
+            };
 
             var createdTeam = await _teamRepository.CreateAsync(team);
             
@@ -116,18 +110,9 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPut("/api/[controller]/{teamId}")]
-        public async Task<IActionResult> Update(string teamId, [FromBody] EditTeamDto editTeamDto)
+        public async Task<IActionResult> Update(Guid teamId, [FromBody] EditTeamDto editTeamDto)
         {
-            Guid teamIdGuid;
-            try
-            {
-                teamIdGuid = new Guid(teamId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
-            var team = await _teamRepository.GetAsync(teamIdGuid);
+            var team = await _teamRepository.GetAsync(teamId);
 
             if (team == null)
             {
@@ -145,21 +130,10 @@ namespace Backend.Controllers
                 }
             }
 
-            if (editTeamDto.Title != null)
-            {
-                team.Title = editTeamDto.Title;
-            }
-            
-            if (editTeamDto.PictureUrl != null)
-            {
-                team.PictureUrl = editTeamDto.PictureUrl;
-            }
-            
-            if (editTeamDto.Description != null)
-            {
-                team.Description = editTeamDto.Description;
-            }
-            
+            team.Title = editTeamDto.Title ?? team.Title;
+            team.PictureUrl = editTeamDto.PictureUrl ?? team.PictureUrl;
+            team.Description = editTeamDto.Description ?? team.Description;
+
             await _teamRepository.UpdateAsync(team);
             
             return NoContent();
@@ -167,18 +141,9 @@ namespace Backend.Controllers
         
         [Authorize]
         [HttpDelete("/api/[controller]/{teamId}")]
-        public async Task<IActionResult> Delete(string teamId)
+        public async Task<IActionResult> Delete(Guid teamId)
         {
-            Guid teamIdGuid;
-            try
-            {
-                teamIdGuid = new Guid(teamId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
-            var team = await _teamRepository.GetAsync(teamIdGuid);
+            var team = await _teamRepository.GetAsync(teamId);
 
             if (team == null)
             {
@@ -196,25 +161,16 @@ namespace Backend.Controllers
                 }
             }
 
-            await _teamRepository.DeleteAsync(teamIdGuid);
+            await _teamRepository.DeleteAsync(teamId);
 
             return NoContent();
         }
 
         [Authorize]
         [HttpPatch("/api/[controller]/{teamId}/Player")]
-        public async Task<IActionResult> AddPlayer(string teamId, [FromBody] AddTeamPlayerDto addTeamPlayerDto)
+        public async Task<IActionResult> AddPlayer(Guid teamId, [FromBody] AddTeamPlayerDto addTeamPlayerDto)
         {
-            Guid teamIdGuid;
-            try
-            {
-                teamIdGuid = new Guid(teamId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
-            var team = await _teamRepository.GetAsync(teamIdGuid);
+            var team = await _teamRepository.GetAsync(teamId);
 
             if (team == null)
             {
@@ -237,10 +193,13 @@ namespace Backend.Controllers
                 return BadRequest("Player with this name already exists");
             }
 
-            var newTeamPlayer = new TeamPlayer();
-            newTeamPlayer.Name = addTeamPlayerDto.Name;
+            var newTeamPlayer = new TeamPlayer
+            {
+                Name = addTeamPlayerDto.Name
+            };
 
             team.Players.Add(newTeamPlayer);
+            team.LastEditDate = DateTime.Now;
 
             await _teamRepository.UpdateAsync(team);
             
@@ -249,29 +208,9 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpDelete("/api/[controller]/{teamId}/Player/{playerId}")]
-        public async Task<IActionResult> RemovePlayers(string teamId, string playerId)
+        public async Task<IActionResult> RemovePlayers(Guid teamId, Guid playerId)
         {
-            Guid teamIdGuid;
-            try
-            {
-                teamIdGuid = new Guid(teamId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
-
-            Guid playerIdGuid;
-            try
-            {
-                playerIdGuid = new Guid(playerId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
-            
-            var team = await _teamRepository.GetAsync(teamIdGuid);
+            var team = await _teamRepository.GetAsync(teamId);
 
             if (team == null)
             {
@@ -289,10 +228,11 @@ namespace Backend.Controllers
                 }
             }
             
-            var playerToRemove = team.Players.FirstOrDefault(x => x.Id == playerIdGuid);
+            var playerToRemove = team.Players.FirstOrDefault(x => x.Id == playerId);
             if (playerToRemove != null)
             {
                 team.Players.Remove(playerToRemove);
+                team.LastEditDate = DateTime.Now;
                 await _teamRepository.UpdateAsync(team);
                 return Ok();
             }

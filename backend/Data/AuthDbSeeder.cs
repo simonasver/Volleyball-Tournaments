@@ -37,7 +37,8 @@ namespace Backend.Data
             {
                 UserName = "admin",
                 FullName = "Admin admin",
-                Email = "admin@admin.com"
+                Email = "admin@admin.com",
+                RegisterDate = DateTime.Now,
             };
 
             var existingAdminUser = await _userManager.FindByNameAsync(newAdminUser.UserName);

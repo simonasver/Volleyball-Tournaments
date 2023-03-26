@@ -1,4 +1,5 @@
-﻿using Backend.Data.Entities.Game;
+﻿using System.Collections;
+using Backend.Data.Entities.Game;
 
 namespace Backend.Interfaces.Repositories;
 
@@ -8,5 +9,5 @@ public interface IGameRepository
     public Task<Game?> GetAsync(Guid gameId);
     public Task<Game> CreateAsync(Game game);
     public Task<Game> UpdateAsync(Game game);
-    public Task DeleteAsync(Game game);
+    public Task DeleteAsync(Guid gameId);
 }

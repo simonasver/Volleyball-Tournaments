@@ -24,7 +24,6 @@ const LoginForm = () => {
     login(email, password)
       .then((res) => {
         setError("");
-        console.log(res);
         dispatch(
           authActions.changeTokens({
             accessToken: res.accessToken,
@@ -38,7 +37,7 @@ const LoginForm = () => {
             email: res.userEmail,
             fullName: res.fullName,
             profilePictureUrl: res.profilePictureUrl,
-            roles: res.roles,
+            roles: res.userRoles,
           })
         );
         dispatch(
