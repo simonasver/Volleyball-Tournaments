@@ -12,7 +12,7 @@ export function errorMessageFromAxiosError(e: any): string {
       if(e.response.status === 500) {
         return "Error";
       } else {
-        return e.response.data.title || e.response.data.message || e.response.data || "Error";
+        return Object.values(e.response.data.errors)[0] || e.response.data.title || e.response.data.message || e.response.data || "Error";
       }
     } else if (e.request) {
       return "Connection error";

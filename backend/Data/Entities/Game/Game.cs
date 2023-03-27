@@ -5,6 +5,8 @@ namespace Backend.Data.Entities.Game;
 public enum GameStatus
 {
     New,
+    SingleTeam,
+    Ready,
     Started,
     Finished
 }
@@ -18,7 +20,7 @@ public class Game
     public int PointDifferenceToWin { get; set; }
     public int MaxSets { get; set; }
     public int PlayersPerTeam { get; set; }
-    
+
     public GameTeam? FirstTeam { get; set; }
     public GameTeam? SecondTeam { get; set; }
     public ICollection<Set> Sets { get; set; }

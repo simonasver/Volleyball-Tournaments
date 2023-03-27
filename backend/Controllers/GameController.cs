@@ -160,17 +160,69 @@ namespace Backend.Controllers
                 }
             }
 
+            if (game.Status == GameStatus.Finished)
+            {
+                return BadRequest("Cannot edit finished game");
+            }
+
             if (editGameDto.MaxSets % 2 == 0)
             {
                 return BadRequest("Max sets must be an odd number");
             }
 
-            game.Title = editGameDto.Title ?? game.Title;
-            game.Description = editGameDto.Description ?? game.Description;
-            game.PointsToWin = editGameDto.PointsToWin ?? game.PointsToWin;
-            game.PointDifferenceToWin = editGameDto.PointDifferenceToWin ?? game.PointDifferenceToWin;
-            game.MaxSets = editGameDto.MaxSets ?? game.MaxSets;
-            game.IsPrivate = editGameDto.IsPrivate ?? game.IsPrivate;
+            if (editGameDto.Title != null)
+            {
+                game.Title = editGameDto.Title;
+            }
+
+            if (editGameDto.Description != null)
+            {
+                game.Description = editGameDto.Description;
+            }
+
+            if (editGameDto.PointsToWin != null)
+            {
+                if (game.Status == GameStatus.Started)
+                {
+                    return BadRequest();
+                }
+
+                game.PointsToWin = editGameDto.PointsToWin ?? game.PointsToWin;
+            }
+
+            if (editGameDto.PointDifferenceToWin != null)
+            {
+                if (game.Status == GameStatus.Started)
+                {
+                    return BadRequest();
+                }
+
+                game.PointDifferenceToWin = editGameDto.PointDifferenceToWin ?? game.PointDifferenceToWin;
+            }
+
+            if (editGameDto.MaxSets != null)
+            {
+                if (game.Status == GameStatus.Started)
+                {
+                    return BadRequest();
+                }
+                game.MaxSets = editGameDto.MaxSets ?? game.MaxSets;
+            }
+            
+            if (editGameDto.PlayersPerTeam != null)
+            {
+                if (game.Status != GameStatus.New)
+                {
+                    return BadRequest();
+                }
+                game.PlayersPerTeam = editGameDto.PlayersPerTeam ?? game.PlayersPerTeam;
+            }
+
+            if (editGameDto.IsPrivate != null)
+            {
+                game.IsPrivate = editGameDto.IsPrivate ?? game.IsPrivate;
+            }
+            
             game.LastEditDate = DateTime.Now;
 
             await _gameRepository.UpdateAsync(game);
@@ -234,7 +286,7 @@ namespace Backend.Controllers
                 }
             }
 
-            if (team.Players.Count != game.PlayersPerTeam)
+            if (team.Players.Count != game.PlayersPerTeam && game.PlayersPerTeam != 0)
             {
                 return BadRequest("Teams in this game are required to have " + game.PlayersPerTeam + " players");
             }
@@ -321,6 +373,15 @@ namespace Backend.Controllers
 
                 game.SecondTeam = null;
             }
+            
+            if ((game.FirstTeam != null && game.SecondTeam == null) || (game.FirstTeam == null && game.SecondTeam != null))
+            {
+                game.Status = GameStatus.SingleTeam;
+            }
+            else if (game.FirstTeam == null && game.SecondTeam == null)
+            {
+                game.Status = GameStatus.New;
+            }
 
             await _gameRepository.UpdateAsync(game);
             
@@ -359,9 +420,19 @@ namespace Backend.Controllers
                 return BadRequest(("Game is already finished"));
             }
 
-            if (game.FirstTeam == null || game.SecondTeam == null)
+            if (game.Status != GameStatus.Ready)
             {
                 return BadRequest("Game does not two teams");
+            }
+
+            if (game.FirstTeam.Players.Count != game.PlayersPerTeam && game.PlayersPerTeam != 0)
+            {
+                return BadRequest("First team has a different player count than needed (" + game.PlayersPerTeam + ")");
+            }
+
+            if (game.SecondTeam.Players.Count != game.PlayersPerTeam && game.PlayersPerTeam != 0)
+            {
+                return BadRequest("Second team has a different player count than needed (" + game.PlayersPerTeam + ")");
             }
 
             game.Status = GameStatus.Started;

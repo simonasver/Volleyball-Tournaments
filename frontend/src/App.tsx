@@ -5,6 +5,7 @@ import RegisterPage from "./pages/Auth/RegisterPage";
 import EmptyPage from "./pages/EmptyPage";
 import AllGamesPage from "./pages/Game/AllGamesPage";
 import CreateGamePage from "./pages/Game/CreateGamePage";
+import EditGamePage from "./pages/Game/EditGamePage";
 import GamePage from "./pages/Game/GamePage";
 import MyGamesPage from "./pages/Game/MyGamesPage";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -37,6 +38,7 @@ function App() {
       <Route path="/mygames" element={<MyGamesPage />} />
       <Route path="/game/:gameId" element={<GamePage />} />
       <Route path="/creategame" element={<CreateGamePage />} />
+      <Route path="/editgame/:gameId" element={<EditGamePage />} />
 
       <Route path="/empty" element={<EmptyPage />} />
       <Route path="*" element={<NotFoundPage />} />

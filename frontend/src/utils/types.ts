@@ -14,8 +14,10 @@ export interface Game {
 
 export enum GameStatus {
   "New" = 0,
-  "In progress" = 1,
-  "Finished" = 2
+  "Single team" = 1,
+  "Ready to start" = 2,
+  "In progress" = 3,
+  "Finished" = 4
 }
 
 export interface Set {

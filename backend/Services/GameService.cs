@@ -32,6 +32,16 @@ public class GameService : IGameService
             game.SecondTeam = gameTeam;
         }
         else throw new InvalidOperationException("Game already has two teams");
+
+        if ((game.FirstTeam != null && game.SecondTeam == null) || (game.FirstTeam == null && game.SecondTeam != null))
+        {
+            game.Status = GameStatus.SingleTeam;
+        }
+        else if (game.FirstTeam != null && game.SecondTeam != null)
+        {
+            game.Status = GameStatus.Ready;
+        }
+        
         return game;
     }
     public Game AddSetToGame(Game game)

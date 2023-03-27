@@ -4,6 +4,8 @@ import {
   CardContent,
   CardHeader,
   IconButton,
+  Tab,
+  Tabs,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -34,6 +36,7 @@ const GameBigCard = (props: GameBigCardProps) => {
   const navigate = useNavigate();
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
+  const [selectedSet, setSelectedSet] = React.useState(0);
 
   const [addPlayerInput, setAddPlayerInput] = React.useState("");
   const [removePlayerInput, setRemovePlayerInput] = React.useState("");
@@ -49,6 +52,10 @@ const GameBigCard = (props: GameBigCardProps) => {
     setRemovePlayerError("");
     setDeleteTeamError("");
     setModalStatus(Modal.None);
+  };
+
+  const onSetChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedSet(newValue);
   };
 
   const onAddPlayerSubmit = () => {
@@ -85,6 +92,11 @@ const GameBigCard = (props: GameBigCardProps) => {
           <Typography variant="body2" color="text.secondary">
             Created at: {createDate}
           </Typography>
+          <Tabs value={selectedSet} onChange={onSetChange} centered>
+            <Tab label="Set 1" />
+            <Tab label="Set 2" />
+            <Tab label="Set 3" />
+          </Tabs>
         </CardContent>
         <CardActions>
           <Box sx={{ flexGrow: 1 }}>

@@ -49,7 +49,7 @@ const GamePage = () => {
         alignItems="center"
         justifyContent="center"
       >
-        <Grid item sx={{ width: { xs: "100%", md: "50%" } }}>
+        <Grid item sx={{ width: { xs: "100%", md: "70%" } }}>
           <Grid
             container
             spacing={1}

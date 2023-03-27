@@ -9,12 +9,20 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../layout/BackButton";
-import { addGame } from "../../services/game.service";
+import { useAppSelector } from "../../utils/hooks";
+import { editGame, getGame } from "../../services/game.service";
+import Loader from "../layout/Loader";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 
-const CreateGameForm = () => {
+const EditGameForm = () => {
+  const { gameId } = useParams();
+
+  const navigate = useNavigate();
+
   const [error, setError] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -25,9 +33,50 @@ const CreateGameForm = () => {
   const [playersPerTeam, setPlayersPerTeam] = React.useState(5);
   const [isPrivate, setIsPrivate] = React.useState(false);
 
+  const [gameStatus, setGameStatus] = React.useState(0);
+
+  const user = useAppSelector((state) => state.auth.user);
+
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    if (!gameId) {
+      return navigate("/", { replace: true });
+    } else if (!user) {
+      return navigate("/", { replace: true });
+    } else {
+      getGame(gameId, abortController.signal)
+        .then((res) => {
+          setError("");
+          setTitle(res.title);
+          setDescription(res.description);
+          setPointsToWin(res.pointsToWin);
+          setPointDifferenceToWin(res.pointDifferenceToWin);
+          setMaxSets(res.maxSets);
+          setPlayersPerTeam(res.playersPerTeam);
+          setIsPrivate(res.isPrivate);
+          setGameStatus(res.status);
+
+          setIsLoading(false);
+        })
+        .catch((e) => {
+          console.log(e);
+          const errorMessage = errorMessageFromAxiosError(e);
+          setError(errorMessage);
+          if (errorMessage) {
+            setIsLoading(false);
+          }
+        });
+    }
+    return () => abortController.abort();
+  }, []);
+
   const onSubmitHandler = (event: React.FormEvent) => {
     event.preventDefault();
-    addGame(
+    if (!gameId) {
+      return navigate("/", { replace: true });
+    }
+    editGame(
+      gameId,
       title,
       description,
       pointsToWin,
@@ -36,8 +85,8 @@ const CreateGameForm = () => {
       limitPlayers ? playersPerTeam : 0,
       isPrivate
     )
-      .then((res) => {
-        console.log(res);
+      .then(() => {
+        return navigate(`/game/${gameId}`, { replace: true });
       })
       .catch((e) => {
         console.log(e);
@@ -61,24 +110,21 @@ const CreateGameForm = () => {
         justifyContent="flex-start"
       >
         <Grid item>
-          <BackButton title="My games" address="/mygames" />
+          <BackButton title="Games" address={`/game/${gameId}`} />
         </Grid>
       </Grid>
+      <Loader isOpen={isLoading} />
       <br />
-      <Typography variant="h5">Create Game</Typography>
+      <Typography variant="h5">Edit Game</Typography>
       <br />
-      <Typography variant="subtitle2">
-        Enter your new game information!
-      </Typography>
-      <Typography variant="subtitle2">You can add teams later.</Typography>
+      <Typography variant="subtitle2">Change your game information!</Typography>
       <br />
       <form onSubmit={onSubmitHandler}>
         <FormGroup>
           <FormControlLabel
-            checked={isPrivate}
             control={
               <Switch
-                value={isPrivate}
+                checked={isPrivate}
                 onChange={() => setIsPrivate((state) => !state)}
               />
             }
@@ -121,6 +167,7 @@ const CreateGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1 }}
           fullWidth
+          disabled={gameStatus > 2}
         />
         <br />
         <br />
@@ -134,6 +181,7 @@ const CreateGameForm = () => {
           variant="outlined"
           inputProps={{ min: 0, max: 10 }}
           fullWidth
+          disabled={gameStatus > 2}
         />
         <br />
         <br />
@@ -147,6 +195,7 @@ const CreateGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1, max: 5 }}
           fullWidth
+          disabled={gameStatus > 2}
         />
         <br />
         <br />
@@ -172,8 +221,8 @@ const CreateGameForm = () => {
           label="Amount of players in each team"
           variant="outlined"
           inputProps={{ min: 1, max: 50 }}
-          disabled={!limitPlayers}
           fullWidth
+          disabled={gameStatus > 0 || !limitPlayers}
         />
         <br />
         <br />
@@ -183,7 +232,7 @@ const CreateGameForm = () => {
             type="submit"
             sx={{ width: { xs: "100%", md: "inherit" } }}
           >
-            Create
+            Save
           </Button>
         </Grid>
       </form>
@@ -192,4 +241,4 @@ const CreateGameForm = () => {
   );
 };
 
-export default CreateGameForm;
+export default EditGameForm;

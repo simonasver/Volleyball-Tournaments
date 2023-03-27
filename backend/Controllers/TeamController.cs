@@ -188,6 +188,11 @@ namespace Backend.Controllers
                 }
             }
 
+            if (team.Players.Count >= 20)
+            {
+                return BadRequest("Team is already full (max number players is 20)");
+            }
+
             if (team.Players.FirstOrDefault(x => x.Name == addTeamPlayerDto.Name) != null)
             {
                 return BadRequest("Player with this name already exists");

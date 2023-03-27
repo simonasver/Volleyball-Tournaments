@@ -20,7 +20,7 @@ export const addGame = async (
   description: string,
   pointsToWin: number,
   pointDifferenceToWin: number,
-  setsToWin: number,
+  maxSets: number,
   playersPerTeam: number,
   isPrivate: boolean
 ) => {
@@ -29,7 +29,29 @@ export const addGame = async (
     Description: description,
     PointsToWin: pointsToWin,
     PointDifferenceToWin: pointDifferenceToWin,
-    SetsToWin: setsToWin,
+    MaxSets: maxSets,
+    PlayersPerTeam: playersPerTeam,
+    IsPrivate: isPrivate,
+  });
+  return res.data;
+};
+
+export const editGame = async (
+  gameId: string,
+  title?: string,
+  description?: string,
+  pointsToWin?: number,
+  pointDifferenceToWin?: number,
+  maxSets?: number,
+  playersPerTeam?: number,
+  isPrivate?: boolean
+) => {
+  const res = await api.put(`/Game/${gameId}`, {
+    Title: title,
+    Description: description,
+    PointsToWin: pointsToWin,
+    PointDifferenceToWin: pointDifferenceToWin,
+    MaxSets: maxSets,
     PlayersPerTeam: playersPerTeam,
     IsPrivate: isPrivate,
   });
