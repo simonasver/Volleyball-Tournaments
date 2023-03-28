@@ -1,6 +1,7 @@
 ﻿using Backend.Auth.Model;
 using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
+using Backend.Data.Entities.Team;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -95,6 +96,20 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
+            if (game.IsPrivate == true)
+            {
+                // Only if it's user owned resource or user is admin
+                if (!User.IsInRole(ApplicationUserRoles.Admin))
+                {
+                    var authorization =
+                        await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                    if (!authorization.Succeeded)
+                    {
+                        return NotFound();
+                    }
+                }
+            }
+
             return Ok(game);
         }
 
@@ -131,6 +146,8 @@ namespace Backend.Controllers
                 OwnerId = user.Id,
                 CreateDate = DateTime.Now,
                 LastEditDate = DateTime.Now,
+                FirstTeamScore = 0,
+                SecondTeamScore = 0,
             };
 
             var createdGame = await _gameRepository.CreateAsync(newGame);
@@ -259,7 +276,7 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPost("/api/[controller]/{gameId}/RequestedTeam")]
-        public async Task<IActionResult> RequestTeam(Guid gameId, [FromBody] Guid teamId)
+        public async Task<IActionResult> RequestTeam(Guid gameId, [FromBody] RequestJoinGameDto requestJoinGameDto)
         {
             var game = await _gameRepository.GetAsync(gameId);
 
@@ -268,7 +285,7 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            var team = await _teamRepository.GetAsync(teamId);
+            var team = await _teamRepository.GetAsync(requestJoinGameDto.TeamId);
 
             if (team == null)
             {
@@ -286,6 +303,12 @@ namespace Backend.Controllers
                 }
             }
 
+            if (game.RequestedTeams.Any(x => x.Id == team.Id) || (game.FirstTeam != null && game.FirstTeam.Title == team.Title) ||
+                (game.SecondTeam != null && game.SecondTeam.Title == team.Title))
+            {
+                return BadRequest("Team already requested to join this game");
+            }
+
             if (team.Players.Count != game.PlayersPerTeam && game.PlayersPerTeam != 0)
             {
                 return BadRequest("Teams in this game are required to have " + game.PlayersPerTeam + " players");
@@ -293,12 +316,14 @@ namespace Backend.Controllers
             
             game.RequestedTeams.Add(team);
 
+            await _gameRepository.UpdateAsync(game);
+
             return Ok();
         }
 
         [Authorize]
         [HttpPost("/api/[controller]/{gameId}/GameTeam")]
-        public async Task<IActionResult> AddTeam(Guid gameId, [FromBody] Guid teamId)
+        public async Task<IActionResult> AddTeam(Guid gameId, [FromBody] AddTeamToGameDto addTeamToGameDto)
         {
             var game = await _gameRepository.GetAsync(gameId);
 
@@ -318,12 +343,18 @@ namespace Backend.Controllers
                 }
             }
 
-            if (!game.RequestedTeams.Any(x => x.Id == teamId))
+            if (!game.RequestedTeams.Any(x => x.Id == addTeamToGameDto.TeamId))
             {
-                return BadRequest();
+                return BadRequest("Team has not requested to join the game");
             }
-            
-            game = _gameService.AddTeamToGame(game, game.RequestedTeams.FirstOrDefault(x => x.Id == teamId));
+
+            var team = game.RequestedTeams.FirstOrDefault(x => x.Id == addTeamToGameDto.TeamId);
+
+            game = _gameService.AddTeamToGame(game, team);
+
+            game.RequestedTeams.Remove(team);
+
+            await _gameRepository.UpdateAsync(game);
             
             return Ok(game);
         }

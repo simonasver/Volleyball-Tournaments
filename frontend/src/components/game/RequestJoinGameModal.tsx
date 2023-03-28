@@ -13,30 +13,32 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { TeamPlayer } from "../../utils/types";
+import { Team } from "../../utils/types";
 
-interface RemovePlayerModalProps {
+interface RequestJoinGameModalProps {
   errorMessage: string;
-  players: TeamPlayer[];
-  removePlayerInput: string;
-  onRemovePlayerInputChange: (value: string) => void;
+  teams: Team[];
+  joinTeamInput: string;
+  onJoinGameInputChange: (value: string) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
 
-const RemovePlayerModal = (props: RemovePlayerModalProps) => {
+const RequestJoinGameModal = (props: RequestJoinGameModalProps) => {
   const {
     errorMessage,
-    players,
-    removePlayerInput,
-    onRemovePlayerInputChange,
+    teams,
+    joinTeamInput,
+    onJoinGameInputChange,
     onSubmit,
     onClose,
   } = props;
 
+  console.log(teams);
+
   return (
     <Dialog open onClose={onClose} fullWidth>
-      <DialogTitle>Remove players</DialogTitle>
+      <DialogTitle>Request join game</DialogTitle>
       <DialogContent>
         {errorMessage && (
           <>
@@ -45,21 +47,21 @@ const RemovePlayerModal = (props: RemovePlayerModalProps) => {
           </>
         )}
         <DialogContentText>
-          Select player to remove from the team
+          Select team to request join game with
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Player to remove</InputLabel>
+          <InputLabel>Team to join</InputLabel>
           <Select
-            value={removePlayerInput}
-            label="Player to remove"
+            value={joinTeamInput}
+            label="Team to join"
             onChange={(e: SelectChangeEvent<string>) =>
-              onRemovePlayerInputChange(e.target.value)
+              onJoinGameInputChange(e.target.value)
             }
           >
-            {players.map((item) => (
+            {teams.map((item) => (
               <MenuItem key={item.id} value={item.id}>
-                {item.name}
+                {item.title}
               </MenuItem>
             ))}
           </Select>
@@ -68,11 +70,11 @@ const RemovePlayerModal = (props: RemovePlayerModalProps) => {
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
         <Button variant="contained" onClick={onSubmit}>
-          Remove
+          Join
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default RemovePlayerModal;
+export default RequestJoinGameModal;

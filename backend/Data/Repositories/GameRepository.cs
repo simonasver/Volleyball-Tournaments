@@ -22,7 +22,17 @@ public class GameRepository : IGameRepository
 
     public async Task<Game?> GetAsync(Guid gameId)
     {
-        return await _dbContext.Games.FirstOrDefaultAsync(x => x.Id == gameId);
+        return await _dbContext.Games.
+            Include(x => x.RequestedTeams)
+                .ThenInclude(x => x.Players)
+            .Include(x => x.BlockedTeams)
+            .Include(x => x.FirstTeam)
+                .ThenInclude(x => x.Players)
+            .Include(x => x.SecondTeam)
+                .ThenInclude(x => x.Players)
+            .Include(x => x.Sets)
+            .Include(x => x.Winner)
+            .FirstOrDefaultAsync(x => x.Id == gameId);
     }
 
     public async Task<Game> CreateAsync(Game game)

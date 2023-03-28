@@ -24,6 +24,8 @@ public class Game
     public GameTeam? FirstTeam { get; set; }
     public GameTeam? SecondTeam { get; set; }
     public ICollection<Set> Sets { get; set; }
+    public int FirstTeamScore { get; set; }
+    public int SecondTeamScore { get; set; }
     
     public bool IsPrivate { get; set; }
     public DateTime CreateDate { get; set; }

@@ -24,6 +24,7 @@ const GamePage = () => {
     } else {
       getGame(gameId, abortController.signal)
         .then((res) => {
+          console.log(res);
           setError("");
           setGame(res);
           setIsLoading(false);
@@ -72,10 +73,16 @@ const GamePage = () => {
           {!isLoading && game && (
             <GameBigCard
               id={game.id}
+              ownerId={game.ownerId}
               title={game.title}
               description={game.description}
               createDate={new Date(game.createDate).toDateString()}
               status={game.status}
+              firstTeam={game.firstTeam}
+              secondTeam={game.secondTeam}
+              firstTeamScore={game.firstTeamScore}
+              secondTeamScore={game.secondTeamScore}
+              requestedTeams={game.requestedTeams}
             />
           )}
         </Grid>

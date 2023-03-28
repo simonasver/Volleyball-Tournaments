@@ -13,7 +13,8 @@ public class GameService : IGameService
         {
             Title = team.Title,
             ProfilePicture = team.PictureUrl,
-            Description = team.Description
+            Description = team.Description,
+            Players = new List<GameTeamPlayer>()
         };
         foreach (var teamPlayer in team.Players)
         {
@@ -23,22 +24,27 @@ public class GameService : IGameService
             };
             gameTeam.Players.Add(gameTeamPlayer);
         }
+        
         if (game.FirstTeam == null)
         {
+            Console.WriteLine("first is null");
             game.FirstTeam = gameTeam;
         }
         else if (game.SecondTeam == null)
         {
+            Console.WriteLine("second is null");
             game.SecondTeam = gameTeam;
         }
         else throw new InvalidOperationException("Game already has two teams");
 
         if ((game.FirstTeam != null && game.SecondTeam == null) || (game.FirstTeam == null && game.SecondTeam != null))
         {
+            Console.WriteLine("single");
             game.Status = GameStatus.SingleTeam;
         }
         else if (game.FirstTeam != null && game.SecondTeam != null)
         {
+            Console.WriteLine("double");
             game.Status = GameStatus.Ready;
         }
         
@@ -49,7 +55,8 @@ public class GameService : IGameService
         var newSet = new Set()
         {
             FirstTeam = game.FirstTeam,
-            SecondTeam = game.SecondTeam
+            SecondTeam = game.SecondTeam,
+            Players = new List<SetPlayer>()
         };
         foreach (var firstTeamPlayer in game.FirstTeam.Players)
         {

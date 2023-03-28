@@ -12,8 +12,11 @@ import {
 import BackButton from "../layout/BackButton";
 import { addGame } from "../../services/game.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { useNavigate } from "react-router-dom";
 
 const CreateGameForm = () => {
+  const navigate = useNavigate();
+
   const [error, setError] = React.useState("");
 
   const [title, setTitle] = React.useState("");
@@ -37,7 +40,7 @@ const CreateGameForm = () => {
       isPrivate
     )
       .then((res) => {
-        console.log(res);
+        navigate("/mygames", { replace: true });
       })
       .catch((e) => {
         console.log(e);

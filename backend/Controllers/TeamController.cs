@@ -92,6 +92,13 @@ namespace Backend.Controllers
             {
                 return Forbid();
             }
+
+            var teams = await _teamRepository.GetAllAsync();
+
+            if (teams.Any(x => x.Title == addTeamDto.Title))
+            {
+                return BadRequest("Team title must be unique");
+            }
             
             var team = new Team
             {
@@ -128,6 +135,13 @@ namespace Backend.Controllers
                 {
                     return Forbid();
                 }
+            }
+            
+            var teams = await _teamRepository.GetAllAsync();
+
+            if (teams.Any(x => x.Title == editTeamDto.Title))
+            {
+                return BadRequest("Team title must be unique");
             }
 
             team.Title = editTeamDto.Title ?? team.Title;

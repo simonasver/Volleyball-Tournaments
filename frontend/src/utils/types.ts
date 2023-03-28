@@ -1,5 +1,6 @@
 export interface Game {
   id: string;
+  ownerId: string;
   title: string;
   description: string;
   pointsToWin: number;
@@ -10,14 +11,17 @@ export interface Game {
   secondTeam: Team;
   createDate: string;
   status: GameStatus;
+  firstTeamScore: number;
+  secondTeamScore: number;
+  requestedTeams: Team[];
 }
 
 export enum GameStatus {
-  "New" = 0,
-  "Single team" = 1,
-  "Ready to start" = 2,
-  "In progress" = 3,
-  "Finished" = 4
+  New = 0,
+  SingleTeam = 1,
+  Ready = 2,
+  Started = 3,
+  Finished = 4
 }
 
 export interface Set {

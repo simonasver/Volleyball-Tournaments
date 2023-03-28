@@ -12,7 +12,8 @@ export function errorMessageFromAxiosError(e: any): string {
       if(e.response.status === 500) {
         return "Error";
       } else {
-        return Object.values(e.response.data.errors)[0] || e.response.data.title || e.response.data.message || e.response.data || "Error";
+        const value = e?.response?.data?.errors ? Object.values(e?.response?.data?.errors)[0] : e?.response?.data?.title || e?.response?.data?.message || e?.response?.data || "Error";
+        return value;
       }
     } else if (e.request) {
       return "Connection error";

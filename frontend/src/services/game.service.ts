@@ -57,3 +57,27 @@ export const editGame = async (
   });
   return res.data;
 };
+
+export const deleteGame = async (gameId: string) => {
+  const res = await api.delete(`/Game/${gameId}`);
+  return res.data;
+};
+
+export const joinGame = async (gameId: string, teamId: string) => {
+  const res = await api.post(`/Game/${gameId}/RequestedTeam`, {
+    TeamId: teamId
+  });
+  return res.data;
+};
+
+export const addTeamToGame = async (gameId: string, teamId: string) => {
+  const res = await api.post(`/Game/${gameId}/GameTeam`, {
+    TeamId: teamId
+  });
+  return res.data;
+}
+
+export const startGame = async (gameId: string) => {
+  const res = await api.patch(`/Game/${gameId}/Status`);
+  return res.data;
+};

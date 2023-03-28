@@ -15,6 +15,7 @@ import { useAppSelector } from "../../utils/hooks";
 import { editGame, getGame } from "../../services/game.service";
 import Loader from "../layout/Loader";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { GameStatus } from "../../utils/types";
 
 const EditGameForm = () => {
   const { gameId } = useParams();
@@ -167,7 +168,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1 }}
           fullWidth
-          disabled={gameStatus > 2}
+          disabled={gameStatus >= GameStatus.Started}
         />
         <br />
         <br />
@@ -181,7 +182,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 0, max: 10 }}
           fullWidth
-          disabled={gameStatus > 2}
+          disabled={gameStatus >= GameStatus.Started}
         />
         <br />
         <br />
@@ -195,7 +196,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1, max: 5 }}
           fullWidth
-          disabled={gameStatus > 2}
+          disabled={gameStatus >= GameStatus.Started}
         />
         <br />
         <br />
@@ -222,7 +223,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1, max: 50 }}
           fullWidth
-          disabled={gameStatus > 0 || !limitPlayers}
+          disabled={gameStatus > GameStatus.New || !limitPlayers}
         />
         <br />
         <br />
