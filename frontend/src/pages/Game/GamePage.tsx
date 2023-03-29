@@ -83,6 +83,7 @@ const GamePage = () => {
               firstTeamScore={game.firstTeamScore}
               secondTeamScore={game.secondTeamScore}
               requestedTeams={game.requestedTeams}
+              sets={game.sets}
             />
           )}
         </Grid>

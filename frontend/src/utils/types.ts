@@ -14,6 +14,7 @@ export interface Game {
   firstTeamScore: number;
   secondTeamScore: number;
   requestedTeams: Team[];
+  sets: Set[];
 }
 
 export enum GameStatus {
@@ -26,7 +27,13 @@ export enum GameStatus {
 
 export interface Set {
   id: string;
-
+  firstTeam: Team;
+  secondTeam: Team;
+  firstTeamScore: number;
+  secondTeamScore: number;
+  players: TeamPlayer;
+  startDate: string;
+  finishDate: string;
 }
 
 export interface Team {

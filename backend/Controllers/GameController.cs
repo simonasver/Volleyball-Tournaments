@@ -313,7 +313,12 @@ namespace Backend.Controllers
             {
                 return BadRequest("Teams in this game are required to have " + game.PlayersPerTeam + " players");
             }
-            
+
+            if (team.Players.Count == 0)
+            {
+                return BadRequest("Team must have at least 1 player");
+            }
+
             game.RequestedTeams.Add(team);
 
             await _gameRepository.UpdateAsync(game);
@@ -349,6 +354,13 @@ namespace Backend.Controllers
             }
 
             var team = game.RequestedTeams.FirstOrDefault(x => x.Id == addTeamToGameDto.TeamId);
+            
+            if ((team.Players.Count != game.PlayersPerTeam && game.PlayersPerTeam != 0) || team.Players.Count == 0)
+            {
+                game.RequestedTeams.Remove(team);
+                await _gameRepository.UpdateAsync(game);
+                return BadRequest("Team has 0 or another incompatible number of players for this game");
+            }
 
             game = _gameService.AddTeamToGame(game, team);
 
@@ -360,7 +372,7 @@ namespace Backend.Controllers
         }
 
         [Authorize]
-        [HttpDelete("/api/[controller]/{gameId}/GameTeam/{teamId}")]
+        [HttpDelete("/api/[controller]/{gameId}/GameTeam")]
         public async Task<IActionResult> RemoveTeam(Guid gameId, [FromQuery] bool team)
         {
             var game = await _gameRepository.GetAsync(gameId);
@@ -381,7 +393,7 @@ namespace Backend.Controllers
                 }
             }
 
-            if (game.Status != GameStatus.New)
+            if (game.Status >= GameStatus.Started)
             {
                 return BadRequest("Game is already started");
             }

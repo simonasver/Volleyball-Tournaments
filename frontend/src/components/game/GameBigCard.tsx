@@ -15,12 +15,13 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { GameStatus, Team } from "../../utils/types";
+import { GameStatus, Set, Team } from "../../utils/types";
 import DeleteGameModal from "./DeleteGameModal";
 import {
   addTeamToGame,
   deleteGame,
   joinGame,
+  removeTeamFromGame,
   startGame,
 } from "../../services/game.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
@@ -44,6 +45,7 @@ interface GameBigCardProps {
   firstTeamScore: number;
   secondTeamScore: number;
   requestedTeams: Team[];
+  sets: Set[];
 }
 
 enum Modal {
@@ -66,6 +68,7 @@ const GameBigCard = (props: GameBigCardProps) => {
     firstTeamScore,
     secondTeamScore,
     requestedTeams,
+    sets,
   } = props;
 
   const navigate = useNavigate();
@@ -130,6 +133,12 @@ const GameBigCard = (props: GameBigCardProps) => {
       });
   };
 
+  const onRemoveTeamFromGameSubmit = (team: boolean) => {
+    removeTeamFromGame(id, team).then(() => {
+      navigate(0);
+    });
+  };
+
   const onDeleteSubmit = () => {
     deleteGame(id)
       .then(() => {
@@ -180,20 +189,72 @@ const GameBigCard = (props: GameBigCardProps) => {
           >
             <Grid item>
               {firstTeam && (
-                <Typography variant="caption">{firstTeam.title}</Typography>
+                <>
+                  <Typography variant="caption">{firstTeam.title}</Typography>
+                  {user?.id === ownerId && status < GameStatus.Started && (
+                    <IconButton
+                      centerRipple={false}
+                      color="error"
+                      onClick={() => onRemoveTeamFromGameSubmit(false)}
+                      size="small"
+                    >
+                      <Tooltip title="Remove team">
+                        <DeleteForeverIcon />
+                      </Tooltip>
+                    </IconButton>
+                  )}
+                  <br />
+                </>
               )}
+            </Grid>
+            <Grid item>
+              {secondTeam && (
+                <>
+                  {user?.id === ownerId && status < GameStatus.Started && (
+                    <IconButton
+                      centerRipple={false}
+                      color="error"
+                      onClick={() => onRemoveTeamFromGameSubmit(true)}
+                      size="small"
+                    >
+                      <Tooltip title="Remove team">
+                        <DeleteForeverIcon />
+                      </Tooltip>
+                    </IconButton>
+                  )}
+                  <Typography variant="caption">{secondTeam.title}</Typography>
+                  <br />
+                </>
+              )}
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            spacing={0}
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Grid item>
               {status === 3 && (
-                <Typography variant="h3" display="inline">
+                <Typography
+                  variant="h3"
+                  display="inline"
+                  width="100%"
+                  textAlign="left"
+                >
                   {firstTeamScore}
                 </Typography>
               )}
             </Grid>
             <Grid item>
-              {secondTeam && (
-                <Typography variant="caption">{secondTeam.title}</Typography>
-              )}
               {status === 3 && (
-                <Typography variant="h3" display="inline">
+                <Typography
+                  variant="h3"
+                  display="inline"
+                  width="100%"
+                  textAlign="right"
+                >
                   {secondTeamScore}
                 </Typography>
               )}
@@ -204,9 +265,9 @@ const GameBigCard = (props: GameBigCardProps) => {
             Created at: {createDate}
           </Typography>
           <Tabs value={selectedSet} onChange={onSetChange} centered>
-            <Tab label="Set 1" />
-            <Tab label="Set 2" />
-            <Tab label="Set 3" />
+            {sets.map((set, index) => {
+              return <Tab key={set.id} label={`Set ${index + 1}`} />;
+            })}
           </Tabs>
         </CardContent>
         <CardActions>

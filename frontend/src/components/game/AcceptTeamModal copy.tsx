@@ -49,7 +49,7 @@ const AcceptTeamModal = (props: AcceptTeamModalProps) => {
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to join</InputLabel>
+          <InputLabel>Team to accept</InputLabel>
           <Select
             value={acceptTeamInput}
             label="Team to accept"
