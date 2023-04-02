@@ -34,8 +34,6 @@ const RequestJoinGameModal = (props: RequestJoinGameModalProps) => {
     onClose,
   } = props;
 
-  console.log(teams);
-
   return (
     <Dialog open onClose={onClose} fullWidth>
       <DialogTitle>Request join game</DialogTitle>

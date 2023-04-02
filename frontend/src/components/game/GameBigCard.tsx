@@ -20,14 +20,13 @@ import DeleteGameModal from "./DeleteGameModal";
 import {
   addTeamToGame,
   changeGameSetScore,
-  deleteGame,
   getGame,
   joinGame,
   removeTeamFromGame,
   startGame,
 } from "../../services/game.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
-import { useAppSelector } from "../../utils/hooks";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RequestJoinGameModal from "./RequestJoinGameModal";
 import { getUserTeams } from "../../services/team.service";
@@ -36,6 +35,7 @@ import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import Alert from "@mui/material/Alert/Alert";
 import GameSets from "./GameSets";
 import Loader from "../layout/Loader";
+import { alertActions } from "../../store/alert-slice";
 
 interface GameBigCardProps {
   id: string;
@@ -52,6 +52,7 @@ const GameBigCard = (props: GameBigCardProps) => {
   const { id } = props;
 
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -68,7 +69,6 @@ const GameBigCard = (props: GameBigCardProps) => {
   const [requestJoinError, setRequestJoinError] = React.useState("");
   const [startError, setStartError] = React.useState("");
   const [acceptTeamError, setAcceptTeamError] = React.useState("");
-  const [deleteTeamError, setDeleteTeamError] = React.useState("");
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -106,13 +106,20 @@ const GameBigCard = (props: GameBigCardProps) => {
   const closeModal = () => {
     setRequestJoinError("");
     setRequestJoinInput("");
-    setDeleteTeamError("");
     setModalStatus(Modal.None);
   };
 
   const onRequestJoinGameSubmit = () => {
     joinGame(id, requestJoinInput)
       .then(() => {
+        closeModal();
+        const successMessage = `Requested to join game ${
+          game?.title
+        } with team ${userTeams.find((x) => x.id === requestJoinInput)?.title}`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+
         getGame(id)
           .then((res) => {
             setError("");
@@ -137,6 +144,10 @@ const GameBigCard = (props: GameBigCardProps) => {
   const onGameStartSubmit = () => {
     startGame(id)
       .then(() => {
+        const successMessage = `Game ${game?.title} was started`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
 
         getGame(id)
           .then((res) => {
@@ -163,6 +174,13 @@ const GameBigCard = (props: GameBigCardProps) => {
     addTeamToGame(id, acceptTeamInput)
       .then(() => {
         closeModal();
+        const successMessage = `Team ${
+          game?.requestedTeams?.find((x) => x.id === acceptTeamInput)?.title ??
+          ""
+        } was added to game ${game?.title}`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
 
         getGame(id)
           .then((res) => {
@@ -186,8 +204,15 @@ const GameBigCard = (props: GameBigCardProps) => {
   };
 
   const onRemoveTeamFromGameSubmit = (team: boolean) => {
-    removeTeamFromGame(id, team).then(() => {
+    removeTeamFromGame(id, team)
+    .then(() => {
       closeModal();
+      const successMessage = `Team ${
+        team ? game?.secondTeam.title : game?.firstTeam.title
+      } was removed from the game`;
+      dispatch(
+        alertActions.changeAlert({ type: "success", message: successMessage })
+      );
 
       getGame(id)
         .then((res) => {
@@ -206,20 +231,18 @@ const GameBigCard = (props: GameBigCardProps) => {
     });
   };
 
-  const onDeleteSubmit = () => {
-    deleteGame(id)
-      .then(() => {
-        navigate("/mygames", { replace: true });
-      })
-      .catch((e) => {
-        console.log(e);
-        setDeleteTeamError(errorMessageFromAxiosError(e));
-      });
-  };
-
   const onChangeScore = (setId: string, playerId: string, change: boolean) => {
     changeGameSetScore(id, setId, playerId, change)
       .then(() => {
+        const successMessage = `Player ${
+          game?.sets
+            .find((x) => x.id === setId)
+            ?.players.find((x) => x.id === playerId)?.name
+        } score was ${change ? "increased" : "decreased"}`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+
         getGame(id)
           .then((res) => {
             setError("");
@@ -311,7 +334,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                           onClick={() => onRemoveTeamFromGameSubmit(false)}
                           size="small"
                         >
-                          <Tooltip title="Remove team">
+                          <Tooltip title="Remove first team">
                             <DeleteForeverIcon />
                           </Tooltip>
                         </IconButton>
@@ -330,7 +353,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                           onClick={() => onRemoveTeamFromGameSubmit(true)}
                           size="small"
                         >
-                          <Tooltip title="Remove team">
+                          <Tooltip title="Remove second team">
                             <DeleteForeverIcon />
                           </Tooltip>
                         </IconButton>
@@ -503,8 +526,8 @@ const GameBigCard = (props: GameBigCardProps) => {
       )}
       {modalStatus === Modal.Delete && (
         <DeleteGameModal
-          errorMessage={deleteTeamError}
-          onSubmit={onDeleteSubmit}
+          gameId={id}
+          gameTitle={game?.title ?? ""}
           onClose={closeModal}
         />
       )}

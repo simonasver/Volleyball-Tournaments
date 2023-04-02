@@ -45,7 +45,7 @@ instance.interceptors.response.use(
 
     const originalConfig = err.config;
     if (
-      !(originalConfig.url === "/Token" && originalConfig.method === "put") &&
+      !(originalConfig.url === "/Tokens" && originalConfig.method === "put") &&
       err.response
     ) {
       if (err.response.status === 401 && !originalConfig._retry) {
@@ -53,7 +53,7 @@ instance.interceptors.response.use(
 
         try {
           const tokens = store.getState().auth.tokens as Tokens;
-          const res = await instance.put("/Token", {
+          const res = await instance.put("/Tokens", {
             AccessToken: tokens.accessToken,
             RefreshToken: tokens.refreshToken,
           });

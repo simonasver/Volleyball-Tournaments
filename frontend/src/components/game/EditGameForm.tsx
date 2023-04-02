@@ -11,16 +11,18 @@ import {
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../layout/BackButton";
-import { useAppSelector } from "../../utils/hooks";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import { editGame, getGame } from "../../services/game.service";
 import Loader from "../layout/Loader";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import { GameStatus } from "../../utils/types";
+import { alertActions } from "../../store/alert-slice";
 
 const EditGameForm = () => {
   const { gameId } = useParams();
 
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -90,6 +92,10 @@ const EditGameForm = () => {
       isPrivate
     )
       .then(() => {
+        const successMessage = `Game ${title} was successfully updated`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
         return navigate(`/game/${gameId}`, { replace: true });
       })
       .catch((e) => {

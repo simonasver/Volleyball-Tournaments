@@ -13,9 +13,12 @@ import BackButton from "../layout/BackButton";
 import { addGame } from "../../services/game.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
+import { alertActions } from "../../store/alert-slice";
+import { useAppDispatch } from "../../utils/hooks";
 
 const CreateGameForm = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [error, setError] = React.useState("");
 
@@ -40,7 +43,11 @@ const CreateGameForm = () => {
       isPrivate
     )
       .then((res) => {
-        navigate("/mygames", { replace: true });
+        const successMessage = `Game ${title} was successfully created`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+        return navigate(`/game/${res}`, { replace: true });
       })
       .catch((e) => {
         console.log(e);

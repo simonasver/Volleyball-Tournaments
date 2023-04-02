@@ -26,7 +26,7 @@ const GameSets = (props: GameSetsProps) => {
             value={selectedSet}
             onChange={onSetChange}
             centered
-            variant="fullWidth"
+            variant="scrollable"
           >
             {sets.map((set, index) => {
               return (
@@ -34,6 +34,7 @@ const GameSets = (props: GameSetsProps) => {
                   key={set.id}
                   label={`Set ${index + 1}`}
                   disabled={set.status < GameStatus.Started}
+                  sx={{ minWidth: "fit-content", flex: 1 }}
                 />
               );
             })}

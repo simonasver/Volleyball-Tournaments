@@ -2,14 +2,16 @@ import React from "react";
 import { Alert, Button, Grid, TextField, Typography } from "@mui/material";
 import BackButton from "../layout/BackButton";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppSelector } from "../../utils/hooks";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import { editTeam, getTeam } from "../../services/team.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import Loader from "../layout/Loader";
+import { alertActions } from "../../store/alert-slice";
 
 const EditTeamForm = () => {
   const { teamId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -54,7 +56,11 @@ const EditTeamForm = () => {
     }
     editTeam(teamId, teamName, teamPicture, teamDescription)
       .then(() => {
-        navigate("/myteams", { replace: true });
+        const successMessage = `Team ${teamName} was successfully updated`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+        return navigate(`/team/${teamId}`, { replace: true });
       })
       .catch((e) => {
         console.log(e);

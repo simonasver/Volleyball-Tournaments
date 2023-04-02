@@ -16,9 +16,12 @@ import CreateTeamPage from "./pages/Team/CreateTeamPage";
 import EditTeamPage from "./pages/Team/EditTeamPage";
 import MyTeamsPage from "./pages/Team/MyTeamsPage";
 import TeamPage from "./pages/Team/TeamPage";
+import NotificationSnackbar from "./components/layout/NotificationSnackbar";
 
 function App() {
   return (
+    <>
+    <NotificationSnackbar />
     <Routes>
       <Route path="/" element={<StartingPage />} />
 
@@ -43,6 +46,7 @@ function App() {
       <Route path="/empty" element={<EmptyPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+    </>
   );
 }
 

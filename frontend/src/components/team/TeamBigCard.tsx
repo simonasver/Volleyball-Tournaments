@@ -21,13 +21,14 @@ import DeleteTeamModal from "./DeleteTeamModal";
 import { useNavigate } from "react-router-dom";
 import {
   addPlayerToTeam,
-  deleteTeam,
   getTeam,
   removePlayerFromTeam,
 } from "../../services/team.service";
 import { Team } from "../../utils/types";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import Loader from "../layout/Loader";
+import { alertActions } from "../../store/alert-slice";
+import { useAppDispatch } from "../../utils/hooks";
 
 interface TeamBigCardProps {
   id: string;
@@ -44,6 +45,7 @@ const TeamBigCard = (props: TeamBigCardProps) => {
   const { id } = props;
 
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -56,7 +58,6 @@ const TeamBigCard = (props: TeamBigCardProps) => {
 
   const [addPlayerError, setAddPlayerError] = React.useState("");
   const [removePlayerError, setRemovePlayerError] = React.useState("");
-  const [deleteTeamError, setDeleteTeamError] = React.useState("");
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -86,7 +87,6 @@ const TeamBigCard = (props: TeamBigCardProps) => {
     setAddPlayerError("");
     setRemovePlayerInput("");
     setRemovePlayerError("");
-    setDeleteTeamError("");
     setModalStatus(Modal.None);
   };
 
@@ -97,6 +97,10 @@ const TeamBigCard = (props: TeamBigCardProps) => {
     addPlayerToTeam(id, addPlayerInput)
       .then(() => {
         closeModal();
+        const successMessage = `Player ${addPlayerInput} was successfully added to ${team?.title} team`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
 
         getTeam(id)
           .then((res) => {
@@ -126,6 +130,12 @@ const TeamBigCard = (props: TeamBigCardProps) => {
     removePlayerFromTeam(id, removePlayerInput)
       .then(() => {
         closeModal();
+        const successMessage = `Player ${
+          team?.players.find((x) => x.id === removePlayerInput)?.name
+        } was successfully removed from ${team?.title} team`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
 
         getTeam(id)
           .then((res) => {
@@ -145,17 +155,6 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       .catch((e) => {
         console.log(e);
         setRemovePlayerError(errorMessageFromAxiosError(e));
-      });
-  };
-
-  const onDeleteSubmit = () => {
-    deleteTeam(id)
-      .then(() => {
-        navigate("/myteams", { replace: true });
-      })
-      .catch((e) => {
-        console.log(e);
-        setDeleteTeamError(errorMessageFromAxiosError(e));
       });
   };
 
@@ -196,14 +195,6 @@ const TeamBigCard = (props: TeamBigCardProps) => {
             <Box sx={{ flexGrow: 1 }}>
               <IconButton
                 centerRipple={false}
-                onClick={() => navigate(`/editteam/${id}`)}
-              >
-                <Tooltip title="Edit team">
-                  <EditIcon />
-                </Tooltip>
-              </IconButton>
-              <IconButton
-                centerRipple={false}
                 onClick={() => setModalStatus(Modal.Add)}
               >
                 <Tooltip title="Add player">
@@ -219,6 +210,14 @@ const TeamBigCard = (props: TeamBigCardProps) => {
                 </Tooltip>
               </IconButton>
             </Box>
+            <IconButton
+              centerRipple={false}
+              onClick={() => navigate(`/editteam/${id}`)}
+            >
+              <Tooltip title="Edit team">
+                <EditIcon />
+              </Tooltip>
+            </IconButton>
             <IconButton
               centerRipple={false}
               color="error"
@@ -252,8 +251,8 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       )}
       {modalStatus === Modal.Delete && (
         <DeleteTeamModal
-          errorMessage={deleteTeamError}
-          onSubmit={onDeleteSubmit}
+          teamId={id}
+          teamTitle={team?.title ?? ""}
           onClose={closeModal}
         />
       )}

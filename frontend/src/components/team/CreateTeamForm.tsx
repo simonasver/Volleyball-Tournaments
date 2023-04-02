@@ -1,13 +1,16 @@
 import React from "react";
 import { Alert, Button, Grid, TextField, Typography } from "@mui/material";
 import BackButton from "../layout/BackButton";
-import { useAppSelector } from "../../utils/hooks";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 import { useNavigate } from "react-router-dom";
 import { addTeam } from "../../services/team.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { alertActions } from "../../store/alert-slice";
 
 const CreateTeamForm = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [error, setError] = React.useState("");
 
   const [teamName, setTeamName] = React.useState("");
@@ -25,8 +28,12 @@ const CreateTeamForm = () => {
   const onCreateTeamSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     addTeam(teamName, teamPicture, teamDescription)
-      .then(() => {
-        navigate("/myteams", { replace: true });
+      .then((res) => {
+        const successMessage = `Team ${teamName} was succesfully created`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+        return navigate(`/team/${res}`, { replace: true });
       })
       .catch((e) => {
         console.log(e);

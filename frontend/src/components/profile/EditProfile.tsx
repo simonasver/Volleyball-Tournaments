@@ -8,6 +8,7 @@ import { authActions } from "../../store/auth-slice";
 import BackButton from "../layout/BackButton";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import Loader from "../layout/Loader";
+import { alertActions } from "../../store/alert-slice";
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -60,6 +61,10 @@ const EditProfile = () => {
             fullName: fullName,
           })
         );
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: "Profile was successfully updated" })
+        );
+
         navigate("/profile", { replace: true });
       })
       .catch((e) => {

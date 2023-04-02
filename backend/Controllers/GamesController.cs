@@ -152,7 +152,7 @@ public class GamesController : ControllerBase
 
         var createdGame = await _gameRepository.CreateAsync(newGame);
         
-        return CreatedAtAction(nameof(Post), createdGame);
+        return CreatedAtAction(nameof(Post), createdGame.Id);
     }
 
     [Authorize]
@@ -619,6 +619,7 @@ public class GamesController : ControllerBase
         {
             if (player.Score > 0)
             {
+                player.Score--;
                 if (!player.Team)
                 {
                     set.FirstTeamScore--;
@@ -627,6 +628,10 @@ public class GamesController : ControllerBase
                 {
                     set.SecondTeamScore--;
                 }
+            }
+            else
+            {
+                return BadRequest("Player's score cannot be below 0");
             }
         }
 
