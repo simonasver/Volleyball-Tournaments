@@ -1,20 +1,26 @@
 export interface Game {
   id: string;
-  ownerId: string;
   title: string;
   description: string;
   pointsToWin: number;
   pointDifferenceToWin: number;
-  setsToWin: number;
+  maxSets: number;
   playersPerTeam: number;
   firstTeam: Team;
   secondTeam: Team;
-  createDate: string;
-  status: GameStatus;
+  sets: GameSet[];
   firstTeamScore: number;
   secondTeamScore: number;
+  isPrivate: boolean;
+  createDate: string;
+  lastEditDate: string;
+  status: GameStatus;
+  startDate: string;
+  winner: GameTeam;
+  finishDate: string;
   requestedTeams: Team[];
-  sets: Set[];
+  blockedTeams: Team[];
+  ownerId: string;
 }
 
 export enum GameStatus {
@@ -25,15 +31,37 @@ export enum GameStatus {
   Finished = 4
 }
 
-export interface Set {
+export interface GameTeam {
   id: string;
-  firstTeam: Team;
-  secondTeam: Team;
+  title: string;
+  profilePicture: string;
+  description: string;
+  players: GameTeamPlayer[];
+}
+
+export interface GameTeamPlayer {
+  id: string;
+  name: string;
+}
+
+export interface GameSet {
+  id: string;
+  firstTeam: GameTeam;
+  secondTeam: GameTeam;
+  players: SetPlayer[];
   firstTeamScore: number;
   secondTeamScore: number;
-  players: TeamPlayer;
+  status: GameStatus;
   startDate: string;
+  winner: GameTeam;
   finishDate: string;
+}
+
+export interface SetPlayer {
+  id: string;
+  name: string;
+  score: number;
+  team: boolean;
 }
 
 export interface Team {

@@ -3,9 +3,10 @@
 public class Set
 {
     public Guid Id { get; set; }
+    public int Number { get; set; }
     public GameTeam FirstTeam { get; set; }
     public GameTeam SecondTeam { get; set; }
-    public ICollection<SetPlayer> Players { get; set; }
+    public IList<SetPlayer> Players { get; set; }
     public int FirstTeamScore { get; set; }
     public int SecondTeamScore { get; set; }
     public GameStatus Status { get; set; }

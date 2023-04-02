@@ -4,6 +4,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   Typography,
 } from "@mui/material";
 import { GameStatus } from "../../utils/types";
@@ -22,20 +23,26 @@ const GameSmallCard = (props: GameSmallCardProps) => {
 
   let statusString = "";
   switch (status) {
-    case 0:
+    case GameStatus.New:
       statusString = "New";
       break;
-    case 1:
+    case GameStatus.SingleTeam:
+      statusString = "Single team";
+      break;
+    case GameStatus.Ready:
+      statusString = "Ready to start";
+      break;
+    case GameStatus.Started:
       statusString = "In progress";
       break;
-    case 2:
+    case GameStatus.Finished:
       statusString = "Finished";
       break;
   }
 
   return (
     <Card sx={{ width: { xs: "100%", md: "50%" } }}>
-      <CardHeader title={title} subheader={statusString} />
+      <CardHeader title={title} subheader={<Chip label={statusString} size="small"/>} />
       <CardContent>
         <Typography variant="body1">{description}</Typography>
         <Typography variant="body2" color="text.secondary">

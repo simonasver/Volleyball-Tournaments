@@ -16,7 +16,7 @@ public class SetRepository : ISetRepository
     
     public async Task<IEnumerable<Set>> GetAllAsync()
     {
-        return await _dbContext.Sets.ToListAsync();
+        return await _dbContext.Sets.Include(x => x.Players).Include(x => x.Game).ToListAsync();
     }
 
     public async Task<Set?> GetAsync(Guid setId)

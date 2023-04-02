@@ -50,10 +50,11 @@ public class GameService : IGameService
         
         return game;
     }
-    public Game AddSetToGame(Game game)
+    public Game AddSetToGame(Game game, int number = 0)
     {
         var newSet = new Set()
         {
+            Number = number + 1,
             FirstTeam = game.FirstTeam,
             SecondTeam = game.SecondTeam,
             Players = new List<SetPlayer>()
@@ -74,7 +75,7 @@ public class GameService : IGameService
             {
                 Name = secondTeamPlayer.Name,
                 Score = 0,
-                Team = false
+                Team = true
             };
             newSet.Players.Add(newSetPlayer);
         }

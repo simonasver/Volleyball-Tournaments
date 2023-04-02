@@ -1,7 +1,7 @@
 import api from "./api";
 
 export const getUser = async (id: string, signal?: AbortSignal) => {
-  const res = await api.get("/User/" + id, { signal: signal });
+  const res = await api.get("/Users/" + id, { signal: signal });
   return res.data;
 };
 
@@ -12,7 +12,7 @@ export const editUser = async (
   signal?: AbortSignal
 ) => {
   const res = await api.patch(
-    "/User/" + id,
+    "/Users/" + id,
     {
       ProfilePictureUrl: profilePictureUrl,
       FullName: fullName,

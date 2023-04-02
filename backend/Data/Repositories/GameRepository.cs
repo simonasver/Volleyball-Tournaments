@@ -31,6 +31,7 @@ public class GameRepository : IGameRepository
             .Include(x => x.SecondTeam)
                 .ThenInclude(x => x.Players)
             .Include(x => x.Sets)
+                .ThenInclude(x => x.Players)
             .Include(x => x.Winner)
             .FirstOrDefaultAsync(x => x.Id == gameId);
     }

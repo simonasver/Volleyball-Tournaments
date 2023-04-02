@@ -54,6 +54,9 @@ const EditGameForm = () => {
           setPointDifferenceToWin(res.pointDifferenceToWin);
           setMaxSets(res.maxSets);
           setPlayersPerTeam(res.playersPerTeam);
+          if(res.playersPerTeam === 0) {
+            setLimitPlayers(false);
+          }
           setIsPrivate(res.isPrivate);
           setGameStatus(res.status);
 
@@ -207,9 +210,10 @@ const EditGameForm = () => {
               <Switch
                 value={limitPlayers}
                 onChange={() => setLimitPlayers((state) => !state)}
+                disabled={gameStatus > GameStatus.New}
               />
             }
-            label="Limit players (player count in teams must be equal to a set number)"
+            label="Limit players (player count in both teams must be equal)"
           />
         </FormGroup>
         <br />

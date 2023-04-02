@@ -3,7 +3,7 @@ import { authActions } from "../store/auth-slice";
 import api from "./api";
 
 export const login = async (username: string, password: string) => {
-  const res = await api.post("/Token", {
+  const res = await api.post("/Tokens", {
     UserName: username,
     Password: password,
   });
@@ -16,7 +16,7 @@ export const register = async (
   email: string,
   password: string
 ) => {
-  const res = await api.post("/User", {
+  const res = await api.post("/Users", {
     UserName: username,
     FullName: fullname,
     Email: email,
@@ -26,7 +26,7 @@ export const register = async (
 };
 
 export const refresh = async (token: string) => {
-  const res = await api.put("/Token", {
+  const res = await api.put("/Tokens", {
     token,
   });
   return res.data;
@@ -34,7 +34,7 @@ export const refresh = async (token: string) => {
 
 export const logout = async (dispatch: AppDispatch) => {
   try {
-    const res = await api.delete(`/Token`);
+    const res = await api.delete(`/Tokens`);
     return res.data;
   } catch (e) {
     return Promise.reject(e);

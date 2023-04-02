@@ -1,4 +1,5 @@
 import {
+  Alert,
   Card,
   CardActions,
   CardContent,
@@ -21,18 +22,15 @@ import { useNavigate } from "react-router-dom";
 import {
   addPlayerToTeam,
   deleteTeam,
+  getTeam,
   removePlayerFromTeam,
 } from "../../services/team.service";
-import { TeamPlayer } from "../../utils/types";
+import { Team } from "../../utils/types";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import Loader from "../layout/Loader";
 
 interface TeamBigCardProps {
   id: string;
-  title: string;
-  imageUrl?: string;
-  description?: string;
-  createDate: string;
-  players: TeamPlayer[];
 }
 
 enum Modal {
@@ -43,9 +41,13 @@ enum Modal {
 }
 
 const TeamBigCard = (props: TeamBigCardProps) => {
-  const { id, title, imageUrl, description, createDate, players } = props;
+  const { id } = props;
 
   const navigate = useNavigate();
+
+  const [error, setError] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [team, setTeam] = React.useState<Team>();
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
 
@@ -55,6 +57,29 @@ const TeamBigCard = (props: TeamBigCardProps) => {
   const [addPlayerError, setAddPlayerError] = React.useState("");
   const [removePlayerError, setRemovePlayerError] = React.useState("");
   const [deleteTeamError, setDeleteTeamError] = React.useState("");
+
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    if (!id) {
+      return navigate("/", { replace: true });
+    } else {
+      getTeam(id, abortController.signal)
+        .then((res) => {
+          setError("");
+          setTeam(res);
+          setIsLoading(false);
+        })
+        .catch((e) => {
+          console.log(e);
+          const errorMessage = errorMessageFromAxiosError(e);
+          setError(errorMessage);
+          if (errorMessage) {
+            setIsLoading(false);
+          }
+        });
+    }
+    return () => abortController.abort();
+  }, []);
 
   const closeModal = () => {
     setAddPlayerInput("");
@@ -71,7 +96,22 @@ const TeamBigCard = (props: TeamBigCardProps) => {
     }
     addPlayerToTeam(id, addPlayerInput)
       .then(() => {
-        navigate(0);
+        closeModal();
+
+        getTeam(id)
+          .then((res) => {
+            setError("");
+            setTeam(res);
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -85,7 +125,22 @@ const TeamBigCard = (props: TeamBigCardProps) => {
     }
     removePlayerFromTeam(id, removePlayerInput)
       .then(() => {
-        navigate(0);
+        closeModal();
+
+        getTeam(id)
+          .then((res) => {
+            setError("");
+            setTeam(res);
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -106,64 +161,76 @@ const TeamBigCard = (props: TeamBigCardProps) => {
 
   return (
     <>
-      <Card>
-        <CardHeader title={title} />
-        {imageUrl && (
-          <CardMedia component="img" height="300" image={imageUrl} />
-        )}
-        <CardContent>
-          <Typography variant="body1">{description}</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Created at: {createDate}
-          </Typography>
+      {error && (
+        <>
+          <Alert severity="error">{error}</Alert>
           <br />
-          <Typography variant="h6">Players:</Typography>
-          {players &&
-            players.map((item) => (
-              <Typography key={item.id} variant="body1">
-                • {item.name}
-              </Typography>
-            ))}
-          {!players || (players && players.length === 0) && <Typography>No players yet. Add some!</Typography>}
-        </CardContent>
-        <CardActions>
-          <Box sx={{ flexGrow: 1 }}>
+        </>
+      )}
+      <Loader isOpen={isLoading} />
+      {team && (
+        <Card>
+          <CardHeader title={team.title} />
+          {team.pictureUrl && (
+            <CardMedia component="img" height="300" image={team.pictureUrl} />
+          )}
+          <CardContent>
+            <Typography variant="body1">{team.description}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Created at: {team.createDate}
+            </Typography>
+            <br />
+            <Typography variant="h6">Players:</Typography>
+            {team.players &&
+              team.players.map((item) => (
+                <Typography key={item.id} variant="body1">
+                  • {item.name}
+                </Typography>
+              ))}
+            {!team.players ||
+              (team.players && team.players.length === 0 && (
+                <Typography>No players yet. Add some!</Typography>
+              ))}
+          </CardContent>
+          <CardActions>
+            <Box sx={{ flexGrow: 1 }}>
+              <IconButton
+                centerRipple={false}
+                onClick={() => navigate(`/editteam/${id}`)}
+              >
+                <Tooltip title="Edit team">
+                  <EditIcon />
+                </Tooltip>
+              </IconButton>
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.Add)}
+              >
+                <Tooltip title="Add player">
+                  <PersonAddAlt1Icon />
+                </Tooltip>
+              </IconButton>
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.Remove)}
+              >
+                <Tooltip title="Remove player">
+                  <PersonRemoveIcon />
+                </Tooltip>
+              </IconButton>
+            </Box>
             <IconButton
               centerRipple={false}
-              onClick={() => navigate(`/editteam/${id}`)}
+              color="error"
+              onClick={() => setModalStatus(Modal.Delete)}
             >
-              <Tooltip title="Edit team">
-                <EditIcon />
+              <Tooltip title="Remove team">
+                <DeleteForeverIcon />
               </Tooltip>
             </IconButton>
-            <IconButton
-              centerRipple={false}
-              onClick={() => setModalStatus(Modal.Add)}
-            >
-              <Tooltip title="Add player">
-                <PersonAddAlt1Icon />
-              </Tooltip>
-            </IconButton>
-            <IconButton
-              centerRipple={false}
-              onClick={() => setModalStatus(Modal.Remove)}
-            >
-              <Tooltip title="Remove player">
-                <PersonRemoveIcon />
-              </Tooltip>
-            </IconButton>
-          </Box>
-          <IconButton
-            centerRipple={false}
-            color="error"
-            onClick={() => setModalStatus(Modal.Delete)}
-          >
-            <Tooltip title="Remove team">
-              <DeleteForeverIcon />
-            </Tooltip>
-          </IconButton>
-        </CardActions>
-      </Card>
+          </CardActions>
+        </Card>
+      )}
       {modalStatus === Modal.Add && (
         <AddPlayerModal
           errorMessage={addPlayerError}
@@ -176,7 +243,7 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       {modalStatus === Modal.Remove && (
         <RemovePlayerModal
           errorMessage={removePlayerError}
-          players={players}
+          players={team?.players ?? []}
           removePlayerInput={removePlayerInput}
           onRemovePlayerInputChange={setRemovePlayerInput}
           onSubmit={onRemovePlayerSubmit}

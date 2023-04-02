@@ -1,17 +1,17 @@
 import api from "./api";
 
 export const getTeams = async (signal?: AbortSignal) => {
-  const res = await api.get("/Team", { signal: signal });
+  const res = await api.get("/Teams", { signal: signal });
   return res.data;
 };
 
 export const getUserTeams = async (userId: string, signal?: AbortSignal) => {
-  const res = await api.get(`/User/${userId}/Team`, { signal: signal });
+  const res = await api.get(`/Users/${userId}/Teams`, { signal: signal });
   return res.data;
 };
 
 export const getTeam = async (teamId: string, signal?: AbortSignal) => {
-  const res = await api.get(`/Team/${teamId}`, { signal: signal });
+  const res = await api.get(`/Teams/${teamId}`, { signal: signal });
   return res.data;
 };
 
@@ -20,7 +20,7 @@ export const addTeam = async (
   teamPicture: string,
   teamDescription: string
 ) => {
-  const res = await api.post("/Team", {
+  const res = await api.post("/Teams", {
     Title: teamTitle,
     PictureUrl: teamPicture,
     Description: teamDescription,
@@ -34,7 +34,7 @@ export const editTeam = async (
   teamPicture: string,
   teamDescription: string
 ) => {
-  const res = await api.put(`/Team/${teamId}`, {
+  const res = await api.put(`/Teams/${teamId}`, {
     Title: teamTitle,
     PictureUrl: teamPicture,
     Description: teamDescription,
@@ -43,12 +43,12 @@ export const editTeam = async (
 };
 
 export const deleteTeam = async (teamId: string) => {
-  const res = await api.delete(`/Team/${teamId}`);
+  const res = await api.delete(`/Teams/${teamId}`);
   return res.data;
 };
 
 export const addPlayerToTeam = async (teamId: string, playerName: string) => {
-  const res = await api.patch(`/Team/${teamId}/Player`, {
+  const res = await api.patch(`/Teams/${teamId}/Players`, {
     Name: playerName,
   });
   return res.data;
@@ -58,6 +58,6 @@ export const removePlayerFromTeam = async (
   teamId: string,
   playerId: string
 ) => {
-  const res = await api.delete(`/Team/${teamId}/Player/${playerId}`);
+  const res = await api.delete(`/Teams/${teamId}/Players/${playerId}`);
   return res.data;
 };
