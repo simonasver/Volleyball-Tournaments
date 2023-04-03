@@ -202,9 +202,9 @@ public class TeamsController : ControllerBase
             }
         }
 
-        if (team.Players.Count >= 20)
+        if (team.Players.Count >= 12)
         {
-            return BadRequest("Team is already full (max number players is 20)");
+            return BadRequest("Team is already full (max number players is 12)");
         }
 
         if (team.Players.FirstOrDefault(x => x.Name == addTeamPlayerDto.Name) != null)

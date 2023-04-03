@@ -25,7 +25,6 @@ const GameSets = (props: GameSetsProps) => {
           <Tabs
             value={selectedSet}
             onChange={onSetChange}
-            centered
             variant="scrollable"
           >
             {sets.map((set, index) => {

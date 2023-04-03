@@ -1,5 +1,4 @@
 import {
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -11,8 +10,8 @@ import {
 } from "@mui/material";
 import { GameStatus, SetPlayer } from "../../utils/types";
 
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import SetPlayerComponent from "./SetPlayerComponent";
+import React from "react";
 
 interface SetTableProps {
   setId: string;
@@ -28,7 +27,7 @@ interface SetTableProps {
   winner?: boolean;
 }
 
-const SetTable = (props: SetTableProps) => {
+const SetTable = React.memo(function SetTable(props: SetTableProps) {
   const {
     setId,
     isOwner,
@@ -50,8 +49,29 @@ const SetTable = (props: SetTableProps) => {
         Started at: {startDate}
       </Typography>
       <br />
-      <Typography color={status === GameStatus.Finished ? !winner ? "green" : "red" : "default"}>{firstTeamName}</Typography>
-      <Typography variant="h6" color={status === GameStatus.Finished ? !winner ? "green" : "red" : "default"}>{firstTeamScore}</Typography>
+      <Typography
+        color={
+          status === GameStatus.Finished
+            ? !winner
+              ? "green"
+              : "red"
+            : "default"
+        }
+      >
+        {firstTeamName}
+      </Typography>
+      <Typography
+        variant="h6"
+        color={
+          status === GameStatus.Finished
+            ? !winner
+              ? "green"
+              : "red"
+            : "default"
+        }
+      >
+        {firstTeamScore}
+      </Typography>
       <TableContainer component={Paper} sx={{ marginY: "20px" }}>
         <Table size="small">
           <TableHead>
@@ -66,42 +86,16 @@ const SetTable = (props: SetTableProps) => {
               players.map((player) => {
                 if (!player.team) {
                   return (
-                    <TableRow key={player.id}>
-                      <TableCell>{player.name}</TableCell>
-                      <TableCell>
-                        {isOwner &&
-                          status >= GameStatus.Started &&
-                          status < GameStatus.Finished && (
-                            <IconButton
-                              color="error"
-                              component="label"
-                              size="small"
-                              sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
-                              onClick={() =>
-                                onChangeScore(setId, player.id, false)
-                              }
-                            >
-                              <ArrowDownwardIcon fontSize="small" />
-                            </IconButton>
-                          )}
-                        {player.score}
-                        {isOwner &&
-                          status >= GameStatus.Started &&
-                          status < GameStatus.Finished && (
-                            <IconButton
-                              color="success"
-                              component="label"
-                              size="small"
-                              sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
-                              onClick={() =>
-                                onChangeScore(setId, player.id, true)
-                              }
-                            >
-                              <ArrowUpwardIcon fontSize="small" />
-                            </IconButton>
-                          )}
-                      </TableCell>
-                    </TableRow>
+                    <SetPlayerComponent
+                      key={player.id}
+                      playerId={player.id}
+                      setId={setId}
+                      name={player.name}
+                      score={player.score}
+                      isOwner={isOwner}
+                      status={status}
+                      onChangeScore={onChangeScore}
+                    />
                   );
                 }
               })}
@@ -109,8 +103,29 @@ const SetTable = (props: SetTableProps) => {
         </Table>
       </TableContainer>
       <br />
-      <Typography color={status === GameStatus.Finished ? winner ? "green" : "red" : "default"}>{secondTeamName}</Typography>
-      <Typography variant="h6"  color={status === GameStatus.Finished ? winner ? "green" : "red" : "default"}>{secondTeamScore}</Typography>
+      <Typography
+        color={
+          status === GameStatus.Finished
+            ? winner
+              ? "green"
+              : "red"
+            : "default"
+        }
+      >
+        {secondTeamName}
+      </Typography>
+      <Typography
+        variant="h6"
+        color={
+          status === GameStatus.Finished
+            ? winner
+              ? "green"
+              : "red"
+            : "default"
+        }
+      >
+        {secondTeamScore}
+      </Typography>
       <TableContainer component={Paper} sx={{ marginY: "20px" }}>
         <Table size="small">
           <TableHead>
@@ -125,42 +140,16 @@ const SetTable = (props: SetTableProps) => {
               players.map((player) => {
                 if (player.team) {
                   return (
-                    <TableRow key={player.id}>
-                      <TableCell>{player.name}</TableCell>
-                      <TableCell>
-                        {isOwner &&
-                          status >= GameStatus.Started &&
-                          status < GameStatus.Finished && (
-                            <IconButton
-                              color="error"
-                              component="label"
-                              size="small"
-                              sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
-                              onClick={() =>
-                                onChangeScore(setId, player.id, false)
-                              }
-                            >
-                              <ArrowDownwardIcon fontSize="small" />
-                            </IconButton>
-                          )}
-                        {player.score}
-                        {isOwner &&
-                          status >= GameStatus.Started &&
-                          status < GameStatus.Finished && (
-                            <IconButton
-                              color="success"
-                              component="label"
-                              size="small"
-                              sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
-                              onClick={() =>
-                                onChangeScore(setId, player.id, true)
-                              }
-                            >
-                              <ArrowUpwardIcon fontSize="small" />
-                            </IconButton>
-                          )}
-                      </TableCell>
-                    </TableRow>
+                    <SetPlayerComponent
+                      key={player.id}
+                      playerId={player.id}
+                      setId={setId}
+                      name={player.name}
+                      score={player.score}
+                      isOwner={isOwner}
+                      status={status}
+                      onChangeScore={onChangeScore}
+                    />
                   );
                 }
               })}
@@ -169,6 +158,6 @@ const SetTable = (props: SetTableProps) => {
       </TableContainer>
     </>
   );
-};
+});
 
 export default SetTable;

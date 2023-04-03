@@ -1,4 +1,5 @@
-﻿using Backend.Auth.Model;
+﻿using System.Diagnostics;
+using Backend.Auth.Model;
 using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
@@ -573,9 +574,9 @@ public class GamesController : ControllerBase
                     set.Status = GameStatus.Finished;
                     game.FirstTeamScore++;
                     var nextSet = game.Sets.FirstOrDefault(x => x.Number == set.Number + 1);
-                    if (nextSet == null)
+                    if (game.FirstTeamScore >= (game.MaxSets + 1) / 2)
                     {
-                        game.Winner = set.FirstTeam;
+                        game.Winner = game.FirstTeam;
                         game.Status = GameStatus.Finished;
                     }
                     else
@@ -599,9 +600,9 @@ public class GamesController : ControllerBase
                     set.Status = GameStatus.Finished;
                     game.SecondTeamScore++;
                     var nextSet = game.Sets.FirstOrDefault(x => x.Number == set.Number + 1);
-                    if (nextSet == null)
+                    if (game.SecondTeamScore >= (game.MaxSets + 1) / 2)
                     {
-                        game.Winner = set.SecondTeam;
+                        game.Winner = game.SecondTeam;
                         game.Status = GameStatus.Finished;
                     }
                     else
@@ -640,7 +641,7 @@ public class GamesController : ControllerBase
             set.Players[index] = player;
 
         await _setRepository.UpdateAsync(set);
-        
+
         return NoContent();
     }
 }

@@ -181,7 +181,7 @@ const CreateGameForm = () => {
           type="number"
           label="Amount of players in each team"
           variant="outlined"
-          inputProps={{ min: 1, max: 50 }}
+          inputProps={{ min: 1, max: 12 }}
           disabled={!limitPlayers}
           fullWidth
         />

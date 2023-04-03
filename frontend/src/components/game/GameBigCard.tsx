@@ -15,7 +15,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { GameStatus, Team, Game } from "../../utils/types";
+import { GameStatus, Team, Game, GameSet } from "../../utils/types";
 import DeleteGameModal from "./DeleteGameModal";
 import {
   addTeamToGame,
@@ -57,6 +57,7 @@ const GameBigCard = (props: GameBigCardProps) => {
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
   const [game, setGame] = React.useState<Game>();
+  const [sets, setSets] = React.useState<GameSet[]>([]);
 
   const user = useAppSelector((state) => state.auth.user);
   const [userTeams, setUserTeams] = React.useState<Team[]>([]);
@@ -79,6 +80,7 @@ const GameBigCard = (props: GameBigCardProps) => {
         .then((res) => {
           setError("");
           setGame(res);
+          setSets(res.sets);
           setIsLoading(false);
         })
         .catch((e) => {
@@ -247,6 +249,16 @@ const GameBigCard = (props: GameBigCardProps) => {
           .then((res) => {
             setError("");
             setGame(res);
+            const changedIndex = res.sets.findIndex((set: GameSet) => set.id === setId);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+            if(res.sets[changedIndex].firstTeamScore >= game?.pointsToWin! || res.sets[changedIndex].secondTeamScore >= game?.pointsToWin!) {
+              setSets(res.sets);
+            } else {
+              setSets((currentSets) => {
+                currentSets[changedIndex] = res.sets[changedIndex];
+                return currentSets;
+              });
+            }
             setIsLoading(false);
           })
           .catch((e) => {
@@ -432,7 +444,7 @@ const GameBigCard = (props: GameBigCardProps) => {
             <Divider />
             <GameSets
               isOwner={user?.id === game.ownerId}
-              sets={game.sets}
+              sets={sets ?? []}
               onChangeScore={onChangeScore}
             />
           </CardContent>

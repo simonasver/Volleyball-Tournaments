@@ -23,11 +23,7 @@ const AddPlayerModal = (props: AddPlayerModalProps) => {
     props;
 
   return (
-    <Dialog
-      open
-      onClose={onClose}
-      fullWidth
-    >
+    <Dialog open onClose={onClose} fullWidth>
       <DialogTitle>Add player</DialogTitle>
       <DialogContent>
         {errorMessage && (
@@ -48,6 +44,7 @@ const AddPlayerModal = (props: AddPlayerModalProps) => {
           variant="outlined"
           fullWidth
           required
+          autoFocus
         />
       </DialogContent>
       <DialogActions>
