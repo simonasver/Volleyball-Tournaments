@@ -15,6 +15,7 @@ public class Game
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
+    public string? PictureUrl { get; set; }
     public string? Description { get; set; }
     public int PointsToWin { get; set; }
     public int PointDifferenceToWin { get; set; }

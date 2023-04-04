@@ -17,35 +17,49 @@ import EditTeamPage from "./pages/Team/EditTeamPage";
 import MyTeamsPage from "./pages/Team/MyTeamsPage";
 import TeamPage from "./pages/Team/TeamPage";
 import NotificationSnackbar from "./components/layout/NotificationSnackbar";
+import AllTournamentsPage from "./pages/Tournament/AllTournamentsPage";
+import MyTournamentsPage from "./pages/Tournament/MyTournamentsPage";
+import TournamentPage from "./pages/Tournament/TournamentPage";
+import CreateTournamentPage from "./pages/Tournament/CreateTournamentPage";
+import EditTournamentPage from "./pages/Tournament/EditTournamentPage";
 
 function App() {
   return (
     <>
-    <NotificationSnackbar />
-    <Routes>
-      <Route path="/" element={<StartingPage />} />
+      <NotificationSnackbar />
+      <Routes>
+        <Route path="/" element={<StartingPage />} />
 
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/logout" element={<LogoutPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/logout" element={<LogoutPage />} />
 
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/editprofile" element={<EditProfilePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/editprofile" element={<EditProfilePage />} />
 
-      <Route path="/myteams" element={<MyTeamsPage />} />
-      <Route path="/team/:teamId" element={<TeamPage />} />
-      <Route path="/createteam" element={<CreateTeamPage />} />
-      <Route path="/editteam/:teamId" element={<EditTeamPage />} />
+        <Route path="/myteams" element={<MyTeamsPage />} />
+        <Route path="/team/:teamId" element={<TeamPage />} />
+        <Route path="/createteam" element={<CreateTeamPage />} />
+        <Route path="/editteam/:teamId" element={<EditTeamPage />} />
 
-      <Route path="/games" element={<AllGamesPage />} />
-      <Route path="/mygames" element={<MyGamesPage />} />
-      <Route path="/game/:gameId" element={<GamePage />} />
-      <Route path="/creategame" element={<CreateGamePage />} />
-      <Route path="/editgame/:gameId" element={<EditGamePage />} />
+        <Route path="/games" element={<AllGamesPage />} />
+        <Route path="/mygames" element={<MyGamesPage />} />
+        <Route path="/game/:gameId" element={<GamePage />} />
+        <Route path="/creategame" element={<CreateGamePage />} />
+        <Route path="/editgame/:gameId" element={<EditGamePage />} />
 
-      <Route path="/empty" element={<EmptyPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        <Route path="/tournaments" element={<AllTournamentsPage />} />
+        <Route path="/mytournaments" element={<MyTournamentsPage />} />
+        <Route path="/tournament/:tournamentId" element={<TournamentPage />} />
+        <Route path="/createtournament" element={<CreateTournamentPage />} />
+        <Route
+          path="/edittournament/:tournamentId"
+          element={<EditTournamentPage />}
+        />
+
+        <Route path="/empty" element={<EmptyPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </>
   );
 }

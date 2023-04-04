@@ -28,7 +28,7 @@ const CreateGameForm = () => {
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
   const [maxSets, setMaxSets] = React.useState(5);
   const [limitPlayers, setLimitPlayers] = React.useState(true);
-  const [playersPerTeam, setPlayersPerTeam] = React.useState(5);
+  const [playersPerTeam, setPlayersPerTeam] = React.useState(6);
   const [isPrivate, setIsPrivate] = React.useState(false);
 
   const onSubmitHandler = (event: React.FormEvent) => {
@@ -124,7 +124,7 @@ const CreateGameForm = () => {
         <TextField
           value={pointsToWin}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setPointsToWin(parseInt(e.target.value) ?? 0)
+            setPointsToWin(parseInt(e.target.value) ?? 1)
           }
           type="number"
           label="Points needed to win a set"
@@ -150,7 +150,7 @@ const CreateGameForm = () => {
         <TextField
           value={maxSets}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setMaxSets(parseInt(e.target.value) ?? 0)
+            setMaxSets(parseInt(e.target.value) ?? 1)
           }
           type="number"
           label="Best of x (max amount of sets)"
@@ -176,7 +176,7 @@ const CreateGameForm = () => {
         <TextField
           value={playersPerTeam}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setPlayersPerTeam(parseInt(e.target.value) ?? 0)
+            setPlayersPerTeam(parseInt(e.target.value) ?? 1)
           }
           type="number"
           label="Amount of players in each team"

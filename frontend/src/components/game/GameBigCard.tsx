@@ -155,6 +155,7 @@ const GameBigCard = (props: GameBigCardProps) => {
           .then((res) => {
             setError("");
             setGame(res);
+            setSets(res.sets);
             setIsLoading(false);
           })
           .catch((e) => {
@@ -206,8 +207,7 @@ const GameBigCard = (props: GameBigCardProps) => {
   };
 
   const onRemoveTeamFromGameSubmit = (team: boolean) => {
-    removeTeamFromGame(id, team)
-    .then(() => {
+    removeTeamFromGame(id, team).then(() => {
       closeModal();
       const successMessage = `Team ${
         team ? game?.secondTeam.title : game?.firstTeam.title
@@ -249,9 +249,15 @@ const GameBigCard = (props: GameBigCardProps) => {
           .then((res) => {
             setError("");
             setGame(res);
-            const changedIndex = res.sets.findIndex((set: GameSet) => set.id === setId);
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
-            if(res.sets[changedIndex].firstTeamScore >= game?.pointsToWin! || res.sets[changedIndex].secondTeamScore >= game?.pointsToWin!) {
+            const changedIndex = res.sets.findIndex(
+              (set: GameSet) => set.id === setId
+            );
+            if (
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+              res.sets[changedIndex].firstTeamScore >= game?.pointsToWin! ||
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+              res.sets[changedIndex].secondTeamScore >= game?.pointsToWin!
+            ) {
               setSets(res.sets);
             } else {
               setSets((currentSets) => {
@@ -325,64 +331,84 @@ const GameBigCard = (props: GameBigCardProps) => {
             >
               <Grid item>
                 {game.firstTeam && (
-                  <>
-                    <Typography
-                      variant="body1"
-                      color={
-                        game.winner
-                          ? game.winner.id === game.firstTeam.id
-                            ? "green"
-                            : "red"
-                          : "default"
-                      }
-                    >
-                      {game.firstTeam.title}
-                    </Typography>
-                    {user?.id === game.ownerId &&
-                      game.status < GameStatus.Started && (
-                        <IconButton
-                          centerRipple={false}
-                          color="error"
-                          onClick={() => onRemoveTeamFromGameSubmit(false)}
-                          size="small"
-                        >
-                          <Tooltip title="Remove first team">
-                            <DeleteForeverIcon />
-                          </Tooltip>
-                        </IconButton>
-                      )}
-                  </>
+                  <Grid
+                    container
+                    spacing={0}
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Grid item>
+                      <Typography
+                        variant="body1"
+                        color={
+                          game.winner
+                            ? game.winner.id === game.firstTeam.id
+                              ? "green"
+                              : "red"
+                            : "default"
+                        }
+                      >
+                        {game.firstTeam.title}
+                      </Typography>
+                    </Grid>
+                    <Grid item>
+                      {user?.id === game.ownerId &&
+                        game.status < GameStatus.Started && (
+                          <IconButton
+                            centerRipple={false}
+                            color="error"
+                            onClick={() => onRemoveTeamFromGameSubmit(false)}
+                            size="small"
+                          >
+                            <Tooltip title="Remove first team">
+                              <DeleteForeverIcon />
+                            </Tooltip>
+                          </IconButton>
+                        )}
+                    </Grid>
+                  </Grid>
                 )}
               </Grid>
               <Grid item>
                 {game.secondTeam && (
-                  <>
-                    {user?.id === game.ownerId &&
-                      game.status < GameStatus.Started && (
-                        <IconButton
-                          centerRipple={false}
-                          color="error"
-                          onClick={() => onRemoveTeamFromGameSubmit(true)}
-                          size="small"
-                        >
-                          <Tooltip title="Remove second team">
-                            <DeleteForeverIcon />
-                          </Tooltip>
-                        </IconButton>
-                      )}
-                    <Typography
-                      variant="body1"
-                      color={
-                        game.winner
-                          ? game.winner.id === game.secondTeam.id
-                            ? "green"
-                            : "red"
-                          : "default"
-                      }
-                    >
-                      {game.secondTeam.title}
-                    </Typography>
-                  </>
+                  <Grid
+                    container
+                    spacing={0}
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                  >
+                    <Grid item>
+                      {user?.id === game.ownerId &&
+                        game.status < GameStatus.Started && (
+                          <IconButton
+                            centerRipple={false}
+                            color="error"
+                            onClick={() => onRemoveTeamFromGameSubmit(true)}
+                            size="small"
+                          >
+                            <Tooltip title="Remove second team">
+                              <DeleteForeverIcon />
+                            </Tooltip>
+                          </IconButton>
+                        )}
+                    </Grid>
+                    <Grid item>
+                      <Typography
+                        variant="body1"
+                        color={
+                          game.winner
+                            ? game.winner.id === game.secondTeam.id
+                              ? "green"
+                              : "red"
+                            : "default"
+                        }
+                      >
+                        {game.secondTeam.title}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 )}
               </Grid>
             </Grid>
@@ -516,7 +542,10 @@ const GameBigCard = (props: GameBigCardProps) => {
           teams={
             game?.requestedTeams
               ? userTeams.filter(
-                  (x) => !game?.requestedTeams.some((y) => y.id == x.id)
+                  (x) =>
+                    !game?.requestedTeams.some((y) => y.id === x.id) &&
+                    x.id !== game?.firstTeam?.id &&
+                    x.id !== game?.secondTeam?.id
                 )
               : userTeams
           }

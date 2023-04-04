@@ -170,7 +170,7 @@ const EditGameForm = () => {
         <TextField
           value={pointsToWin}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setPointsToWin(parseInt(e.target.value) ?? 0)
+            setPointsToWin(parseInt(e.target.value) ?? 1)
           }
           type="number"
           label="Points needed to win a set"
@@ -198,7 +198,7 @@ const EditGameForm = () => {
         <TextField
           value={maxSets}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setMaxSets(parseInt(e.target.value) ?? 0)
+            setMaxSets(parseInt(e.target.value) ?? 1)
           }
           type="number"
           label="Best of x (max amount of sets)"
@@ -226,7 +226,7 @@ const EditGameForm = () => {
         <TextField
           value={playersPerTeam}
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setPlayersPerTeam(parseInt(e.target.value) ?? 0)
+            setPlayersPerTeam(parseInt(e.target.value) ?? 1)
           }
           type="number"
           label="Amount of players in each team"

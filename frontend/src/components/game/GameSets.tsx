@@ -26,6 +26,7 @@ const GameSets = (props: GameSetsProps) => {
             value={selectedSet}
             onChange={onSetChange}
             variant="scrollable"
+            scrollButtons
           >
             {sets.map((set, index) => {
               return (
