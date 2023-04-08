@@ -13,30 +13,30 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { Team } from "../../utils/types";
+import { Team } from "../../../utils/types";
 
-interface RequestJoinGameModalProps {
+interface AcceptTeamModalProps {
   errorMessage: string;
   teams: Team[];
-  joinTeamInput: string;
-  onJoinGameInputChange: (value: string) => void;
+  acceptTeamInput: string;
+  onAcceptTeamInputChange: (value: string) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
 
-const RequestJoinGameModal = (props: RequestJoinGameModalProps) => {
+const AcceptGameTeamModal = (props: AcceptTeamModalProps) => {
   const {
     errorMessage,
     teams,
-    joinTeamInput,
-    onJoinGameInputChange,
+    acceptTeamInput,
+    onAcceptTeamInputChange,
     onSubmit,
     onClose,
   } = props;
 
   return (
     <Dialog open onClose={onClose} fullWidth>
-      <DialogTitle>Request join game</DialogTitle>
+      <DialogTitle>Accept team to a game</DialogTitle>
       <DialogContent>
         {errorMessage && (
           <>
@@ -45,16 +45,16 @@ const RequestJoinGameModal = (props: RequestJoinGameModalProps) => {
           </>
         )}
         <DialogContentText>
-          Select team to request join game with
+          Select team to accept to a game
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to join</InputLabel>
+          <InputLabel>Team to accept</InputLabel>
           <Select
-            value={joinTeamInput}
-            label="Team to join"
+            value={acceptTeamInput}
+            label="Team to accept"
             onChange={(e: SelectChangeEvent<string>) =>
-              onJoinGameInputChange(e.target.value)
+              onAcceptTeamInputChange(e.target.value)
             }
           >
             {teams.map((item) => (
@@ -68,11 +68,11 @@ const RequestJoinGameModal = (props: RequestJoinGameModalProps) => {
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
         <Button variant="contained" onClick={onSubmit}>
-          Join
+          Accept
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default RequestJoinGameModal;
+export default AcceptGameTeamModal;

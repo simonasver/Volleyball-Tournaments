@@ -116,8 +116,8 @@ public class TeamsController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("/api/[controller]/{teamId}")]
-    public async Task<IActionResult> Update(Guid teamId, [FromBody] EditTeamDto editTeamDto)
+    [HttpPatch("/api/[controller]/{teamId}")]
+    public async Task<IActionResult> Patch(Guid teamId, [FromBody] EditTeamDto editTeamDto)
     {
         var team = await _teamRepository.GetAsync(teamId);
 

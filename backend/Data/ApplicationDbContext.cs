@@ -1,6 +1,7 @@
 ﻿using Backend.Auth.Model;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
+using Backend.Data.Entities.Tournament;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ namespace Backend.Data;
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     private readonly IConfiguration _configuration;
+    public DbSet<Tournament> Tournaments { get; set; }
+    
     public DbSet<Team> Teams { get; set; }
     public DbSet<TeamPlayer> TeamPlayers { get; set; }
     

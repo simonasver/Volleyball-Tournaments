@@ -8,20 +8,20 @@ import {
     DialogContentText,
     DialogTitle,
   } from "@mui/material";
-import { deleteGame } from "../../services/game.service";
+import { deleteGame } from "../../../services/game.service";
 import { useNavigate } from "react-router-dom";
-import { alertActions } from "../../store/alert-slice";
-import { useAppDispatch } from "../../utils/hooks";
-import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { alertActions } from "../../../store/alert-slice";
+import { useAppDispatch } from "../../../utils/hooks";
+import { errorMessageFromAxiosError } from "../../../utils/helpers";
   
-  interface DeleteGameModalProps {
-    gameId: string;
-    gameTitle: string;
+  interface DeleteTournamentModalProps {
+    tournamentId: string;
+    tournamentTitle: string;
     onClose: () => void;
   }
   
-  const DeleteGameModal = (props: DeleteGameModalProps) => {
-    const { gameId, gameTitle, onClose } = props;
+  const DeleteTournamentModal = (props: DeleteTournamentModalProps) => {
+    const { tournamentId, tournamentTitle, onClose } = props;
 
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -29,13 +29,13 @@ import { errorMessageFromAxiosError } from "../../utils/helpers";
     const [error, setError] = React.useState("");
 
     const onDeleteSubmit = () => {
-      deleteGame(gameId)
+      deleteGame(tournamentId)
         .then(() => {
-          const successMessage = `Game ${gameTitle} was deleted`;
+          const successMessage = `Tournament ${tournamentTitle} was deleted`;
           dispatch(
             alertActions.changeAlert({ type: "success", message: successMessage })
           );
-          return navigate("/mygames", { replace: true });
+          return navigate("/mytournaments", { replace: true });
         })
         .catch((e) => {
           console.log(e);
@@ -54,7 +54,7 @@ import { errorMessageFromAxiosError } from "../../utils/helpers";
             </>
           )}
           <DialogContentText>
-            Are you sure you want to permanently delete game {gameTitle}?
+            Are you sure you want to permanently delete tournament {tournamentTitle}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -67,5 +67,5 @@ import { errorMessageFromAxiosError } from "../../utils/helpers";
     );
   };
   
-  export default DeleteGameModal;
+  export default DeleteTournamentModal;
   

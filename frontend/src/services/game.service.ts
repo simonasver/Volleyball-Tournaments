@@ -17,6 +17,7 @@ export const getGame = async (gameId: string, signal?: AbortSignal) => {
 
 export const addGame = async (
   title: string,
+  pictureUrl: string,
   description: string,
   pointsToWin: number,
   pointDifferenceToWin: number,
@@ -26,6 +27,7 @@ export const addGame = async (
 ) => {
   const res = await api.post("/Games", {
     Title: title,
+    PictureUrl: pictureUrl,
     Description: description,
     PointsToWin: pointsToWin,
     PointDifferenceToWin: pointDifferenceToWin,
@@ -39,6 +41,7 @@ export const addGame = async (
 export const editGame = async (
   gameId: string,
   title?: string,
+  pictureUrl?: string,
   description?: string,
   pointsToWin?: number,
   pointDifferenceToWin?: number,
@@ -46,8 +49,9 @@ export const editGame = async (
   playersPerTeam?: number,
   isPrivate?: boolean
 ) => {
-  const res = await api.put(`/Games/${gameId}`, {
+  const res = await api.patch(`/Games/${gameId}`, {
     Title: title,
+    PictureUrl: pictureUrl,
     Description: description,
     PointsToWin: pointsToWin,
     PointDifferenceToWin: pointDifferenceToWin,

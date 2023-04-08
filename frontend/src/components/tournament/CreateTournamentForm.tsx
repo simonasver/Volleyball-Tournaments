@@ -18,8 +18,16 @@ import {
 } from "@mui/material";
 import BackButton from "../layout/BackButton";
 import { TournamentType } from "../../utils/types";
+import { addTournament } from "../../services/tournament.service";
+import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
+import { alertActions } from "../../store/alert-slice";
 
 const CreateTournamentForm = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [error, setError] = React.useState("");
 
   const [title, setTitle] = React.useState("");
@@ -38,12 +46,43 @@ const CreateTournamentForm = () => {
 
   const [currentTab, setCurrentTab] = React.useState<number>(0);
 
+  const user = useAppSelector((state) => state.auth.user);
+
+  React.useEffect(() => {
+    if (!user) {
+      return navigate("/", { replace: true });
+    }
+  }, []);
+
   const onTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
   const onSubmitHandler = (event: React.FormEvent) => {
     event.preventDefault();
+    addTournament(
+      title,
+      pictureUrl,
+      description,
+      type,
+      maxTeams,
+      pointsToWin,
+      pointDifferenceToWin,
+      maxSets,
+      limitPlayers ? playersPerTeam : 0,
+      isPrivate
+    )
+      .then((res) => {
+        const successMessage = `Game ${title} was successfully created`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+        return navigate(`/tournament/${res}`, { replace: true });
+      })
+      .catch((e) => {
+        console.log(e);
+        setError(errorMessageFromAxiosError(e));
+      });
   };
 
   return (

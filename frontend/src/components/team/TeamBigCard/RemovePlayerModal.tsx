@@ -13,30 +13,30 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { Team } from "../../utils/types";
+import { TeamPlayer } from "../../../utils/types";
 
-interface AcceptTeamModalProps {
+interface RemovePlayerModalProps {
   errorMessage: string;
-  teams: Team[];
-  acceptTeamInput: string;
-  onAcceptTeamInputChange: (value: string) => void;
+  players: TeamPlayer[];
+  removePlayerInput: string;
+  onRemovePlayerInputChange: (value: string) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
 
-const AcceptTeamModal = (props: AcceptTeamModalProps) => {
+const RemovePlayerModal = (props: RemovePlayerModalProps) => {
   const {
     errorMessage,
-    teams,
-    acceptTeamInput,
-    onAcceptTeamInputChange,
+    players,
+    removePlayerInput,
+    onRemovePlayerInputChange,
     onSubmit,
     onClose,
   } = props;
 
   return (
     <Dialog open onClose={onClose} fullWidth>
-      <DialogTitle>Accept team to a game</DialogTitle>
+      <DialogTitle>Remove players</DialogTitle>
       <DialogContent>
         {errorMessage && (
           <>
@@ -45,21 +45,21 @@ const AcceptTeamModal = (props: AcceptTeamModalProps) => {
           </>
         )}
         <DialogContentText>
-          Select team to accept to a game
+          Select player to remove from the team
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to accept</InputLabel>
+          <InputLabel>Player to remove</InputLabel>
           <Select
-            value={acceptTeamInput}
-            label="Team to accept"
+            value={removePlayerInput}
+            label="Player to remove"
             onChange={(e: SelectChangeEvent<string>) =>
-              onAcceptTeamInputChange(e.target.value)
+              onRemovePlayerInputChange(e.target.value)
             }
           >
-            {teams.map((item) => (
+            {players.map((item) => (
               <MenuItem key={item.id} value={item.id}>
-                {item.title}
+                {item.name}
               </MenuItem>
             ))}
           </Select>
@@ -68,11 +68,11 @@ const AcceptTeamModal = (props: AcceptTeamModalProps) => {
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
         <Button variant="contained" onClick={onSubmit}>
-          Accept
+          Remove
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default AcceptTeamModal;
+export default RemovePlayerModal;

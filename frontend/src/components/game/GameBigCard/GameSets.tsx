@@ -1,7 +1,7 @@
 import React from "react";
 import { Tab, Tabs } from "@mui/material";
-import SetTable from "./SetTable";
-import { GameSet, GameStatus } from "../../utils/types";
+import GameSetComponent from "./GameSetComponent";
+import { GameSet, GameStatus } from "../../../utils/types";
 
 interface GameSetsProps {
   isOwner: boolean;
@@ -42,7 +42,7 @@ const GameSets = (props: GameSetsProps) => {
           {sets.map((set, index) => {
             return (
               <div key={set.id} hidden={selectedSet !== index}>
-                <SetTable
+                <GameSetComponent
                   setId={set.id}
                   isOwner={isOwner}
                   firstTeamName={set.firstTeam.title}

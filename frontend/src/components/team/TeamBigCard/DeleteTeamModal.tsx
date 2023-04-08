@@ -9,11 +9,11 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material";
-import { deleteTeam } from "../../services/team.service";
-import { alertActions } from "../../store/alert-slice";
-import { useAppDispatch } from "../../utils/hooks";
+import { deleteTeam } from "../../../services/team.service";
+import { alertActions } from "../../../store/alert-slice";
+import { useAppDispatch } from "../../../utils/hooks";
 import { useNavigate } from "react-router-dom";
-import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { errorMessageFromAxiosError } from "../../../utils/helpers";
 
 interface DeleteTeamModalProps {
   teamId: string;

@@ -75,6 +75,9 @@ builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddTransient<ITeamRepository, TeamRepository>();
 
+builder.Services.AddTransient<ITournamentService, TournamentService>();
+builder.Services.AddTransient<ITournamentRepository, TournamentRepository>();
+
 builder.Services.AddTransient<IGameService, GameService>();
 builder.Services.AddTransient<IGameRepository, GameRepository>();
 builder.Services.AddTransient<ISetRepository, SetRepository>();

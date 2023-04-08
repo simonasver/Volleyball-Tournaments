@@ -11,6 +11,7 @@ export interface Tournament {
   status: TournamentStatus;
   requestedTeams: Team[];
   acceptedTeams: GameTeam[];
+  ownerId: string;
 }
 
 export interface TournamentGame {
@@ -28,15 +29,17 @@ export enum TournamentType {
 }
 
 export enum TournamentStatus {
-  New = 0,
-  Started = 1,
-  Finished = 2
+  Open = 0,
+  Closed = 1,
+  Started = 2,
+  Finished = 3
 }
 
 export interface Game {
   id: string;
   title: string;
   description: string;
+  pictureUrl: string;
   pointsToWin: number;
   pointDifferenceToWin: number;
   maxSets: number;

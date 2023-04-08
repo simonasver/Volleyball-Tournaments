@@ -1,12 +1,12 @@
 import React from "react";
-import { useAppSelector } from "../../utils/hooks";
+import { useAppSelector } from "../../../utils/hooks";
 import { useNavigate } from "react-router-dom";
-import { getGames, getUserGames } from "../../services/game.service";
-import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { getGames, getUserGames } from "../../../services/game.service";
+import { errorMessageFromAxiosError } from "../../../utils/helpers";
 import { Alert, Typography } from "@mui/material";
-import Loader from "../layout/Loader";
+import Loader from "../../layout/Loader";
 import GameSmallCard from "./GameSmallCard";
-import { Game } from "../../utils/types";
+import { Game } from "../../../utils/types";
 
 interface GameListProps {
   all?: boolean;
@@ -82,6 +82,7 @@ const GameList = (props: GameListProps) => {
               key={item.id}
               id={item.id}
               title={item.title}
+              pictureUrl={item.pictureUrl}
               description={item.description}
               createDate={new Date(item.createDate).toDateString()}
               status={item.status}

@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Team } from "../../utils/types";
-import { useAppSelector } from "../../utils/hooks";
-import { getTeams, getUserTeams } from "../../services/team.service";
-import { errorMessageFromAxiosError, isAdmin } from "../../utils/helpers";
+import { Team } from "../../../utils/types";
+import { useAppSelector } from "../../../utils/hooks";
+import { getTeams, getUserTeams } from "../../../services/team.service";
+import { errorMessageFromAxiosError, isAdmin } from "../../../utils/helpers";
 import { Alert, Typography } from "@mui/material";
-import Loader from "../layout/Loader";
+import Loader from "../../layout/Loader";
 import TeamSmallCard from "./TeamSmallCard";
 
 interface TeamListProps {

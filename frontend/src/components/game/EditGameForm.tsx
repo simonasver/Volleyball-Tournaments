@@ -28,6 +28,7 @@ const EditGameForm = () => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const [title, setTitle] = React.useState("");
+  const [pictureUrl, setPictureUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [pointsToWin, setPointsToWin] = React.useState(25);
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
@@ -56,9 +57,7 @@ const EditGameForm = () => {
           setPointDifferenceToWin(res.pointDifferenceToWin);
           setMaxSets(res.maxSets);
           setPlayersPerTeam(res.playersPerTeam);
-          if(res.playersPerTeam === 0) {
-            setLimitPlayers(false);
-          }
+          setLimitPlayers(res.playersPerTeam !== 0);
           setIsPrivate(res.isPrivate);
           setGameStatus(res.status);
 
@@ -84,6 +83,7 @@ const EditGameForm = () => {
     editGame(
       gameId,
       title,
+      pictureUrl,
       description,
       pointsToWin,
       pointDifferenceToWin,
@@ -152,6 +152,18 @@ const EditGameForm = () => {
           variant="outlined"
           fullWidth
           required
+        />
+        <br />
+        <br />
+        <TextField
+          value={pictureUrl}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPictureUrl(e.target.value)
+          }
+          type="text"
+          label="Game picture (url)"
+          variant="outlined"
+          fullWidth
         />
         <br />
         <br />

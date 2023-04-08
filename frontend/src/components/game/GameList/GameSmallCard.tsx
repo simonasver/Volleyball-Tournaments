@@ -4,14 +4,16 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CardMedia,
   Chip,
   Typography,
 } from "@mui/material";
-import { GameStatus } from "../../utils/types";
+import { GameStatus } from "../../../utils/types";
 
 interface GameSmallCardProps {
   id: string;
   title: string;
+  pictureUrl: string;
   description: string;
   createDate: string;
   status: GameStatus;
@@ -19,7 +21,7 @@ interface GameSmallCardProps {
 }
 
 const GameSmallCard = (props: GameSmallCardProps) => {
-  const { title, description, createDate, status, onButtonPress } = props;
+  const { title, pictureUrl, description, createDate, status, onButtonPress } = props;
 
   let statusString = "";
   switch (status) {
@@ -43,6 +45,13 @@ const GameSmallCard = (props: GameSmallCardProps) => {
   return (
     <Card sx={{ width: { xs: "100%", md: "50%" } }}>
       <CardHeader title={title} subheader={<Chip label={statusString} size="small"/>} />
+      {pictureUrl && (
+        <CardMedia
+          component="img"
+          height="200"
+          image={pictureUrl}
+        />
+      )}
       <CardContent>
         <Typography variant="body1">{description}</Typography>
         <Typography variant="body2" color="text.secondary">

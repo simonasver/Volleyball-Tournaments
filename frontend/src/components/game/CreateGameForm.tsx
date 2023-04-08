@@ -14,7 +14,7 @@ import { addGame } from "../../services/game.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { alertActions } from "../../store/alert-slice";
-import { useAppDispatch } from "../../utils/hooks";
+import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 
 const CreateGameForm = () => {
   const navigate = useNavigate();
@@ -23,6 +23,7 @@ const CreateGameForm = () => {
   const [error, setError] = React.useState("");
 
   const [title, setTitle] = React.useState("");
+  const [pictureUrl, setPictureUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [pointsToWin, setPointsToWin] = React.useState(25);
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
@@ -31,10 +32,19 @@ const CreateGameForm = () => {
   const [playersPerTeam, setPlayersPerTeam] = React.useState(6);
   const [isPrivate, setIsPrivate] = React.useState(false);
 
+  const user = useAppSelector((state) => state.auth.user);
+
+  React.useEffect(() => {
+    if (!user) {
+      return navigate("/", { replace: true });
+    }
+  }, []);
+
   const onSubmitHandler = (event: React.FormEvent) => {
     event.preventDefault();
     addGame(
       title,
+      pictureUrl,
       description,
       pointsToWin,
       pointDifferenceToWin,
@@ -106,6 +116,18 @@ const CreateGameForm = () => {
           variant="outlined"
           fullWidth
           required
+        />
+        <br />
+        <br />
+        <TextField
+          value={pictureUrl}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPictureUrl(e.target.value)
+          }
+          type="text"
+          label="Game picture (url)"
+          variant="outlined"
+          fullWidth
         />
         <br />
         <br />

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Auth.Model;
 using Backend.Data.Entities.Game;
 
 namespace Backend.Data.Entities.Tournament;
@@ -12,7 +13,8 @@ public enum TournamentType
 
 public enum TournamentStatus
 {
-    New,
+    Open,
+    Closed,
     Started,
     Finished
 }
@@ -37,6 +39,9 @@ public class Tournament
     public int PointDifferenceToWin { get; set; }
     public int MaxSets { get; set; }
     public int PlayersPerTeam { get; set; }
+    
+    public string OwnerId { get; set; }
+    public ApplicationUser Owner { get; set; }
 }
 
 public class TournamentGame

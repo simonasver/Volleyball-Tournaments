@@ -4,9 +4,18 @@ import Layout from "../../components/layout/Layout";
 import TeamList from "../../components/team/TeamList";
 import BackButton from "../../components/layout/BackButton";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../utils/hooks";
 
 const MyTeamsPage = () => {
   const navigate = useNavigate();
+
+  const user = useAppSelector((state) => state.auth.user);
+
+  React.useEffect(() => {
+    if(!user) {
+      navigate("/", { replace: true });
+    }
+  }, []);
 
   return (
     <Layout>

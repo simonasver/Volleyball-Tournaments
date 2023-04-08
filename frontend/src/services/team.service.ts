@@ -34,7 +34,7 @@ export const editTeam = async (
   teamPicture: string,
   teamDescription: string
 ) => {
-  const res = await api.put(`/Teams/${teamId}`, {
+  const res = await api.patch(`/Teams/${teamId}`, {
     Title: teamTitle,
     PictureUrl: teamPicture,
     Description: teamDescription,

@@ -27,24 +27,20 @@ public class GameService : IGameService
         
         if (game.FirstTeam == null)
         {
-            Console.WriteLine("first is null");
             game.FirstTeam = gameTeam;
         }
         else if (game.SecondTeam == null)
         {
-            Console.WriteLine("second is null");
             game.SecondTeam = gameTeam;
         }
         else throw new InvalidOperationException("Game already has two teams");
 
         if ((game.FirstTeam != null && game.SecondTeam == null) || (game.FirstTeam == null && game.SecondTeam != null))
         {
-            Console.WriteLine("single");
             game.Status = GameStatus.SingleTeam;
         }
         else if (game.FirstTeam != null && game.SecondTeam != null)
         {
-            Console.WriteLine("double");
             game.Status = GameStatus.Ready;
         }
         

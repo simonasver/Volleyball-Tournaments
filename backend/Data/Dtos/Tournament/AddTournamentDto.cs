@@ -1,13 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Backend.Data.Entities.Tournament;
 
-namespace Backend.Data.Dtos.Game;
+namespace Backend.Data.Dtos.Tournament;
 
-public class AddGameDto
+public class AddTournamentDto
 {
     public string Title { get; set; }
     public string? PictureUrl { get; set; }
     public string? Description { get; set; }
-    
+    public TournamentType Type { get; set; }
+    [Range(2, 128, ErrorMessage = "Team limit must be between 2 and 128")]
+    public int MaxTeams { get; set; }
     [Range(1, 100, ErrorMessage = "Points to win must be between 1 and 100")]
     public int PointsToWin { get; set; }
     

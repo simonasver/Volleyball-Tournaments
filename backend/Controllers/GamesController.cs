@@ -49,8 +49,8 @@ public class GamesController : ControllerBase
         }
         else
         {
-            games = (await _gameRepository.GetAllAsync()).Where(x => !x.IsPrivate).ToList();
-;            }
+            games = (await _gameRepository.GetAllAsync()).Where(x => !x.IsPrivate).ToList(); 
+        }
 
         return Ok(games);
     }
@@ -138,6 +138,7 @@ public class GamesController : ControllerBase
         var newGame = new Game
         {
             Title = addGameDto.Title,
+            PictureUrl = addGameDto.PictureUrl,
             Description = addGameDto.Description,
             PointsToWin = addGameDto.PointsToWin,
             PointDifferenceToWin = addGameDto.PointDifferenceToWin,
@@ -157,7 +158,7 @@ public class GamesController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("/api/[controller]/{gameId}")]
+    [HttpPatch("/api/[controller]/{gameId}")]
     public async Task<IActionResult> Patch(Guid gameId, [FromBody] EditGameDto editGameDto)
     {
         var game = await _gameRepository.GetAsync(gameId);
@@ -191,6 +192,11 @@ public class GamesController : ControllerBase
         if (editGameDto.Title != null)
         {
             game.Title = editGameDto.Title;
+        }
+        
+        if (editGameDto.PictureUrl != null)
+        {
+            game.PictureUrl = editGameDto.PictureUrl;
         }
 
         if (editGameDto.Description != null)
@@ -271,7 +277,7 @@ public class GamesController : ControllerBase
 
     [Authorize]
     [HttpPost("/api/[controller]/{gameId}/RequestedTeams")]
-    public async Task<IActionResult> RequestTeam(Guid gameId, [FromBody] RequestJoinGameDto requestJoinGameDto)
+    public async Task<IActionResult> RequestJoinTeam(Guid gameId, [FromBody] RequestJoinGameDto requestJoinGameDto)
     {
         var game = await _gameRepository.GetAsync(gameId);
 
@@ -358,8 +364,6 @@ public class GamesController : ControllerBase
         }
 
         game = _gameService.AddTeamToGame(game, team);
-
-        game.RequestedTeams.Remove(team);
 
         await _gameRepository.UpdateAsync(game);
         

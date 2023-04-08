@@ -3,6 +3,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  CardMedia,
   Chip,
   Divider,
   Grid,
@@ -15,7 +16,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { Box } from "@mui/system";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { GameStatus, Team, Game, GameSet } from "../../utils/types";
+import { GameStatus, Team, Game, GameSet } from "../../../utils/types";
 import DeleteGameModal from "./DeleteGameModal";
 import {
   addTeamToGame,
@@ -24,18 +25,18 @@ import {
   joinGame,
   removeTeamFromGame,
   startGame,
-} from "../../services/game.service";
-import { errorMessageFromAxiosError } from "../../utils/helpers";
-import { useAppDispatch, useAppSelector } from "../../utils/hooks";
+} from "../../../services/game.service";
+import { errorMessageFromAxiosError } from "../../../utils/helpers";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RequestJoinGameModal from "./RequestJoinGameModal";
-import { getUserTeams } from "../../services/team.service";
-import AcceptTeamModal from "./AcceptTeamModal";
+import { getUserTeams } from "../../../services/team.service";
+import AcceptGameTeamModal from "./AcceptGameTeamModal";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import Alert from "@mui/material/Alert/Alert";
 import GameSets from "./GameSets";
-import Loader from "../layout/Loader";
-import { alertActions } from "../../store/alert-slice";
+import Loader from "../../layout/Loader";
+import { alertActions } from "../../../store/alert-slice";
 
 interface GameBigCardProps {
   id: string;
@@ -108,6 +109,8 @@ const GameBigCard = (props: GameBigCardProps) => {
   const closeModal = () => {
     setRequestJoinError("");
     setRequestJoinInput("");
+    setAcceptTeamError("");
+    setAcceptTeamInput("");
     setModalStatus(Modal.None);
   };
 
@@ -315,6 +318,9 @@ const GameBigCard = (props: GameBigCardProps) => {
             title={game.title}
             subheader={<Chip label={statusString} />}
           />
+          {game.pictureUrl && (
+            <CardMedia component="img" height="200" image={game.pictureUrl} />
+          )}
           <CardContent>
             {startError && (
               <>
@@ -476,31 +482,29 @@ const GameBigCard = (props: GameBigCardProps) => {
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
-              {user &&
-                userTeams &&
-                game.status != GameStatus.Started &&
-                game.status != GameStatus.Finished && (
+              {user?.id === game.ownerId &&
+                game.status === GameStatus.Ready && (
                   <IconButton
                     centerRipple={false}
-                    onClick={() => setModalStatus(Modal.Join)}
+                    color="success"
+                    onClick={onGameStartSubmit}
                   >
-                    <Tooltip title="Request to join">
-                      <GroupAddIcon />
+                    <Tooltip title="Start game">
+                      <PlayCircleOutlineIcon />
                     </Tooltip>
                   </IconButton>
                 )}
+              {user && userTeams && game.status < GameStatus.Started && (
+                <IconButton
+                  centerRipple={false}
+                  onClick={() => setModalStatus(Modal.Join)}
+                >
+                  <Tooltip title="Request to join">
+                    <GroupAddIcon />
+                  </Tooltip>
+                </IconButton>
+              )}
             </Box>
-            {user?.id === game.ownerId && game.status === GameStatus.Ready && (
-              <IconButton
-                centerRipple={false}
-                color="success"
-                onClick={onGameStartSubmit}
-              >
-                <Tooltip title="Start game">
-                  <PlayCircleOutlineIcon />
-                </Tooltip>
-              </IconButton>
-            )}
             {user?.id === game.ownerId && game.status < GameStatus.Started && (
               <IconButton
                 centerRipple={false}
@@ -556,7 +560,7 @@ const GameBigCard = (props: GameBigCardProps) => {
         />
       )}
       {modalStatus === Modal.Accept && (
-        <AcceptTeamModal
+        <AcceptGameTeamModal
           errorMessage={acceptTeamError}
           teams={game?.requestedTeams ?? []}
           acceptTeamInput={acceptTeamInput}

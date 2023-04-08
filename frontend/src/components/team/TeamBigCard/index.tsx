@@ -23,12 +23,12 @@ import {
   addPlayerToTeam,
   getTeam,
   removePlayerFromTeam,
-} from "../../services/team.service";
-import { Team } from "../../utils/types";
-import { errorMessageFromAxiosError } from "../../utils/helpers";
-import Loader from "../layout/Loader";
-import { alertActions } from "../../store/alert-slice";
-import { useAppDispatch } from "../../utils/hooks";
+} from "../../../services/team.service";
+import { Team } from "../../../utils/types";
+import { errorMessageFromAxiosError } from "../../../utils/helpers";
+import Loader from "../../layout/Loader";
+import { alertActions } from "../../../store/alert-slice";
+import { useAppDispatch } from "../../../utils/hooks";
 
 interface TeamBigCardProps {
   id: string;
