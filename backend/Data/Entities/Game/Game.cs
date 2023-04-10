@@ -37,8 +37,7 @@ public class Game
     public DateTime? FinishDate { get; set; }
     
     public ICollection<Team.Team> RequestedTeams { get; set; }
-    public ICollection<Team.Team> BlockedTeams { get; set; }
-    
+
     public string OwnerId { get; set; }
     public ApplicationUser Owner { get; set; }
 }

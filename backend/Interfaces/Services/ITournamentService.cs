@@ -5,5 +5,6 @@ namespace Backend.Interfaces.Services;
 
 public interface ITournamentService
 {
-    public Tournament AddTeamToGame(Tournament tournament, Team team);
+    public Tournament AddTeamToTournament(Tournament tournament, Team team);
+    public TournamentMatch GenerateEmptyBracket(Tournament tournament, int roundCount);
 }

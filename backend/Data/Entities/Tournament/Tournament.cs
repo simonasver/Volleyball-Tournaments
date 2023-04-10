@@ -40,15 +40,9 @@ public class Tournament
     public int MaxSets { get; set; }
     public int PlayersPerTeam { get; set; }
     
+    // TOURNAMENT MATCHUPS
+    public ICollection<TournamentMatch> Matches { get; set; }
+    
     public string OwnerId { get; set; }
     public ApplicationUser Owner { get; set; }
-}
-
-public class TournamentGame
-{
-    public Guid Id { get; set; }
-    public int Round { get; set; }
-    public Game.Game Game { get; set; }
-    public TournamentGame FirstParent { get; set; }
-    public TournamentGame SecondParent { get; set; }
 }

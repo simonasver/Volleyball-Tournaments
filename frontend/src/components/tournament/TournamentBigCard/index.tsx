@@ -40,6 +40,7 @@ import {
 import { getUserTeams } from "../../../services/team.service";
 import { alertActions } from "../../../store/alert-slice";
 import RemoveTournamentTeamModal from "./RemoveTournamentTeamModal";
+import TournamentBracket from "./TournamentBracket";
 
 interface TournamentBigCardProps {
   id: string;
@@ -272,6 +273,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 <br />
               </>
             )}
+            <TournamentBracket tournamentGames={tournament.matches}/>
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>

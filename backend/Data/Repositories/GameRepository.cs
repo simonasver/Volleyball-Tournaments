@@ -25,7 +25,6 @@ public class GameRepository : IGameRepository
         return await _dbContext.Games.
             Include(x => x.RequestedTeams)
                 .ThenInclude(x => x.Players)
-            .Include(x => x.BlockedTeams)
             .Include(x => x.FirstTeam)
                 .ThenInclude(x => x.Players)
             .Include(x => x.SecondTeam)

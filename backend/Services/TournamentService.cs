@@ -7,7 +7,7 @@ namespace Backend.Services;
 
 public class TournamentService : ITournamentService
 {
-    public Tournament AddTeamToGame(Tournament tournament, Team team)
+    public Tournament AddTeamToTournament(Tournament tournament, Team team)
     {
         tournament.RequestedTeams.Remove(team);
         var gameTeam = new GameTeam()
@@ -28,7 +28,7 @@ public class TournamentService : ITournamentService
 
         if (tournament.AcceptedTeams.Count >= tournament.MaxTeams)
         {
-            throw new InvalidOperationException("Game already has two teams");
+            throw new InvalidOperationException("Tournament is already full");
         }
         else
         {
@@ -36,5 +36,26 @@ public class TournamentService : ITournamentService
         }
 
         return tournament;
+    }
+
+    public TournamentMatch GenerateEmptyBracket(Tournament tournament, int roundCount)
+    {
+        return GenerateParentGame(new TournamentMatch(){ Tournament = tournament }, roundCount);
+    }
+
+    private TournamentMatch GenerateParentGame(TournamentMatch childMatch, int currentRound)
+    {
+        if (currentRound == 0)
+        {
+            return null;
+        }
+
+        childMatch.FirstParent =
+            GenerateParentGame(new TournamentMatch() { Tournament = childMatch.Tournament }, currentRound - 1);
+
+        childMatch.SecondParent =
+            GenerateParentGame(new TournamentMatch() { Tournament = childMatch.Tournament }, currentRound - 1);
+
+        return childMatch;
     }
 }

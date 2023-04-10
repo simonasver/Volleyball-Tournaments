@@ -11,6 +11,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     private readonly IConfiguration _configuration;
     public DbSet<Tournament> Tournaments { get; set; }
+    public DbSet<TournamentMatch> TournamentMatches { get; set; }
     
     public DbSet<Team> Teams { get; set; }
     public DbSet<TeamPlayer> TeamPlayers { get; set; }
@@ -30,9 +31,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Team>().HasMany(t => t.Players).WithOne(tp => tp.Team);
 
         builder.Entity<Game>().HasMany(g => g.Sets).WithOne(s => s.Game);
-        builder.Entity<Game>().HasMany(g => g.RequestedTeams).WithMany(t => t.GamesRequestedTo).UsingEntity(j => j.ToTable("TeamsRequestedGames"));
-        builder.Entity<Game>().HasMany(g => g.BlockedTeams).WithMany(t => t.GamesBlockedFrom).UsingEntity(j => j.ToTable("TeamsBlockedGames"));
 
         builder.Entity<Set>().HasMany(s => s.Players).WithOne(s => s.Set);
+        
+        builder.Entity<Tournament>().HasMany(t => t.RequestedTeams);
+        builder.Entity<Tournament>().HasMany(t => t.Matches).WithOne(m => m.Tournament);
+
+        builder.Entity<TournamentMatch>().HasOne(tm => tm.FirstParent);
+        builder.Entity<TournamentMatch>().HasOne(tm => tm.SecondParent);
     }
 }

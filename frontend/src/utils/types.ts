@@ -11,15 +11,16 @@ export interface Tournament {
   status: TournamentStatus;
   requestedTeams: Team[];
   acceptedTeams: GameTeam[];
+  matches: TournamentMatch[];
   ownerId: string;
 }
 
-export interface TournamentGame {
+export interface TournamentMatch {
   id: string;
   round: number;
-  game: Game;
-  FirstParent: TournamentGame;
-  SecondParent: TournamentGame;
+  game?: Game;
+  FirstParent?: TournamentMatch;
+  SecondParent?: TournamentMatch;
 }
 
 export enum TournamentType {

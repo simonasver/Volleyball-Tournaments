@@ -77,6 +77,7 @@ builder.Services.AddTransient<ITeamRepository, TeamRepository>();
 
 builder.Services.AddTransient<ITournamentService, TournamentService>();
 builder.Services.AddTransient<ITournamentRepository, TournamentRepository>();
+builder.Services.AddTransient<ITournamentMatchRepository, TournamentMatchRepository>();
 
 builder.Services.AddTransient<IGameService, GameService>();
 builder.Services.AddTransient<IGameRepository, GameRepository>();

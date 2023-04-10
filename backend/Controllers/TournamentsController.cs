@@ -2,6 +2,7 @@
 using Backend.Data.Dtos.Game;
 using Backend.Data.Dtos.Tournament;
 using Backend.Data.Entities.Tournament;
+using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -18,13 +19,15 @@ public class TournamentsController : ControllerBase
     private readonly ITournamentService _tournamentService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITournamentRepository _tournamentRepository;
+    private readonly ITournamentMatchRepository _tournamentMatchRepository;
     private readonly ITeamRepository _teamRepository;
-    public TournamentsController(IAuthorizationService authorizationService, ITournamentService tournamentService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITeamRepository teamRepository)
+    public TournamentsController(IAuthorizationService authorizationService, ITournamentService tournamentService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, ITeamRepository teamRepository)
     {
         _authorizationService = authorizationService;
         _tournamentService = tournamentService;
         _userManager = userManager;
         _tournamentRepository = tournamentRepository;
+        _tournamentMatchRepository = tournamentMatchRepository;
         _teamRepository = teamRepository;
     }
     
@@ -373,7 +376,7 @@ public class TournamentsController : ControllerBase
             return BadRequest("Team has 0 or another incompatible number of players for this game");
         }
 
-        tournament = _tournamentService.AddTeamToGame(tournament, team);
+        tournament = _tournamentService.AddTeamToTournament(tournament, team);
 
         await _tournamentRepository.UpdateAsync(tournament);
         
@@ -417,5 +420,57 @@ public class TournamentsController : ControllerBase
         await _tournamentRepository.UpdateAsync(tournament);
         
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPatch("/api/[controller]/{tournamentId}/Status")]
+    public async Task<IActionResult> Start(Guid tournamentId)
+    {
+        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+
+        if (tournament == null)
+        {
+            return NotFound();
+        }
+        
+        // Only if it's user owned resource or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        if (tournament.Status == TournamentStatus.Started)
+        {
+            return BadRequest("Tournament is already started");
+        }
+
+        if (tournament.Status == TournamentStatus.Finished)
+        {
+            return BadRequest(("Tournament is already finished"));
+        }
+
+        if (tournament.AcceptedTeams.Count < 2)
+        {
+            return BadRequest("Tournament does not two teams");
+        }
+
+        tournament.Status = TournamentStatus.Started;
+
+        var roundCount = tournament.AcceptedTeams.CountTournamentRounds();
+        var generatedMatches = _tournamentService.GenerateEmptyBracket(tournament, roundCount).ToList();
+        
+        foreach (var tournamentMatch in generatedMatches)
+        {
+            await _tournamentMatchRepository.CreateAsync(tournamentMatch);
+        }
+
+        await _tournamentRepository.UpdateAsync(tournament);
+
+        return Ok();
     }
 }
