@@ -1,28 +1,47 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import SetPlayerComponent from "./SetPlayerComponent";
 import { GameStatus, SetPlayer } from "../../../utils/types";
 
 interface SetTableProps {
-    setId: string;
-    isOwner: boolean;
-    status: GameStatus;
-    teamName: string;
-    teamScore: number;
-    winner: boolean | undefined;
-    players: SetPlayer[];
-    team: boolean;
-    onChangeScore: (setId: string, playerId: string, change: boolean) => void;
+  setId: string;
+  isOwner: boolean;
+  status: GameStatus;
+  teamName: string;
+  teamScore: number;
+  winner: boolean | undefined;
+  players: SetPlayer[];
+  team: boolean;
+  onChangeScore: (setId: string, playerId: string, change: boolean) => void;
 }
 
 const SetTable = (props: SetTableProps) => {
-    const { setId, isOwner, status, teamName, teamScore, winner, players, team, onChangeScore } = props;
+  const {
+    setId,
+    isOwner,
+    status,
+    teamName,
+    teamScore,
+    winner,
+    players,
+    team,
+    onChangeScore,
+  } = props;
 
   return (
     <>
       <Typography
         color={
           status === GameStatus.Finished
-            ? !winner
+            ? team === winner
               ? "green"
               : "red"
             : "default"
@@ -34,10 +53,10 @@ const SetTable = (props: SetTableProps) => {
         variant="h6"
         color={
           status === GameStatus.Finished
-            ? !winner
-              ? "green"
-              : "red"
-            : "default"
+            ? team === winner
+            ? "green"
+            : "red"
+          : "default"
         }
       >
         {teamScore}

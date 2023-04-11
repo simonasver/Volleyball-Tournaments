@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import store from "./store";
 import { injectStore } from "./services/api";
 injectStore(store);
@@ -12,11 +13,25 @@ injectStore(store);
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#e95900",
+    },
+    secondary: {
+      main: "#009b72",
+    },
+  },
+});
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Provider store={store}>
-        <App />
+        <ThemeProvider theme={theme}>
+          <App />
+        </ThemeProvider>
       </Provider>
     </BrowserRouter>
   </React.StrictMode>

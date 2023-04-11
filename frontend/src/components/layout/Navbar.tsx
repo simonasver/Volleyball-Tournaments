@@ -12,7 +12,29 @@ import { Avatar, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
 
-const Navbar = () => {
+interface NavbarProps {
+  onNavbarHeightChange: (newHeight: number) => void;
+}
+
+const Navbar = (props: NavbarProps) => {
+  const { onNavbarHeightChange } = props;
+
+  const resizeElementRef = React.createRef<HTMLDivElement>();
+
+  React.useEffect(() => {
+    const element = resizeElementRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(() => {
+      onNavbarHeightChange(element.offsetHeight);
+    });
+    observer.observe(element);
+    
+    return () => {
+      observer.disconnect();
+    }
+  }, []);
+
   const navigate = useNavigate();
 
   const user = useAppSelector((state) => state.auth.user);
@@ -61,7 +83,7 @@ const Navbar = () => {
 
   return (
     <>
-      <AppBar sx={{ boxShadow: 0 }}>
+      <AppBar ref={resizeElementRef} >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <SportsVolleyballIcon
@@ -197,7 +219,6 @@ const Navbar = () => {
           </Toolbar>
         </Container>
       </AppBar>
-      <Toolbar />
     </>
   );
 };
