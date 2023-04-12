@@ -17,7 +17,7 @@ public class GameRepository : IGameRepository
     
     public async Task<IEnumerable<Game>> GetAllAsync()
     {
-        return await _dbContext.Games.ToListAsync();
+        return await _dbContext.Games.OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).ToListAsync();
     }
 
     public async Task<Game?> GetAsync(Guid gameId)

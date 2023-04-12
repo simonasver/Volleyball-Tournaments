@@ -522,7 +522,7 @@ public class GamesController : ControllerBase
             }
         }
 
-        var sets = (await _setRepository.GetAllAsync()).Where(x => x.Game.Id == gameId).OrderBy(x => x.Number).ToList();
+        var sets = (await _setRepository.GetAllAsync()).Where(x => x.Game.Id == gameId).ToList();
 
         return Ok(sets);
     }

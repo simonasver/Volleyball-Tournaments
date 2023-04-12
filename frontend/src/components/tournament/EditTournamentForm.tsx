@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import BackButton from "../layout/BackButton";
-import { TournamentType } from "../../utils/types";
+import { TournamentStatus, TournamentType } from "../../utils/types";
 import {
   editTournament,
   getTournament,
@@ -36,6 +36,7 @@ const EditTournamentForm = () => {
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
 
+  const [status, setStatus] = React.useState<TournamentStatus>(TournamentStatus.Open);
   const [title, setTitle] = React.useState("");
   const [pictureUrl, setPictureUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -79,6 +80,8 @@ const EditTournamentForm = () => {
           setLimitPlayers(res.playersPerTeam !== 0);
           setPlayersPerTeam(res.playersPerTeam);
           setIsPrivate(res.isPrivate);
+
+          setStatus(res.status);
 
           setIsLoading(false);
         })
@@ -222,6 +225,7 @@ const EditTournamentForm = () => {
               onChange={(e: SelectChangeEvent<TournamentType>) =>
                 setType(e.target.value as TournamentType)
               }
+              disabled={status >= TournamentStatus.Started}
             >
               {[
                 {
@@ -252,6 +256,7 @@ const EditTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 2, max: 128 }}
             fullWidth
+            disabled={status >= TournamentStatus.Started}
           />
           <br />
           <br />
@@ -267,6 +272,7 @@ const EditTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 1 }}
             fullWidth
+            disabled={status >= TournamentStatus.Started}
           />
           <br />
           <br />
@@ -280,6 +286,7 @@ const EditTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 0, max: 10 }}
             fullWidth
+            disabled={status >= TournamentStatus.Started}
           />
           <br />
           <br />
@@ -293,6 +300,7 @@ const EditTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 1, max: 5 }}
             fullWidth
+            disabled={status >= TournamentStatus.Started}
           />
           <br />
           <br />
@@ -306,6 +314,7 @@ const EditTournamentForm = () => {
                 />
               }
               label="Limit players (player count in teams must be equal to a set number)"
+              disabled={status >= TournamentStatus.Started}
             />
           </FormGroup>
           <br />
@@ -318,7 +327,7 @@ const EditTournamentForm = () => {
             label="Amount of players in each team"
             variant="outlined"
             inputProps={{ min: 1, max: 12 }}
-            disabled={!limitPlayers}
+            disabled={!limitPlayers || status >= TournamentStatus.Started}
             fullWidth
           />
           <br />

@@ -1,4 +1,4 @@
-import { AppBar, Container, Toolbar } from "@mui/material";
+import { Box, Container, Toolbar, Typography } from "@mui/material";
 import React from "react";
 
 interface FooterProps {
@@ -25,11 +25,11 @@ const Footer = (props: FooterProps) => {
   }, []);
 
   return (
-    <AppBar ref={resizeElementRef} position="static">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>Footer</Toolbar>
+    <Box ref={resizeElementRef} position="static" sx={{ backgroundColor: "#1B1C20", color: "#e7e5e5" }} boxShadow={3}>
+      <Container maxWidth="md">
+        <Toolbar variant="dense"><Typography variant="body1">© Simonas Verenius, 2023</Typography></Toolbar>
       </Container>
-    </AppBar>
+    </Box>
   );
 };
 

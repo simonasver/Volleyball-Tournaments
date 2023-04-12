@@ -174,6 +174,8 @@ public class TeamsController : ControllerBase
                 return Forbid();
             }
         }
+        
+        
 
         await _teamRepository.DeleteAsync(teamId);
 

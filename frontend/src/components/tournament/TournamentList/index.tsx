@@ -31,7 +31,6 @@ const TournamentList = (props: GameListProps) => {
       } else {
         getUserTournaments(user.id, abortController.signal)
           .then((res) => {
-            console.log(res);
             setTournaments(res);
             setIsLoading(false);
           })
@@ -47,7 +46,6 @@ const TournamentList = (props: GameListProps) => {
     } else {
       getTournaments(abortController.signal)
         .then((res) => {
-          console.log(res);
           setTournaments(res);
           setIsLoading(false);
         })

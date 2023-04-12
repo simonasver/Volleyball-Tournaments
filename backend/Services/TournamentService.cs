@@ -40,21 +40,22 @@ public class TournamentService : ITournamentService
 
     public TournamentMatch GenerateEmptyBracket(Tournament tournament, int roundCount)
     {
-        return GenerateParentGame(new TournamentMatch(){ Tournament = tournament }, roundCount);
+        var games = GenerateParentGames(new TournamentMatch(){ Tournament = tournament, Round = roundCount + 1}, roundCount);
+        return games;
     }
 
-    private TournamentMatch GenerateParentGame(TournamentMatch childMatch, int currentRound)
+    private TournamentMatch GenerateParentGames(TournamentMatch childMatch, int currentRound)
     {
-        if (currentRound == 0)
+        if (currentRound < 0)
         {
             return null;
         }
 
         childMatch.FirstParent =
-            GenerateParentGame(new TournamentMatch() { Tournament = childMatch.Tournament }, currentRound - 1);
+            GenerateParentGames(new TournamentMatch() { Tournament = childMatch.Tournament, Round = currentRound}, currentRound - 1);
 
         childMatch.SecondParent =
-            GenerateParentGame(new TournamentMatch() { Tournament = childMatch.Tournament }, currentRound - 1);
+            GenerateParentGames(new TournamentMatch() { Tournament = childMatch.Tournament, Round = currentRound}, currentRound - 1);
 
         return childMatch;
     }

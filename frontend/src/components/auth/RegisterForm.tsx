@@ -24,8 +24,7 @@ const RegisterForm = () => {
     event.preventDefault();
 
     register(username, fullname, email, password)
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         setAlertType("success");
         const successfulElement = (
           <>

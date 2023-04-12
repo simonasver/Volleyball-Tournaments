@@ -19,8 +19,8 @@ export interface TournamentMatch {
   id: string;
   round: number;
   game?: Game;
-  FirstParent?: TournamentMatch;
-  SecondParent?: TournamentMatch;
+  firstParent?: TournamentMatch;
+  secondParent?: TournamentMatch;
 }
 
 export enum TournamentType {

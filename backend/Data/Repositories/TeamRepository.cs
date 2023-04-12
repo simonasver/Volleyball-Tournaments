@@ -22,7 +22,7 @@ public class TeamRepository : ITeamRepository
 
     public async Task<Team?> GetAsync(Guid teamId)
     {
-        return await _dbContext.Teams.Include(x => x.Players).FirstOrDefaultAsync(x => x.Id == teamId);
+        return await _dbContext.Teams.Include(x => x.Players).OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).FirstOrDefaultAsync(x => x.Id == teamId);
     }
 
     public async Task<Team> CreateAsync(Team team)

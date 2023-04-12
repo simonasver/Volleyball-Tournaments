@@ -31,7 +31,6 @@ const GameList = (props: GameListProps) => {
       } else {
         getUserGames(user.id, abortController.signal)
           .then((res) => {
-            console.log(res);
             setGames(res);
             setIsLoading(false);
           })
@@ -47,7 +46,6 @@ const GameList = (props: GameListProps) => {
     } else {
       getGames(abortController.signal)
         .then((res) => {
-          console.log(res);
           setGames(res);
           setIsLoading(false);
         })

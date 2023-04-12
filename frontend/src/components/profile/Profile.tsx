@@ -31,7 +31,6 @@ const Profile = () => {
     } else {
       getUser(user.id, abortController.signal)
         .then((res) => {
-          console.log(res);
           dispatch(
             authActions.changeUser({
               ...user,

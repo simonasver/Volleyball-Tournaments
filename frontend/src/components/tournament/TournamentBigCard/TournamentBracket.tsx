@@ -3,90 +3,6 @@ import { Bracket, BracketGame } from "react-tournament-bracket";
 import { TournamentMatch } from "../../../utils/types";
 import { Game } from "react-tournament-bracket/lib/components/model";
 
-const game2 = {
-  id: "2",
-  name: "semi-finals",
-  scheduled: Number(new Date()),
-  sides: {
-    home: {
-      team: {
-        id: "12",
-        name: "First",
-      },
-      score: {
-        score: 1,
-      },
-    },
-    visitor: {
-      team: {
-        id: "13",
-        name: "Second",
-      },
-      score: {
-        score: 0,
-      },
-    },
-  },
-};
-const game3 = {
-  id: "3",
-  name: "semi-finals",
-  scheduled: Number(new Date()),
-  sides: {
-    home: {
-      team: {
-        id: "11",
-        name: "Third",
-      },
-      score: {
-        score: 1,
-      },
-    },
-    visitor: {
-      team: {
-        id: "12",
-        name: "First",
-      },
-      score: {
-        score: 0,
-      },
-    },
-  },
-};
-const game1 = {
-  id: "1",
-  name: "finals",
-  scheduled: Number(new Date()),
-  sides: {
-    home: {
-      team: {
-        id: "10",
-        name: "Fourth",
-      },
-      score: {
-        score: 2,
-      },
-      seed: {
-        displayName: "A1",
-        rank: 1,
-        sourceGame: game2,
-        sourcePool: {},
-      },
-    },
-    visitor: {
-      score: {
-        score: 3,
-      },
-      seed: {
-        displayName: "",
-        rank: 1,
-        sourceGame: game3,
-        sourcePool: {},
-      },
-    },
-  },
-};
-
 interface TournamentBracketProps {
   tournamentGames: TournamentMatch[];
 }
@@ -147,23 +63,23 @@ const MapGameToParentGames = (
     return mappedGame;
   }
 
-  if (tournamentGame.FirstParent) {
+  if (tournamentGame.firstParent) {
     mappedGame.sides.home.seed = {
       displayName: "",
       rank: 1,
       sourceGame: MapGameToParentGames(
-        MapGameDataToFrontEnd(tournamentGame.FirstParent),
+        MapGameDataToFrontEnd(tournamentGame.firstParent),
         tournamentGames
       ),
       sourcePool: {},
     };
   }
-  if (tournamentGame.SecondParent) {
+  if (tournamentGame.secondParent) {
     mappedGame.sides.visitor.seed = {
       displayName: "",
       rank: 1,
       sourceGame: MapGameToParentGames(
-        MapGameDataToFrontEnd(tournamentGame.SecondParent),
+        MapGameDataToFrontEnd(tournamentGame.secondParent),
         tournamentGames
       ),
       sourcePool: {},
@@ -192,6 +108,7 @@ const TournamentBracket = (props: TournamentBracketProps) => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TournamentBracketGameComponent = (props: any) => {
   return <BracketGame {...props} onClick={() => console.log(props.game.id)} />;
 };

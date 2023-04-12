@@ -304,7 +304,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 )}
             </Box>
             {user?.id === tournament.ownerId &&
-              tournament.status < GameStatus.Started && (
+              tournament.status < TournamentStatus.Started && (
                 <IconButton
                   centerRipple={false}
                   color="success"
@@ -316,7 +316,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 </IconButton>
               )}
             {user?.id === tournament.ownerId &&
-              tournament.status < GameStatus.Started && (
+              tournament.status < TournamentStatus.Started && (
                 <IconButton
                   centerRipple={false}
                   color="error"

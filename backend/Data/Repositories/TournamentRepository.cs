@@ -17,7 +17,7 @@ public class TournamentRepository : ITournamentRepository
     
     public async Task<IEnumerable<Tournament>> GetAllAsync()
     {
-        return await _dbContext.Tournaments.ToListAsync();
+        return await _dbContext.Tournaments.OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).ToListAsync();
     }
 
     public async Task<Tournament?> GetAsync(Guid tournamentId)

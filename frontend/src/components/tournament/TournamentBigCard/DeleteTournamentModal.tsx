@@ -8,11 +8,11 @@ import {
     DialogContentText,
     DialogTitle,
   } from "@mui/material";
-import { deleteGame } from "../../../services/game.service";
 import { useNavigate } from "react-router-dom";
 import { alertActions } from "../../../store/alert-slice";
 import { useAppDispatch } from "../../../utils/hooks";
 import { errorMessageFromAxiosError } from "../../../utils/helpers";
+import { deleteTournament } from "../../../services/tournament.service";
   
   interface DeleteTournamentModalProps {
     tournamentId: string;
@@ -29,7 +29,7 @@ import { errorMessageFromAxiosError } from "../../../utils/helpers";
     const [error, setError] = React.useState("");
 
     const onDeleteSubmit = () => {
-      deleteGame(tournamentId)
+      deleteTournament(tournamentId)
         .then(() => {
           const successMessage = `Tournament ${tournamentTitle} was deleted`;
           dispatch(
@@ -45,7 +45,7 @@ import { errorMessageFromAxiosError } from "../../../utils/helpers";
   
     return (
       <Dialog open onClose={onClose} fullWidth>
-        <DialogTitle>Delete game</DialogTitle>
+        <DialogTitle>Delete tournament</DialogTitle>
         <DialogContent>
           {error && (
             <>

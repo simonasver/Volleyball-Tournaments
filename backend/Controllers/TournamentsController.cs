@@ -1,6 +1,8 @@
 ﻿using Backend.Auth.Model;
 using Backend.Data.Dtos.Game;
 using Backend.Data.Dtos.Tournament;
+using Backend.Data.Entities.Game;
+using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
 using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
@@ -463,14 +465,75 @@ public class TournamentsController : ControllerBase
 
         var roundCount = tournament.AcceptedTeams.CountTournamentRounds();
         var generatedMatches = _tournamentService.GenerateEmptyBracket(tournament, roundCount).ToList();
+        Console.WriteLine("Generated matches count: " + generatedMatches.Count);
         
         foreach (var tournamentMatch in generatedMatches)
         {
-            await _tournamentMatchRepository.CreateAsync(tournamentMatch);
+            tournament.Matches.Add(tournamentMatch);
         }
 
         await _tournamentRepository.UpdateAsync(tournament);
 
+        return Ok();
+    }
+    
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
+    [HttpPost("/api/[controller]/generate")]
+    public async Task<IActionResult> Generate([FromQuery] int teamAmount)
+    {
+        if (teamAmount == null || teamAmount < 0 || teamAmount > 128)
+        {
+            return BadRequest("Team amount must be between 1 and 128");
+        }
+        
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        
+        if (user == null)
+        {
+            return Forbid();
+        }
+
+        var generatedNamePrefix = DateTime.Now.ToShortTimeString();
+
+        var tournament = new Tournament()
+        {
+            Title = "Tournament" + generatedNamePrefix,
+            Description = "Generated" + generatedNamePrefix + " very good tournament",
+            Type = TournamentType.SingleElimination,
+            MaxTeams = 128,
+            IsPrivate = false,
+            CreateDate = DateTime.Now,
+            LastEditDate = DateTime.Now,
+            Status = TournamentStatus.Open,
+            RequestedTeams = new List<Team>(),
+            AcceptedTeams = new List<GameTeam>(),
+            PointsToWin = 25,
+            PointDifferenceToWin = 2,
+            MaxSets = 5,
+            PlayersPerTeam = 6,
+            OwnerId = user.Id
+        };
+
+        for (int i = 0; i < teamAmount; i++)
+        {
+            var team = new GameTeam()
+            {
+                Title = "Team" + generatedNamePrefix + (i+1),
+                Description = "Generated" + generatedNamePrefix + " very good team " + (i+1),
+                Players = new List<GameTeamPlayer>(),
+            };
+            for (int j = 0; j < 6; j++)
+            {
+                var player = new GameTeamPlayer()
+                {
+                    Name = "Player" + (j+1)
+                };
+                team.Players.Add(player);
+            }
+            tournament.AcceptedTeams.Add(team);
+        }
+
+        await _tournamentRepository.CreateAsync(tournament);
         return Ok();
     }
 }
