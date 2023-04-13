@@ -18,7 +18,7 @@ const TournamentSmallCard = (props: TournamentSmallCardProps) => {
     const { title, pictureUrl, description, createDate, status, teamCount, maxTeams, onButtonPress } = props;
 
   return (
-    <Card sx={{ width: { xs: "100%", md: "50%" } }}>
+    <Card sx={{ width: { xs: "100%", md: "70%" } }}>
       <CardHeader
         title={title}
         subheader={<Chip label={TournamentStatus[status]} size="small" />}

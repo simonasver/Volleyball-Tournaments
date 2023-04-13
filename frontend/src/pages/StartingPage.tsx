@@ -1,29 +1,14 @@
-import { Button, Grid, Typography } from "@mui/material";
-import Alert from "@mui/material/Alert";
-import { Stack } from "@mui/system";
 import React from "react";
+import { Button, Grid, Typography } from "@mui/material";
+import { Stack } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import { useAppDispatch, useAppSelector } from "../utils/hooks";
-import { alertActions } from "../store/alert-slice";
+import { useAppSelector } from "../utils/hooks";
 
 const StartingPage = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const alertData = useAppSelector((state) => state.alert);
 
   const user = useAppSelector((state) => state.auth.user);
-
-  React.useEffect(() => {
-    const clearAlertTimeout = setTimeout(() => {
-      dispatch(alertActions.clearAlert());
-    }, 10000);
-    return () => {
-      clearTimeout(clearAlertTimeout);
-      dispatch(alertActions.clearAlert());
-    };
-  }, []);
 
   return (
     <Layout header>
@@ -34,13 +19,8 @@ const StartingPage = () => {
         alignItems="center"
         justifyContent="center"
       >
-        <Grid item>
-          {alertData.type && (
-            <Alert severity={alertData.type}>{alertData.message}</Alert>
-          )}
-          <br />
-        </Grid>
         <Grid item textAlign="center">
+          <br />
           <Typography variant="h3">Volleyball tournaments!</Typography>
           <br />
           <Typography variant="subtitle1">

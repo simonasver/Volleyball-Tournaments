@@ -40,11 +40,32 @@ public class TournamentService : ITournamentService
 
     public TournamentMatch GenerateEmptyBracket(Tournament tournament, int roundCount)
     {
-        var games = GenerateParentGames(new TournamentMatch(){ Tournament = tournament, Round = roundCount + 1}, roundCount);
+        var games = GenerateParentGames(
+            tournament,
+            new TournamentMatch()
+            {
+                Tournament = tournament,
+                Round = roundCount + 1,
+                Game = new Game()
+                {
+                    Title = tournament.Title + " game " + roundCount + 1,
+                    PointsToWin = tournament.PointsToWin,
+                    PointDifferenceToWin = tournament.PointDifferenceToWin,
+                    MaxSets = tournament.MaxSets,
+                    PlayersPerTeam = tournament.PlayersPerTeam,
+                    FirstTeamScore = 0,
+                    SecondTeamScore = 0,
+                    IsPrivate = tournament.IsPrivate,
+                    CreateDate = DateTime.Now,
+                    LastEditDate = DateTime.Now,
+                    Status = GameStatus.New,
+                    OwnerId = tournament.OwnerId
+                }
+            }, roundCount);
         return games;
     }
 
-    private TournamentMatch GenerateParentGames(TournamentMatch childMatch, int currentRound)
+    private TournamentMatch GenerateParentGames(Tournament tournament, TournamentMatch childMatch, int currentRound)
     {
         if (currentRound < 0)
         {
@@ -52,11 +73,52 @@ public class TournamentService : ITournamentService
         }
 
         childMatch.FirstParent =
-            GenerateParentGames(new TournamentMatch() { Tournament = childMatch.Tournament, Round = currentRound}, currentRound - 1);
+            GenerateParentGames(
+                tournament,
+                new TournamentMatch()
+                {
+                    Tournament = childMatch.Tournament,
+                    Round = currentRound,
+                    Game = new Game()
+                    {
+                        Title = tournament.Title + " game " + currentRound,
+                        PointsToWin = tournament.PointsToWin,
+                        PointDifferenceToWin = tournament.PointDifferenceToWin,
+                        MaxSets = tournament.MaxSets,
+                        PlayersPerTeam = tournament.PlayersPerTeam,
+                        FirstTeamScore = 0,
+                        SecondTeamScore = 0,
+                        IsPrivate = tournament.IsPrivate,
+                        CreateDate = DateTime.Now,
+                        LastEditDate = DateTime.Now,
+                        Status = GameStatus.New,
+                        OwnerId = tournament.OwnerId
+                    }
+                }, currentRound - 1);
 
         childMatch.SecondParent =
-            GenerateParentGames(new TournamentMatch() { Tournament = childMatch.Tournament, Round = currentRound}, currentRound - 1);
-
+            GenerateParentGames(
+                tournament,
+                new TournamentMatch()
+                {
+                    Tournament = childMatch.Tournament,
+                    Round = currentRound,
+                    Game = new Game()
+                    {
+                        Title = tournament.Title + " game " + currentRound,
+                        PointsToWin = tournament.PointsToWin,
+                        PointDifferenceToWin = tournament.PointDifferenceToWin,
+                        MaxSets = tournament.MaxSets,
+                        PlayersPerTeam = tournament.PlayersPerTeam,
+                        FirstTeamScore = 0,
+                        SecondTeamScore = 0,
+                        IsPrivate = tournament.IsPrivate,
+                        CreateDate = DateTime.Now,
+                        LastEditDate = DateTime.Now,
+                        Status = GameStatus.New,
+                        OwnerId = tournament.OwnerId
+                    }
+                }, currentRound - 1);
         return childMatch;
     }
 }

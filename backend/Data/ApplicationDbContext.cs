@@ -39,5 +39,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<TournamentMatch>().HasOne(tm => tm.FirstParent);
         builder.Entity<TournamentMatch>().HasOne(tm => tm.SecondParent);
+
+        builder.Entity<TournamentMatch>().HasOne(tm => tm.Game).WithOne(g => g.TournamentMatch).HasForeignKey<TournamentMatch>(tm => tm.Id);
     }
 }

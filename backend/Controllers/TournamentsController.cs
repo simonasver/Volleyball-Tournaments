@@ -465,8 +465,7 @@ public class TournamentsController : ControllerBase
 
         var roundCount = tournament.AcceptedTeams.CountTournamentRounds();
         var generatedMatches = _tournamentService.GenerateEmptyBracket(tournament, roundCount).ToList();
-        Console.WriteLine("Generated matches count: " + generatedMatches.Count);
-        
+
         foreach (var tournamentMatch in generatedMatches)
         {
             tournament.Matches.Add(tournamentMatch);

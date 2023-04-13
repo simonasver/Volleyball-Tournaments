@@ -19,7 +19,7 @@ interface TeamSmallCardProps {
 const TeamSmallCard = (props: TeamSmallCardProps) => {
   const { title, imageUrl, description, createDate, onButtonPress } = props;
   return (
-    <Card sx={{ width: { xs: "100%", md: "50%" } }}>
+    <Card sx={{ width: { xs: "100%", md: "70%" } }}>
       <CardHeader title={title} />
       {imageUrl && (
         <CardMedia

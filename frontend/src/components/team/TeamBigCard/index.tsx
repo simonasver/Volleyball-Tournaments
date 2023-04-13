@@ -5,6 +5,7 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
+  Chip,
   IconButton,
   Tooltip,
   Typography,
@@ -169,7 +170,7 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       <Loader isOpen={isLoading} />
       {team && (
         <Card>
-          <CardHeader title={team.title} />
+          <CardHeader title={team.title} subheader={<Chip color="primary" variant="outlined" label="Team"/>}/>
           {team.pictureUrl && (
             <CardMedia component="img" height="300" image={team.pictureUrl} />
           )}

@@ -69,8 +69,6 @@ const GameList = (props: GameListProps) => {
           <br />
         </>
       )}
-      <Typography variant="h3">{all ? "All games" : "My games"}</Typography>
-      <br />
       <Loader isOpen={isLoading} />
       {!isLoading &&
         games &&
@@ -91,6 +89,9 @@ const GameList = (props: GameListProps) => {
         ))}
       {!isLoading && (!games || (games && games.length === 0)) && (
         <Typography variant="h6">
+          <br />
+          <br />
+          <br />
           There are no games yet. Create one!
         </Typography>
       )}

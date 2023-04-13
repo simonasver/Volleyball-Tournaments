@@ -54,9 +54,9 @@ const SetTable = (props: SetTableProps) => {
         color={
           status === GameStatus.Finished
             ? team === winner
-            ? "green"
-            : "red"
-          : "default"
+              ? "green"
+              : "red"
+            : "default"
         }
       >
         {teamScore}

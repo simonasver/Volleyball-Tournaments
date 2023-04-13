@@ -68,12 +68,10 @@ const TournamentList = (props: GameListProps) => {
           <br />
         </>
       )}
-      <Typography variant="h3">{all ? "All tournaments" : "My tournaments"}</Typography>
-      <br />
       <Loader isOpen={isLoading} />
       {!isLoading &&
         tournaments &&
-        tournaments.map((item) => (
+        tournaments.map((item) => { console.log(item); return (
           <>
             <TournamentSmallCard
               key={item.id}
@@ -89,9 +87,12 @@ const TournamentList = (props: GameListProps) => {
             />
             <br />
           </>
-        ))}
+        )})}
       {!isLoading && (!tournaments || (tournaments && tournaments.length === 0)) && (
         <Typography variant="h6">
+          <br />
+          <br />
+          <br />
           There are no tournaments yet. Create one!
         </Typography>
       )}

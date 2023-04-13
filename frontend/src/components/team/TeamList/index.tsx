@@ -4,7 +4,7 @@ import { Team } from "../../../utils/types";
 import { useAppSelector } from "../../../utils/hooks";
 import { getTeams, getUserTeams } from "../../../services/team.service";
 import { errorMessageFromAxiosError, isAdmin } from "../../../utils/helpers";
-import { Alert, Typography } from "@mui/material";
+import { Alert, Pagination, Typography } from "@mui/material";
 import Loader from "../../layout/Loader";
 import TeamSmallCard from "./TeamSmallCard";
 
@@ -76,8 +76,6 @@ const TeamList = (props: TeamListProps) => {
           <br />
         </>
       )}
-      <Typography variant="h3">My teams</Typography>
-      <br />
       <Loader isOpen={isLoading} />
       {!isLoading &&
         teams &&
@@ -95,8 +93,14 @@ const TeamList = (props: TeamListProps) => {
           </>
         ))}
       {!isLoading && (!teams || (teams && teams.length === 0)) && (
-        <Typography variant="h6">You have no teams yet. Create one!</Typography>
+        <Typography variant="h6">
+          <br />
+          <br />
+          <br />
+          You have no teams yet. Create one!
+        </Typography>
       )}
+      <Pagination count={10} color="primary"/>
     </>
   );
 };

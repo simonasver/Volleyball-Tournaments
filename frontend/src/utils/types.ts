@@ -21,6 +21,7 @@ export interface TournamentMatch {
   game?: Game;
   firstParent?: TournamentMatch;
   secondParent?: TournamentMatch;
+  tournament: Tournament;
 }
 
 export enum TournamentType {
@@ -59,6 +60,7 @@ export interface Game {
   finishDate: string;
   requestedTeams: Team[];
   blockedTeams: Team[];
+  tournamentMatch: TournamentMatch;
   ownerId: string;
 }
 

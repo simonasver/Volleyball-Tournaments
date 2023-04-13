@@ -49,7 +49,7 @@ public class GamesController : ControllerBase
         }
         else
         {
-            games = (await _gameRepository.GetAllAsync()).Where(x => !x.IsPrivate).ToList(); 
+            games = (await _gameRepository.GetAllAsync()).Where(x => !x.IsPrivate && x.TournamentMatch == null).ToList(); 
         }
 
         return Ok(games);
@@ -81,7 +81,7 @@ public class GamesController : ControllerBase
         }
 
         var games = await _gameRepository.GetAllAsync();
-        var userGames = games.Where(x => x.OwnerId == user.Id).ToList();
+        var userGames = games.Where(x => x.OwnerId == user.Id && x.TournamentMatch == null).ToList();
 
         return Ok(userGames);
     }
@@ -270,6 +270,11 @@ public class GamesController : ControllerBase
             }
         }
 
+        if (game.TournamentMatch != null)
+        {
+            return BadRequest("Cannot delete tournament game without deleting the tournament");
+        }
+
         await _gameRepository.DeleteAsync(gameId);
 
         return NoContent();
@@ -302,6 +307,11 @@ public class GamesController : ControllerBase
             {
                 return Forbid();
             }
+        }
+
+        if (game.TournamentMatch != null)
+        {
+            return BadRequest("Cannot join tournament game");
         }
 
         if (game.RequestedTeams.Any(x => x.Id == team.Id) || (game.FirstTeam != null && game.FirstTeam.Title == team.Title) ||
@@ -349,6 +359,11 @@ public class GamesController : ControllerBase
             }
         }
 
+        if (game.TournamentMatch != null)
+        {
+            return BadRequest("Cannot join tournament game");
+        }
+
         if (!game.RequestedTeams.Any(x => x.Id == addTeamToGameDto.TeamId))
         {
             return BadRequest("Team has not requested to join the game");
@@ -390,6 +405,11 @@ public class GamesController : ControllerBase
             {
                 return Forbid();
             }
+        }
+
+        if (game.TournamentMatch != null)
+        {
+            return BadRequest("Cannot leave tournament game");
         }
 
         if (game.Status >= GameStatus.Started)

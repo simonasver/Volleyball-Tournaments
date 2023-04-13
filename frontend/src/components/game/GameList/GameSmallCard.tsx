@@ -43,7 +43,7 @@ const GameSmallCard = (props: GameSmallCardProps) => {
   }
 
   return (
-    <Card sx={{ width: { xs: "100%", md: "50%" } }}>
+    <Card sx={{ width: { xs: "100%", md: "70%" } }}>
       <CardHeader title={title} subheader={<Chip label={statusString} size="small"/>} />
       {pictureUrl && (
         <CardMedia

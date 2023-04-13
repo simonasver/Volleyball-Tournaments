@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { Bracket, BracketGame } from "react-tournament-bracket";
 import { TournamentMatch } from "../../../utils/types";
 import { Game } from "react-tournament-bracket/lib/components/model";
+import { useNavigate } from "react-router-dom";
 
 interface TournamentBracketProps {
   tournamentGames: TournamentMatch[];
@@ -91,7 +92,6 @@ const MapGameToParentGames = (
 const TournamentBracket = (props: TournamentBracketProps) => {
   const { tournamentGames } = props;
 
-  // FORMAT GAMES AND DISPLAY TO FRONT
   const formattedGames = MapTournamentDataToFrontEnd(tournamentGames);
 
   return (
@@ -110,7 +110,8 @@ const TournamentBracket = (props: TournamentBracketProps) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TournamentBracketGameComponent = (props: any) => {
-  return <BracketGame {...props} onClick={() => console.log(props.game.id)} />;
+  const navigate = useNavigate();
+  return <BracketGame {...props} onClick={() => navigate(`/game/${props.game.id}`)} />;
 };
 
 export default TournamentBracket;

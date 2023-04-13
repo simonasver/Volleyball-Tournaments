@@ -11,6 +11,7 @@ import SportsVolleyballIcon from "@mui/icons-material/SportsVolleyball";
 import { Avatar, Button, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
+import { isAdmin } from "../../utils/helpers";
 
 interface NavbarProps {
   onNavbarHeightChange: (newHeight: number) => void;
@@ -29,10 +30,10 @@ const Navbar = (props: NavbarProps) => {
       onNavbarHeightChange(element.offsetHeight);
     });
     observer.observe(element);
-    
+
     return () => {
       observer.disconnect();
-    }
+    };
   }, []);
 
   const navigate = useNavigate();
@@ -42,15 +43,18 @@ const Navbar = (props: NavbarProps) => {
   const title = "Volleyball";
 
   const navMenuItems = [
-    { title: "Home", href: "/" },
-    { title: "Help", href: "/asdf" },
+    { title: "Home", href: "/", loggedIn: false },
+    { title: "Tournaments", href: "/tournaments", loggedIn: false },
+    { title: "Games", href: "/games", loggedIn: false },
+    { title: "Teams", href: "/myteams", loggedIn: true },
   ];
   const profileMenuItems = [
-    { title: "Profile", href: "/profile" },
-    { title: "My teams", href: "/myteams" },
-    { title: "My games", href: "/mygames" },
-    { title: "My tournaments", href: "/mytournaments" },
-    { title: "Logout", href: "/logout" },
+    { title: "Profile", href: "/profile", admin: false },
+    { title: "Admin", href: "/admin", admin: true },
+    { title: "My teams", href: "/myteams", admin: false },
+    { title: "My games", href: "/mygames", admin: false },
+    { title: "My tournaments", href: "/mytournaments", admin: false },
+    { title: "Logout", href: "/logout", admin: false },
   ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -83,7 +87,7 @@ const Navbar = (props: NavbarProps) => {
 
   return (
     <>
-      <AppBar ref={resizeElementRef} >
+      <AppBar ref={resizeElementRef}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <SportsVolleyballIcon
@@ -128,14 +132,18 @@ const Navbar = (props: NavbarProps) => {
                 onClose={() => handleNavMenuClick()}
                 sx={{ display: { xs: "block", md: "none" } }}
               >
-                {navMenuItems.map((item) => (
-                  <MenuItem
-                    key={item.title}
-                    onClick={() => handleNavMenuClick(item.href)}
-                  >
-                    <Typography textAlign="center">{item.title}</Typography>
-                  </MenuItem>
-                ))}
+                {navMenuItems.map((item) => {
+                  if (item.loggedIn && !user) return;
+                  else
+                    return (
+                      <MenuItem
+                        key={item.title}
+                        onClick={() => handleNavMenuClick(item.href)}
+                      >
+                        <Typography textAlign="center">{item.title}</Typography>
+                      </MenuItem>
+                    );
+                })}
               </Menu>
             </Box>
             <SportsVolleyballIcon
@@ -160,15 +168,19 @@ const Navbar = (props: NavbarProps) => {
               {title}
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {navMenuItems.map((item) => (
-                <Button
-                  key={item.title}
-                  onClick={() => handleNavMenuClick(item.href)}
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  {item.title}
-                </Button>
-              ))}
+              {navMenuItems.map((item) => {
+                if (item.loggedIn && !user) return;
+                else
+                  return (
+                    <Button
+                      key={item.title}
+                      onClick={() => handleNavMenuClick(item.href)}
+                      sx={{ my: 2, color: "white", display: "block" }}
+                    >
+                      {item.title}
+                    </Button>
+                  );
+              })}
             </Box>
             {user && (
               <Box sx={{ flexGrow: 0 }}>
@@ -187,14 +199,20 @@ const Navbar = (props: NavbarProps) => {
                   open={Boolean(anchorElUser)}
                   onClose={() => handleUserMenuClick()}
                 >
-                  {profileMenuItems.map((item) => (
-                    <MenuItem
-                      key={item.title}
-                      onClick={() => handleUserMenuClick(item.href)}
-                    >
-                      <Typography textAlign="center">{item.title}</Typography>
-                    </MenuItem>
-                  ))}
+                  {profileMenuItems.map((item) => {
+                    if (item.admin && !isAdmin(user)) return;
+                    else
+                      return (
+                        <MenuItem
+                          key={item.title}
+                          onClick={() => handleUserMenuClick(item.href)}
+                        >
+                          <Typography textAlign="center">
+                            {item.title}
+                          </Typography>
+                        </MenuItem>
+                      );
+                  })}
                 </Menu>
               </Box>
             )}
@@ -209,7 +227,11 @@ const Navbar = (props: NavbarProps) => {
                 </Button>
                 <Button
                   key="register"
-                  sx={{ my: 2, color: "white", display: { xs: "none", md: "inline-flex" } }}
+                  sx={{
+                    my: 2,
+                    color: "white",
+                    display: { xs: "none", md: "inline-flex" },
+                  }}
                   onClick={() => navigate("/register")}
                 >
                   Register

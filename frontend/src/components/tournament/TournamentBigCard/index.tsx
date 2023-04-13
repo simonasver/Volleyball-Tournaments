@@ -1,4 +1,7 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   Box,
   Card,
@@ -9,8 +12,9 @@ import {
   Chip,
   IconButton,
   Tooltip,
+  Typography,
 } from "@mui/material";
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import Loader from "../../layout/Loader";
 import {
   GameStatus,
@@ -41,6 +45,8 @@ import { getUserTeams } from "../../../services/team.service";
 import { alertActions } from "../../../store/alert-slice";
 import RemoveTournamentTeamModal from "./RemoveTournamentTeamModal";
 import TournamentBracket from "./TournamentBracket";
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface TournamentBigCardProps {
   id: string;
@@ -78,6 +84,8 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   const [startError, setStartError] = React.useState("");
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
+
+  const [teamsExpand, setTeamsExpand] = React.useState(true);
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -257,7 +265,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         <Card>
           <CardHeader
             title={tournament.title}
-            subheader={<Chip label={TournamentStatus[tournament.status]} />}
+            subheader={<><Chip color="primary" variant="outlined" label="Tournament"/><Chip label={TournamentStatus[tournament.status]} /></>}
           />
           {tournament.pictureUrl && (
             <CardMedia
@@ -273,7 +281,21 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 <br />
               </>
             )}
-            <TournamentBracket tournamentGames={tournament.matches}/>
+            <Accordion expanded={teamsExpand} onChange={(event: SyntheticEvent<Element, Event>, expanded: boolean) => setTeamsExpand(expanded)} variant="outlined">
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography sx={{ width: "33%", flexShrink: 0 }}>
+                  Teams
+                </Typography>
+                <Typography sx={{ color: "text.secondary" }}>
+                  Tournament team list
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {tournament.acceptedTeams.map((item, index) => <Typography key={item.id}>{index+1}. {item.title}</Typography>)}
+              </AccordionDetails>
+            </Accordion>
+            <br />
+            {tournament.matches && tournament.matches.length > 0 && <TournamentBracket tournamentGames={tournament.matches}/>}
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>

@@ -303,6 +303,14 @@ const GameBigCard = (props: GameBigCardProps) => {
       break;
   }
 
+  const getSubHeader = () => {
+    return <>
+    <Chip color="primary" variant="outlined" label={<b>Game</b>} />
+    <Chip label={statusString} />
+    {game?.tournamentMatch && <Chip label="Tournament game" clickable onClick={() => navigate(`/tournament/${game?.tournamentMatch.tournament.id}`)}/>}
+    </>;
+  };
+
   return (
     <>
       {error && (
@@ -316,7 +324,7 @@ const GameBigCard = (props: GameBigCardProps) => {
         <Card>
           <CardHeader
             title={game.title}
-            subheader={<Chip label={statusString} />}
+            subheader={getSubHeader()}
           />
           {game.pictureUrl && (
             <CardMedia component="img" height="200" image={game.pictureUrl} />
@@ -494,7 +502,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                     </Tooltip>
                   </IconButton>
                 )}
-              {user && userTeams && game.status < GameStatus.Started && (
+              {user && userTeams && !game.tournamentMatch && game.status < GameStatus.Started && (
                 <IconButton
                   centerRipple={false}
                   onClick={() => setModalStatus(Modal.Join)}
@@ -505,7 +513,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                 </IconButton>
               )}
             </Box>
-            {user?.id === game.ownerId && game.status < GameStatus.Started && (
+            {user?.id === game.ownerId && !game.tournamentMatch && game.status < GameStatus.Started && (
               <IconButton
                 centerRipple={false}
                 color="success"
@@ -526,7 +534,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                 </Tooltip>
               </IconButton>
             )}
-            {user?.id === game.ownerId && (
+            {user?.id === game.ownerId && !game.tournamentMatch && (
               <IconButton
                 centerRipple={false}
                 color="error"

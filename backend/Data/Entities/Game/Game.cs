@@ -1,4 +1,5 @@
 ﻿using Backend.Auth.Model;
+using Backend.Data.Entities.Tournament;
 
 namespace Backend.Data.Entities.Game;
 
@@ -37,6 +38,8 @@ public class Game
     public DateTime? FinishDate { get; set; }
     
     public ICollection<Team.Team> RequestedTeams { get; set; }
+    
+    public TournamentMatch? TournamentMatch { get; set; }
 
     public string OwnerId { get; set; }
     public ApplicationUser Owner { get; set; }

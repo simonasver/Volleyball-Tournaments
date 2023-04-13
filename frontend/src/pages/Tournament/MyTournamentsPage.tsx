@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import Layout from "../../components/layout/Layout";
 import BackButton from "../../components/layout/BackButton";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,10 @@ const MyTournamentsPage = () => {
         alignItems="center"
         justifyContent="center"
       >
-        <Grid item sx={{ width: { xs: "100%", md: "50%" } }}>
+        <Grid item sx={{ width: { xs: "100%", md: "70%" } }}>
+          <Typography variant="h4">My tournaments</Typography>
+          <br />
+          <br />
           <Grid
             container
             spacing={1}

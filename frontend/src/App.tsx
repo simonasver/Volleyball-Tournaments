@@ -22,6 +22,7 @@ import MyTournamentsPage from "./pages/Tournament/MyTournamentsPage";
 import TournamentPage from "./pages/Tournament/TournamentPage";
 import CreateTournamentPage from "./pages/Tournament/CreateTournamentPage";
 import EditTournamentPage from "./pages/Tournament/EditTournamentPage";
+import AdminPanel from "./pages/AdminPanel";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
 
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/editprofile" element={<EditProfilePage />} />
+        <Route path="/admin" element={<AdminPanel />} />
 
         <Route path="/myteams" element={<MyTeamsPage />} />
         <Route path="/team/:teamId" element={<TeamPage />} />
