@@ -45,10 +45,10 @@ public class TournamentService : ITournamentService
             new TournamentMatch()
             {
                 Tournament = tournament,
-                Round = roundCount + 1,
+                Round = roundCount,
                 Game = new Game()
                 {
-                    Title = tournament.Title + " game " + roundCount + 1,
+                    Title = tournament.Title + " game " + roundCount,
                     PointsToWin = tournament.PointsToWin,
                     PointDifferenceToWin = tournament.PointDifferenceToWin,
                     MaxSets = tournament.MaxSets,
@@ -67,7 +67,7 @@ public class TournamentService : ITournamentService
 
     private TournamentMatch GenerateParentGames(Tournament tournament, TournamentMatch childMatch, int currentRound)
     {
-        if (currentRound < 0)
+        if (currentRound <= 0)
         {
             return null;
         }
@@ -78,7 +78,7 @@ public class TournamentService : ITournamentService
                 new TournamentMatch()
                 {
                     Tournament = childMatch.Tournament,
-                    Round = currentRound,
+                    Round = currentRound - 1,
                     Game = new Game()
                     {
                         Title = tournament.Title + " game " + currentRound,
@@ -102,7 +102,7 @@ public class TournamentService : ITournamentService
                 new TournamentMatch()
                 {
                     Tournament = childMatch.Tournament,
-                    Round = currentRound,
+                    Round = currentRound - 1,
                     Game = new Game()
                     {
                         Title = tournament.Title + " game " + currentRound,
@@ -119,6 +119,7 @@ public class TournamentService : ITournamentService
                         OwnerId = tournament.OwnerId
                     }
                 }, currentRound - 1);
+        
         return childMatch;
     }
 }

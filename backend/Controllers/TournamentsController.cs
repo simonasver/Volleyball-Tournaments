@@ -23,7 +23,8 @@ public class TournamentsController : ControllerBase
     private readonly ITournamentRepository _tournamentRepository;
     private readonly ITournamentMatchRepository _tournamentMatchRepository;
     private readonly ITeamRepository _teamRepository;
-    public TournamentsController(IAuthorizationService authorizationService, ITournamentService tournamentService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, ITeamRepository teamRepository)
+    private readonly IGameTeamRepository _gameTeamRepository;
+    public TournamentsController(IAuthorizationService authorizationService, ITournamentService tournamentService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository)
     {
         _authorizationService = authorizationService;
         _tournamentService = tournamentService;
@@ -31,6 +32,7 @@ public class TournamentsController : ControllerBase
         _tournamentRepository = tournamentRepository;
         _tournamentMatchRepository = tournamentMatchRepository;
         _teamRepository = teamRepository;
+        _gameTeamRepository = gameTeamRepository;
     }
     
     [AllowAnonymous]
@@ -418,6 +420,8 @@ public class TournamentsController : ControllerBase
         {
             tournament.AcceptedTeams.Remove(team);
         }
+
+        await _gameTeamRepository.DeleteAsync(team.Id);
 
         await _tournamentRepository.UpdateAsync(tournament);
         

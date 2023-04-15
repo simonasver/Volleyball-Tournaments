@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace WebApplication1.Migrations
+namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230408094143_adding tournaments")]
-    partial class addingtournaments
+    [Migration("20230415130542_intial")]
+    partial class intial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,9 +120,6 @@ namespace WebApplication1.Migrations
                     b.Property<DateTime?>("FinishDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("FirstTeamId")
-                        .HasColumnType("char(36)");
-
                     b.Property<int>("FirstTeamScore")
                         .HasColumnType("int");
 
@@ -151,9 +148,6 @@ namespace WebApplication1.Migrations
                     b.Property<int>("PointsToWin")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("SecondTeamId")
-                        .HasColumnType("char(36)");
-
                     b.Property<int>("SecondTeamScore")
                         .HasColumnType("int");
 
@@ -167,16 +161,18 @@ namespace WebApplication1.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<Guid?>("TournamentMatchId")
+                        .HasColumnType("char(36)");
+
                     b.Property<Guid?>("WinnerId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FirstTeamId");
-
                     b.HasIndex("OwnerId");
 
-                    b.HasIndex("SecondTeamId");
+                    b.HasIndex("TournamentMatchId")
+                        .IsUnique();
 
                     b.HasIndex("WinnerId");
 
@@ -190,11 +186,15 @@ namespace WebApplication1.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<Guid?>("GameWhereFirstId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("GameWhereSecondId")
+                        .HasColumnType("char(36)");
+
                     b.Property<string>("ProfilePicture")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Title")
@@ -206,9 +206,15 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GameWhereFirstId")
+                        .IsUnique();
+
+                    b.HasIndex("GameWhereSecondId")
+                        .IsUnique();
+
                     b.HasIndex("TournamentId");
 
-                    b.ToTable("GameTeam");
+                    b.ToTable("GameTeams");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Game.GameTeamPlayer", b =>
@@ -228,7 +234,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("GameTeamId");
 
-                    b.ToTable("GameTeamPlayer");
+                    b.ToTable("GameTeamPlayers");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Game.Set", b =>
@@ -303,7 +309,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("SetId");
 
-                    b.ToTable("SetPlayer");
+                    b.ToTable("SetPlayers");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Team.Team", b =>
@@ -317,6 +323,9 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
+
+                    b.Property<Guid?>("GameId")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("LastEditDate")
                         .HasColumnType("datetime(6)");
@@ -336,6 +345,8 @@ namespace WebApplication1.Migrations
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GameId");
 
                     b.HasIndex("OwnerId");
 
@@ -421,34 +432,33 @@ namespace WebApplication1.Migrations
                     b.ToTable("Tournaments");
                 });
 
-            modelBuilder.Entity("GameTeam", b =>
+            modelBuilder.Entity("Backend.Data.Entities.Tournament.TournamentMatch", b =>
                 {
-                    b.Property<Guid>("GamesRequestedToId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("RequestedTeamsId")
+                    b.Property<Guid?>("FirstParentId")
                         .HasColumnType("char(36)");
 
-                    b.HasKey("GamesRequestedToId", "RequestedTeamsId");
+                    b.Property<int>("Round")
+                        .HasColumnType("int");
 
-                    b.HasIndex("RequestedTeamsId");
-
-                    b.ToTable("TeamsRequestedGames", (string)null);
-                });
-
-            modelBuilder.Entity("GameTeam1", b =>
-                {
-                    b.Property<Guid>("BlockedTeamsId")
+                    b.Property<Guid?>("SecondParentId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("GamesBlockedFromId")
+                    b.Property<Guid>("TournamentId")
                         .HasColumnType("char(36)");
 
-                    b.HasKey("BlockedTeamsId", "GamesBlockedFromId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("GamesBlockedFromId");
+                    b.HasIndex("FirstParentId");
 
-                    b.ToTable("TeamsBlockedGames", (string)null);
+                    b.HasIndex("SecondParentId");
+
+                    b.HasIndex("TournamentId");
+
+                    b.ToTable("TournamentMatches");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -581,38 +591,50 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Game.Game", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Game.GameTeam", "FirstTeam")
-                        .WithMany()
-                        .HasForeignKey("FirstTeamId");
-
                     b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Data.Entities.Game.GameTeam", "SecondTeam")
-                        .WithMany()
-                        .HasForeignKey("SecondTeamId");
+                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "TournamentMatch")
+                        .WithOne("Game")
+                        .HasForeignKey("Backend.Data.Entities.Game.Game", "TournamentMatchId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.HasOne("Backend.Data.Entities.Game.GameTeam", "Winner")
                         .WithMany()
                         .HasForeignKey("WinnerId");
 
-                    b.Navigation("FirstTeam");
-
                     b.Navigation("Owner");
 
-                    b.Navigation("SecondTeam");
+                    b.Navigation("TournamentMatch");
 
                     b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Game.GameTeam", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", null)
+                    b.HasOne("Backend.Data.Entities.Game.Game", "GameWhereFirst")
+                        .WithOne("FirstTeam")
+                        .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "GameWhereFirstId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Backend.Data.Entities.Game.Game", "GameWhereSecond")
+                        .WithOne("SecondTeam")
+                        .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "GameWhereSecondId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
                         .WithMany("AcceptedTeams")
-                        .HasForeignKey("TournamentId");
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
+
+                    b.Navigation("GameWhereFirst");
+
+                    b.Navigation("GameWhereSecond");
+
+                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Game.GameTeamPlayer", b =>
@@ -637,7 +659,7 @@ namespace WebApplication1.Migrations
                     b.HasOne("Backend.Data.Entities.Game.Game", "Game")
                         .WithMany("Sets")
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.HasOne("Backend.Data.Entities.Game.GameTeam", "SecondTeam")
@@ -664,7 +686,7 @@ namespace WebApplication1.Migrations
                     b.HasOne("Backend.Data.Entities.Game.Set", "Set")
                         .WithMany("Players")
                         .HasForeignKey("SetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Set");
@@ -672,6 +694,10 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Team.Team", b =>
                 {
+                    b.HasOne("Backend.Data.Entities.Game.Game", null)
+                        .WithMany("RequestedTeams")
+                        .HasForeignKey("GameId");
+
                     b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
@@ -690,7 +716,7 @@ namespace WebApplication1.Migrations
                     b.HasOne("Backend.Data.Entities.Team.Team", "Team")
                         .WithMany("Players")
                         .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("Team");
@@ -707,34 +733,27 @@ namespace WebApplication1.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("GameTeam", b =>
+            modelBuilder.Entity("Backend.Data.Entities.Tournament.TournamentMatch", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Game.Game", null)
+                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "FirstParent")
                         .WithMany()
-                        .HasForeignKey("GamesRequestedToId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("FirstParentId");
+
+                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "SecondParent")
+                        .WithMany()
+                        .HasForeignKey("SecondParentId");
+
+                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
+                        .WithMany("Matches")
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Data.Entities.Team.Team", null)
-                        .WithMany()
-                        .HasForeignKey("RequestedTeamsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.Navigation("FirstParent");
 
-            modelBuilder.Entity("GameTeam1", b =>
-                {
-                    b.HasOne("Backend.Data.Entities.Team.Team", null)
-                        .WithMany()
-                        .HasForeignKey("BlockedTeamsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("SecondParent");
 
-                    b.HasOne("Backend.Data.Entities.Game.Game", null)
-                        .WithMany()
-                        .HasForeignKey("GamesBlockedFromId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -790,6 +809,12 @@ namespace WebApplication1.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Game.Game", b =>
                 {
+                    b.Navigation("FirstTeam");
+
+                    b.Navigation("RequestedTeams");
+
+                    b.Navigation("SecondTeam");
+
                     b.Navigation("Sets");
                 });
 
@@ -812,7 +837,15 @@ namespace WebApplication1.Migrations
                 {
                     b.Navigation("AcceptedTeams");
 
+                    b.Navigation("Matches");
+
                     b.Navigation("RequestedTeams");
+                });
+
+            modelBuilder.Entity("Backend.Data.Entities.Tournament.TournamentMatch", b =>
+                {
+                    b.Navigation("Game")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

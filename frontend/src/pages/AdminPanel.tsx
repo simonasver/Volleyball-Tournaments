@@ -48,8 +48,9 @@ const AdminPanel = () => {
           label="Team number"
           variant="outlined"
           value={teamNumber}
+          type="number"
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTeamNumber(parseInt(e.target.value) ?? 2)
+            setTeamNumber(parseInt(e.target.value ?? 0))
           }
         />
         <Button type="submit">Generate</Button>

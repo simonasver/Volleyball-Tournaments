@@ -81,6 +81,7 @@ builder.Services.AddTransient<ITournamentMatchRepository, TournamentMatchReposit
 
 builder.Services.AddTransient<IGameService, GameService>();
 builder.Services.AddTransient<IGameRepository, GameRepository>();
+builder.Services.AddTransient<IGameTeamRepository, GameTeamRepository>();
 builder.Services.AddTransient<ISetRepository, SetRepository>();
 builder.Services.AddScoped<AuthDbSeeder>();
 

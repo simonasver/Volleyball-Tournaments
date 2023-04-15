@@ -94,6 +94,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
     } else {
       getTournament(id, abortController.signal)
         .then((res) => {
+          console.log(res);
           setError("");
           setTournament(res);
           setIsLoading(false);

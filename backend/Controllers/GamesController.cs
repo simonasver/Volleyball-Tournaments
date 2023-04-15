@@ -22,8 +22,9 @@ public class GamesController : ControllerBase
     private readonly IGameRepository _gameRepository;
     private readonly ISetRepository _setRepository;
     private readonly ITeamRepository _teamRepository;
+    private readonly IGameTeamRepository _gameTeamRepository;
 
-    public GamesController(IGameService gameService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, IGameRepository gameRepository, ISetRepository setRepository, ITeamRepository teamRepository)
+    public GamesController(IGameService gameService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, IGameRepository gameRepository, ISetRepository setRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository)
     {
         _gameService = gameService;
         _authorizationService = authorizationService;
@@ -31,6 +32,7 @@ public class GamesController : ControllerBase
         _gameRepository = gameRepository;
         _setRepository = setRepository;
         _teamRepository = teamRepository;
+        _gameTeamRepository = gameTeamRepository;
     }
     
     [AllowAnonymous]
@@ -424,6 +426,7 @@ public class GamesController : ControllerBase
                 return BadRequest("Game does not have a first team");
             }
 
+            await _gameTeamRepository.DeleteAsync(game.FirstTeam.Id);
             game.FirstTeam = null;
         }
         else
@@ -433,6 +436,7 @@ public class GamesController : ControllerBase
                 return BadRequest("Game does not have a second team");
             }
 
+            await _gameTeamRepository.DeleteAsync(game.SecondTeam.Id);
             game.SecondTeam = null;
         }
         
@@ -444,7 +448,7 @@ public class GamesController : ControllerBase
         {
             game.Status = GameStatus.New;
         }
-
+        
         await _gameRepository.UpdateAsync(game);
         
         return NoContent();

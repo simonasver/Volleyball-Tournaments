@@ -53,6 +53,10 @@ public class GameTeam
     public string? Description { get; set; }
     
     public ICollection<GameTeamPlayer> Players { get; set; }
+
+    public Game? GameWhereFirst { get; set; }
+    public Game? GameWhereSecond { get; set; }
+    public Tournament.Tournament? Tournament { get; set; }
 }
 
 public class GameTeamPlayer

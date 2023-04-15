@@ -8,29 +8,34 @@ interface TournamentBracketProps {
   tournamentGames: TournamentMatch[];
 }
 
-const MapGameDataToFrontEnd = (tournamentGame: TournamentMatch) => {
-  const mappedGame: Game = {
-    id: tournamentGame.id,
-    name: tournamentGame.game?.title ?? "",
-    bracketLabel: tournamentGame.game?.title ?? "",
-    scheduled: Number(new Date()),
+interface ExtendedGame extends Game {
+  gameId: string;
+}
+
+const MapGameDataToFrontEnd = (tournamentMatch: TournamentMatch) => {
+  const mappedGame: ExtendedGame = {
+    id: tournamentMatch.id ?? "",
+    gameId: tournamentMatch.game?.id ?? "",
+    name: tournamentMatch.game?.title ?? "",
+    bracketLabel: tournamentMatch.game?.title ?? "",
+    scheduled: Number(new Date(tournamentMatch.game?.createDate ?? "")),
     sides: {
       home: {
         team: {
-          id: tournamentGame.game?.firstTeam.id ?? "",
-          name: tournamentGame.game?.firstTeam.title ?? "",
+          id: tournamentMatch.game?.firstTeam?.id ?? "",
+          name: tournamentMatch.game?.firstTeam?.title ?? "",
         },
         score: {
-          score: tournamentGame.game?.firstTeamScore ?? 0,
+          score: tournamentMatch.game?.firstTeamScore ?? 0,
         },
       },
       visitor: {
         team: {
-          id: tournamentGame.game?.secondTeam.id ?? "",
-          name: tournamentGame.game?.secondTeam.title ?? "",
+          id: tournamentMatch.game?.secondTeam?.id ?? "",
+          name: tournamentMatch.game?.secondTeam?.title ?? "",
         },
         score: {
-          score: tournamentGame.game?.secondTeamScore ?? 0,
+          score: tournamentMatch.game?.secondTeamScore ?? 0,
         },
       },
     },
@@ -111,7 +116,7 @@ const TournamentBracket = (props: TournamentBracketProps) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TournamentBracketGameComponent = (props: any) => {
   const navigate = useNavigate();
-  return <BracketGame {...props} onClick={() => navigate(`/game/${props.game.id}`)} />;
+  return <BracketGame {...props} onClick={() => { console.log(props); navigate(`/game/${props.game.gameId}`); }} />;
 };
 
 export default TournamentBracket;

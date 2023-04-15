@@ -37,6 +37,7 @@ import Alert from "@mui/material/Alert/Alert";
 import GameSets from "./GameSets";
 import Loader from "../../layout/Loader";
 import { alertActions } from "../../../store/alert-slice";
+import BackButton from "../../layout/BackButton";
 
 interface GameBigCardProps {
   id: string;
@@ -304,15 +305,38 @@ const GameBigCard = (props: GameBigCardProps) => {
   }
 
   const getSubHeader = () => {
-    return <>
-    <Chip color="primary" variant="outlined" label={<b>Game</b>} />
-    <Chip label={statusString} />
-    {game?.tournamentMatch && <Chip label="Tournament game" clickable onClick={() => navigate(`/tournament/${game?.tournamentMatch.tournament.id}`)}/>}
-    </>;
+    return (
+      <>
+        <Chip color="primary" variant="outlined" label={<b>Game</b>} />
+        <Chip label={statusString} />
+        {game?.tournamentMatch && (
+          <Chip
+            label="Tournament game"
+            clickable
+            onClick={() =>
+              navigate(`/tournament/${game?.tournamentMatch.tournament.id}`)
+            }
+          />
+        )}
+      </>
+    );
   };
 
   return (
     <>
+      <Grid
+        container
+        spacing={1}
+        direction="row"
+        alignItems="center"
+        justifyContent="flex-start"
+      >
+        <Grid item>
+          {game?.tournamentMatch && <BackButton title="Tournament" address={`/tournament/${game.tournamentMatch.tournament.id}`} />}
+          {!game?.tournamentMatch && <BackButton title="All games" address="/games" />}
+        </Grid>
+      </Grid>
+      <br />
       {error && (
         <>
           <Alert severity="error">{error}</Alert>
@@ -322,10 +346,7 @@ const GameBigCard = (props: GameBigCardProps) => {
       <Loader isOpen={isLoading} />
       {game && (
         <Card>
-          <CardHeader
-            title={game.title}
-            subheader={getSubHeader()}
-          />
+          <CardHeader title={game.title} subheader={getSubHeader()} />
           {game.pictureUrl && (
             <CardMedia component="img" height="200" image={game.pictureUrl} />
           )}
@@ -502,28 +523,33 @@ const GameBigCard = (props: GameBigCardProps) => {
                     </Tooltip>
                   </IconButton>
                 )}
-              {user && userTeams && !game.tournamentMatch && game.status < GameStatus.Started && (
+              {user &&
+                userTeams &&
+                !game.tournamentMatch &&
+                game.status < GameStatus.Started && (
+                  <IconButton
+                    centerRipple={false}
+                    onClick={() => setModalStatus(Modal.Join)}
+                  >
+                    <Tooltip title="Request to join">
+                      <GroupAddIcon />
+                    </Tooltip>
+                  </IconButton>
+                )}
+            </Box>
+            {user?.id === game.ownerId &&
+              !game.tournamentMatch &&
+              game.status < GameStatus.Started && (
                 <IconButton
                   centerRipple={false}
-                  onClick={() => setModalStatus(Modal.Join)}
+                  color="success"
+                  onClick={() => setModalStatus(Modal.Accept)}
                 >
-                  <Tooltip title="Request to join">
+                  <Tooltip title="Add team">
                     <GroupAddIcon />
                   </Tooltip>
                 </IconButton>
               )}
-            </Box>
-            {user?.id === game.ownerId && !game.tournamentMatch && game.status < GameStatus.Started && (
-              <IconButton
-                centerRipple={false}
-                color="success"
-                onClick={() => setModalStatus(Modal.Accept)}
-              >
-                <Tooltip title="Add team">
-                  <GroupAddIcon />
-                </Tooltip>
-              </IconButton>
-            )}
             {user?.id === game.ownerId && game.status < GameStatus.Finished && (
               <IconButton
                 centerRipple={false}
