@@ -6,19 +6,25 @@ public class Utils
 {
     public static async Task<bool> IsLinkImage(string imageUrl)
     {
-        using (var httpClient = new HttpClient())
+        try
         {
-            var response = await httpClient.GetAsync(imageUrl);
-            if (response.IsSuccessStatusCode)
+            using (var httpClient = new HttpClient())
             {
-                var contentType = response.Content.Headers.ContentType?.MediaType;
-                if (!string.IsNullOrEmpty(contentType) && contentType.StartsWith("image/"))
+                var response = await httpClient.GetAsync(imageUrl);
+                if (response.IsSuccessStatusCode)
                 {
-                    return true;
+                    var contentType = response.Content.Headers.ContentType?.MediaType;
+                    if (!string.IsNullOrEmpty(contentType) && contentType.StartsWith("image/"))
+                    {
+                        return true;
+                    }
                 }
             }
         }
-
+        catch (Exception ex)
+        {
+            return false;
+        }
         return false;
     }
 }

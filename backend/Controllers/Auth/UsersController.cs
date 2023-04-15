@@ -1,6 +1,7 @@
 ﻿using Backend.Auth.Model;
 using Backend.Data.Dtos.Auth;
 using Backend.Data.Dtos.User;
+using Backend.Helpers.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -59,8 +60,8 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(Register), newUserDto);
     }
 
-    [HttpGet("/api/[controller]/{userId}")]
     [Authorize]
+    [HttpGet("/api/[controller]/{userId}")]
     public async Task<IActionResult> Get(string userId)
     {
         if (User.Identity == null)
@@ -115,7 +116,10 @@ public class UsersController : ControllerBase
 
         if (editUserDto.ProfilePictureUrl != null)
         {
-            // Check if its actually a picture
+            if (!(await Utils.IsLinkImage(editUserDto.ProfilePictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
             userToEdit.ProfilePictureUrl = editUserDto.ProfilePictureUrl;
         }
 

@@ -5,6 +5,7 @@ using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
 using Backend.Helpers.Extensions;
+using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -137,6 +138,14 @@ public class TournamentsController : ControllerBase
             return BadRequest("Max sets must be an odd number");
         }
 
+        if (addTournamentDto.PictureUrl != null)
+        {
+            if (!(await Utils.IsLinkImage(addTournamentDto.PictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
+        }
+
         var newTournament = new Tournament()
         {
             Title = addTournamentDto.Title,
@@ -199,6 +208,10 @@ public class TournamentsController : ControllerBase
 
         if (editTournamentDto.PictureUrl != null)
         {
+            if (!(await Utils.IsLinkImage(editTournamentDto.PictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
             tournament.PictureUrl = editTournamentDto.PictureUrl;
         }
 

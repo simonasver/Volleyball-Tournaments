@@ -81,7 +81,7 @@ public class TournamentService : ITournamentService
                     Round = currentRound - 1,
                     Game = new Game()
                     {
-                        Title = tournament.Title + " game " + currentRound,
+                        Title = "Empty " + tournament.Title + " game",
                         PointsToWin = tournament.PointsToWin,
                         PointDifferenceToWin = tournament.PointDifferenceToWin,
                         MaxSets = tournament.MaxSets,
@@ -105,7 +105,7 @@ public class TournamentService : ITournamentService
                     Round = currentRound - 1,
                     Game = new Game()
                     {
-                        Title = tournament.Title + " game " + currentRound,
+                        Title = "Empty " + tournament.Title + " game",
                         PointsToWin = tournament.PointsToWin,
                         PointDifferenceToWin = tournament.PointDifferenceToWin,
                         MaxSets = tournament.MaxSets,

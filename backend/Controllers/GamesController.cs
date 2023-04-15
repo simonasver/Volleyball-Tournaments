@@ -3,6 +3,7 @@ using Backend.Auth.Model;
 using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
+using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -137,6 +138,14 @@ public class GamesController : ControllerBase
             return BadRequest("Max sets must be an odd number");
         }
 
+        if (addGameDto.PictureUrl != null)
+        {
+            if (!(await Utils.IsLinkImage(addGameDto.PictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
+        }
+
         var newGame = new Game
         {
             Title = addGameDto.Title,
@@ -198,6 +207,10 @@ public class GamesController : ControllerBase
         
         if (editGameDto.PictureUrl != null)
         {
+            if (!(await Utils.IsLinkImage(editGameDto.PictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
             game.PictureUrl = editGameDto.PictureUrl;
         }
 

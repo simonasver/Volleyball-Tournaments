@@ -1,6 +1,7 @@
 ﻿using Backend.Auth.Model;
 using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;
+using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -99,6 +100,14 @@ public class TeamsController : ControllerBase
         {
             return BadRequest("Team title must be unique");
         }
+
+        if (addTeamDto.PictureUrl != null)
+        {
+            if (!(await Utils.IsLinkImage(addTeamDto.PictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
+        }
         
         var team = new Team
         {
@@ -144,9 +153,24 @@ public class TeamsController : ControllerBase
             return BadRequest("Team title must be unique");
         }
 
-        team.Title = editTeamDto.Title ?? team.Title;
-        team.PictureUrl = editTeamDto.PictureUrl ?? team.PictureUrl;
-        team.Description = editTeamDto.Description ?? team.Description;
+        if (editTeamDto.Title != null)
+        {
+            team.Title = editTeamDto.Title;
+        }
+
+        if (editTeamDto.PictureUrl != null)
+        {
+            if (!(await Utils.IsLinkImage(editTeamDto.PictureUrl)))
+            {
+                return BadRequest("Provided picture url was not an image");
+            }
+            team.PictureUrl = editTeamDto.PictureUrl;
+        }
+
+        if (editTeamDto.Description != null)
+        {
+            team.Description = editTeamDto.Description;
+        }
 
         await _teamRepository.UpdateAsync(team);
         
