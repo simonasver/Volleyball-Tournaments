@@ -79,7 +79,7 @@ const TournamentList = (props: GameListProps) => {
               title={item.title}
               pictureUrl={item.pictureUrl}
               description={item.description}
-              createDate={new Date(item.createDate).toDateString()}
+              createDate={new Date(item.createDate).toLocaleString()}
               status={item.status}
               teamCount={item.acceptedTeams?.length ?? 0}
               maxTeams={item.maxTeams}

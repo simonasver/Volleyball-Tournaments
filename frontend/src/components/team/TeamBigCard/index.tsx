@@ -29,7 +29,7 @@ import { Team } from "../../../utils/types";
 import { errorMessageFromAxiosError } from "../../../utils/helpers";
 import Loader from "../../layout/Loader";
 import { alertActions } from "../../../store/alert-slice";
-import { useAppDispatch } from "../../../utils/hooks";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
 
 interface TeamBigCardProps {
   id: string;
@@ -47,6 +47,8 @@ const TeamBigCard = (props: TeamBigCardProps) => {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const user = useAppSelector((state) => state.auth.user);
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -170,15 +172,23 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       <Loader isOpen={isLoading} />
       {team && (
         <Card>
-          <CardHeader title={team.title} subheader={<Chip color="primary" variant="outlined" label="Team"/>}/>
+          <CardHeader
+            title={team.title}
+            subheader={<Chip color="primary" variant="outlined" label="Team" />}
+          />
           {team.pictureUrl && (
             <CardMedia component="img" height="300" image={team.pictureUrl} />
           )}
           <CardContent>
             <Typography variant="body1">{team.description}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Created at: {team.createDate}
+              Created at: {new Date(team.createDate).toLocaleString()}
             </Typography>
+            {user?.id === team.ownerId && (
+              <Typography variant="body2" color="text.secondary">
+                Last edited at: {new Date(team.lastEditDate).toLocaleString()}
+              </Typography>
+            )}
             <br />
             <Typography variant="h6">Players:</Typography>
             {team.players &&

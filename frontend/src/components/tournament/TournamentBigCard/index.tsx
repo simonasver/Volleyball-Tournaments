@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardMedia,
   Chip,
+  Divider,
   IconButton,
   Tooltip,
   Typography,
@@ -282,6 +283,18 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 <br />
               </>
             )}
+            {tournament.winner && <Typography variant="h6" color="success">Tournament winner is {tournament.winner.title}!</Typography>}
+            <Typography variant="body1">{tournament.description}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Created at: {new Date(tournament.createDate).toLocaleString()}
+            </Typography>
+            {user?.id === tournament.ownerId && (
+              <Typography variant="body2" color="text.secondary">
+                Last edited at: {new Date(tournament.lastEditDate).toLocaleString()}
+              </Typography>
+            )}
+            <Divider />
+            <br />
             <Accordion expanded={teamsExpand} onChange={(event: SyntheticEvent<Element, Event>, expanded: boolean) => setTeamsExpand(expanded)} variant="outlined">
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography sx={{ width: "33%", flexShrink: 0 }}>
@@ -293,6 +306,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
               </AccordionSummary>
               <AccordionDetails>
                 {tournament.acceptedTeams.map((item, index) => <Typography key={item.id}>{index+1}. {item.title}</Typography>)}
+                {(!tournament.acceptedTeams || tournament.acceptedTeams.length === 0) && <Typography>No teams in this tournament yet!</Typography>}
               </AccordionDetails>
             </Accordion>
             <br />

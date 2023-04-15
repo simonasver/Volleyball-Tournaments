@@ -17,7 +17,7 @@ const MapGameDataToFrontEnd = (tournamentMatch: TournamentMatch) => {
     id: tournamentMatch.id ?? "",
     gameId: tournamentMatch.game?.id ?? "",
     name: tournamentMatch.game?.title ?? "",
-    bracketLabel: tournamentMatch.game?.title ?? "",
+    bracketLabel: "",
     scheduled: Number(new Date(tournamentMatch.game?.createDate ?? "")),
     sides: {
       home: {

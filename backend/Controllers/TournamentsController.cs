@@ -138,7 +138,7 @@ public class TournamentsController : ControllerBase
             return BadRequest("Max sets must be an odd number");
         }
 
-        if (addTournamentDto.PictureUrl != null)
+        if (!String.IsNullOrEmpty(addTournamentDto.PictureUrl))
         {
             if (!(await Utils.IsLinkImage(addTournamentDto.PictureUrl)))
             {
@@ -206,7 +206,7 @@ public class TournamentsController : ControllerBase
             tournament.Title = editTournamentDto.Title;
         }
 
-        if (editTournamentDto.PictureUrl != null)
+        if (!String.IsNullOrEmpty(editTournamentDto.PictureUrl))
         {
             if (!(await Utils.IsLinkImage(editTournamentDto.PictureUrl)))
             {
@@ -394,6 +394,8 @@ public class TournamentsController : ControllerBase
         }
 
         tournament = _tournamentService.AddTeamToTournament(tournament, team);
+        
+        tournament.LastEditDate = DateTime.Now;
 
         await _tournamentRepository.UpdateAsync(tournament);
         
@@ -435,6 +437,8 @@ public class TournamentsController : ControllerBase
         }
 
         await _gameTeamRepository.DeleteAsync(team.Id);
+        
+        tournament.LastEditDate = DateTime.Now;
 
         await _tournamentRepository.UpdateAsync(tournament);
         
@@ -487,6 +491,8 @@ public class TournamentsController : ControllerBase
         {
             tournament.Matches.Add(tournamentMatch);
         }
+        
+        tournament.LastEditDate = DateTime.Now;
 
         await _tournamentRepository.UpdateAsync(tournament);
 
@@ -548,6 +554,8 @@ public class TournamentsController : ControllerBase
             }
             tournament.AcceptedTeams.Add(team);
         }
+        
+        
 
         await _tournamentRepository.CreateAsync(tournament);
         return Ok();

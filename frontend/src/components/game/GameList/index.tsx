@@ -80,7 +80,7 @@ const GameList = (props: GameListProps) => {
               title={item.title}
               pictureUrl={item.pictureUrl}
               description={item.description}
-              createDate={new Date(item.createDate).toDateString()}
+              createDate={new Date(item.createDate).toLocaleString()}
               status={item.status}
               onButtonPress={() => navigate("/game/" + item.id)}
             />

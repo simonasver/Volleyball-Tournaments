@@ -495,11 +495,11 @@ const GameBigCard = (props: GameBigCardProps) => {
             </Grid>
             <Typography variant="body1">{game.description}</Typography>
             <Typography variant="body2" color="text.secondary">
-              Created at: {game.createDate}
+              Created at: {new Date(game.createDate).toLocaleString()}
             </Typography>
             {user?.id === game.ownerId && (
               <Typography variant="body2" color="text.secondary">
-                Last edited at: {game.lastEditDate}
+                Last edited at: {new Date(game.lastEditDate).toLocaleString()}
               </Typography>
             )}
             <Divider />

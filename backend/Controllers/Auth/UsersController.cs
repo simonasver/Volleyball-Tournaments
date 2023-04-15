@@ -114,7 +114,7 @@ public class UsersController : ControllerBase
             }
         }
 
-        if (editUserDto.ProfilePictureUrl != null)
+        if (!String.IsNullOrEmpty(editUserDto.ProfilePictureUrl))
         {
             if (!(await Utils.IsLinkImage(editUserDto.ProfilePictureUrl)))
             {

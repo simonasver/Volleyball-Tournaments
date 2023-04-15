@@ -87,7 +87,7 @@ const TeamList = (props: TeamListProps) => {
               imageUrl={item.pictureUrl}
               description={item.description}
               onButtonPress={() => navigate(`/team/${item.id}`)}
-              createDate={new Date(item.createDate).toDateString()}
+              createDate={new Date(item.createDate).toLocaleString()}
             />
             <br />
           </>

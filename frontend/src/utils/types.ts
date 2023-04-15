@@ -11,6 +11,7 @@ export interface Tournament {
   status: TournamentStatus;
   requestedTeams: Team[];
   acceptedTeams: GameTeam[];
+  winner: GameTeam;
   matches: TournamentMatch[];
   ownerId: string;
 }
@@ -113,6 +114,7 @@ export interface Team {
   createDate: string;
   lastEditDate: string;
   players: TeamPlayer[];
+  ownerId: string;
 }
 
 export interface TeamPlayer {

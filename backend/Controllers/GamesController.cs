@@ -138,7 +138,7 @@ public class GamesController : ControllerBase
             return BadRequest("Max sets must be an odd number");
         }
 
-        if (addGameDto.PictureUrl != null)
+        if (!String.IsNullOrEmpty(addGameDto.PictureUrl))
         {
             if (!(await Utils.IsLinkImage(addGameDto.PictureUrl)))
             {
@@ -205,7 +205,7 @@ public class GamesController : ControllerBase
             game.Title = editGameDto.Title;
         }
         
-        if (editGameDto.PictureUrl != null)
+        if (!String.IsNullOrEmpty(editGameDto.PictureUrl))
         {
             if (!(await Utils.IsLinkImage(editGameDto.PictureUrl)))
             {
@@ -394,6 +394,8 @@ public class GamesController : ControllerBase
         }
 
         game = _gameService.AddTeamToGame(game, team);
+        
+        game.LastEditDate = DateTime.Now;
 
         await _gameRepository.UpdateAsync(game);
         
@@ -461,6 +463,8 @@ public class GamesController : ControllerBase
         {
             game.Status = GameStatus.New;
         }
+        
+        game.LastEditDate = DateTime.Now;
         
         await _gameRepository.UpdateAsync(game);
         
@@ -680,6 +684,8 @@ public class GamesController : ControllerBase
         int index = set.Players.IndexOf(player);
         if(index != -1)
             set.Players[index] = player;
+        
+        game.LastEditDate = DateTime.Now;
 
         await _setRepository.UpdateAsync(set);
 

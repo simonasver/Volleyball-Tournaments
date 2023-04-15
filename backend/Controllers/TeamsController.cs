@@ -101,7 +101,7 @@ public class TeamsController : ControllerBase
             return BadRequest("Team title must be unique");
         }
 
-        if (addTeamDto.PictureUrl != null)
+        if (!String.IsNullOrEmpty(addTeamDto.PictureUrl))
         {
             if (!(await Utils.IsLinkImage(addTeamDto.PictureUrl)))
             {
@@ -158,7 +158,7 @@ public class TeamsController : ControllerBase
             team.Title = editTeamDto.Title;
         }
 
-        if (editTeamDto.PictureUrl != null)
+        if (!String.IsNullOrEmpty(editTeamDto.PictureUrl))
         {
             if (!(await Utils.IsLinkImage(editTeamDto.PictureUrl)))
             {
