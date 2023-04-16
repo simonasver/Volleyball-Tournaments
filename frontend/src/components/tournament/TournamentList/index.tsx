@@ -81,7 +81,7 @@ const TournamentList = (props: GameListProps) => {
               description={item.description}
               createDate={new Date(item.createDate).toLocaleString()}
               status={item.status}
-              teamCount={item.acceptedTeams?.length ?? 0}
+              teamCount={item.acceptedTeams?.filter(x => !x.duplicate).length ?? 0}
               maxTeams={item.maxTeams}
               onButtonPress={() => navigate("/tournament/" + item.id)}
             />

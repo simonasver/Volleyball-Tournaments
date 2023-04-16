@@ -22,5 +22,4 @@ public class SetPlayer
     public string Name { get; set; }
     public int Score { get; set; }
     public bool Team { get; set; }
-    public Set Set { get; set; }
 }

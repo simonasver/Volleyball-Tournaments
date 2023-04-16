@@ -21,6 +21,7 @@ import {
   GameStatus,
   Team,
   Tournament,
+  TournamentMatch,
   TournamentStatus,
 } from "../../../utils/types";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +39,7 @@ import { errorMessageFromAxiosError } from "../../../utils/helpers";
 import {
   addTeamToTournament,
   getTournament,
+  getTournamentMatches,
   joinTournament,
   removeTeamFromTournament,
   startTournament,
@@ -47,7 +49,7 @@ import { alertActions } from "../../../store/alert-slice";
 import RemoveTournamentTeamModal from "./RemoveTournamentTeamModal";
 import TournamentBracket from "./TournamentBracket";
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface TournamentBigCardProps {
   id: string;
@@ -71,6 +73,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const [tournament, setTournament] = React.useState<Tournament>();
+  const [tournamentMatches, setTournamentMatches] = React.useState<TournamentMatch[]>();
 
   const user = useAppSelector((state) => state.auth.user);
   const [userTeams, setUserTeams] = React.useState<Team[]>([]);
@@ -95,10 +98,24 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
     } else {
       getTournament(id, abortController.signal)
         .then((res) => {
-          console.log(res);
           setError("");
           setTournament(res);
-          setIsLoading(false);
+
+          getTournamentMatches(id, abortController.signal)
+          .then((res) => {
+            setTournamentMatches(res);
+            setTeamsExpand(!(res && res.length > 0));
+            setError("");
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if(errorMessage) {
+              setIsLoading(false);
+            }
+          });
         })
         .catch((e) => {
           console.log(e);
@@ -181,6 +198,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
             setError("");
             setTournament(res);
             setIsLoading(false);
+            setTeamsExpand(true);
           })
           .catch((e) => {
             console.log(e);
@@ -213,6 +231,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
           setError("");
           setTournament(res);
           setIsLoading(false);
+          setTeamsExpand(true);
         })
         .catch((e) => {
           console.log(e);
@@ -238,6 +257,22 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
             setError("");
             setTournament(res);
             setIsLoading(false);
+            setTeamsExpand(false);
+
+            getTournamentMatches(id)
+            .then((res) => {
+              setTournamentMatches(res);
+              setError("");
+              setIsLoading(false);
+            })
+            .catch((e) => {
+              console.log(e);
+              const errorMessage = errorMessageFromAxiosError(e);
+              setError(errorMessage);
+              if(errorMessage) {
+                setIsLoading(false);
+              }
+            });
           })
           .catch((e) => {
             console.log(e);
@@ -267,7 +302,12 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         <Card>
           <CardHeader
             title={tournament.title}
-            subheader={<><Chip color="primary" variant="outlined" label="Tournament"/><Chip label={TournamentStatus[tournament.status]} /></>}
+            subheader={
+              <>
+                <Chip color="primary" variant="outlined" label="Tournament" />
+                <Chip label={TournamentStatus[tournament.status]} />
+              </>
+            }
           />
           {tournament.pictureUrl && (
             <CardMedia
@@ -283,34 +323,63 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 <br />
               </>
             )}
-            {tournament.winner && <Typography variant="h6" color="success">Tournament winner is {tournament.winner.title}!</Typography>}
+            {tournament.winner && (
+              <>
+                <Typography variant="h5" color="green" textAlign="center">
+                  Tournament winner is {tournament.winner.title}!
+                </Typography>
+                <br />
+              </>
+            )}
             <Typography variant="body1">{tournament.description}</Typography>
             <Typography variant="body2" color="text.secondary">
               Created at: {new Date(tournament.createDate).toLocaleString()}
             </Typography>
             {user?.id === tournament.ownerId && (
               <Typography variant="body2" color="text.secondary">
-                Last edited at: {new Date(tournament.lastEditDate).toLocaleString()}
+                Last edited at:{" "}
+                {new Date(tournament.lastEditDate).toLocaleString()}
               </Typography>
             )}
             <Divider />
             <br />
-            <Accordion expanded={teamsExpand} onChange={(event: SyntheticEvent<Element, Event>, expanded: boolean) => setTeamsExpand(expanded)} variant="outlined">
+            <Accordion
+              expanded={teamsExpand}
+              onChange={(
+                event: SyntheticEvent<Element, Event>,
+                expanded: boolean
+              ) => setTeamsExpand(expanded)}
+              variant="outlined"
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography sx={{ width: "33%", flexShrink: 0 }}>
                   Teams
                 </Typography>
                 <Typography sx={{ color: "text.secondary" }}>
-                  Tournament team list
+                  Registered team list
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {tournament.acceptedTeams.map((item, index) => <Typography key={item.id}>{index+1}. {item.title}</Typography>)}
-                {(!tournament.acceptedTeams || tournament.acceptedTeams.length === 0) && <Typography>No teams in this tournament yet!</Typography>}
+                {tournament.acceptedTeams.filter(x => !x.duplicate).map((item, index) => (
+                  <Typography key={item.id}>
+                    {index + 1}. {item.title}
+                  </Typography>
+                ))}
+                {(!tournament.acceptedTeams ||
+                  tournament.acceptedTeams.length === 0) && (
+                  <Typography>No teams in this tournament yet!</Typography>
+                )}
               </AccordionDetails>
             </Accordion>
             <br />
-            {tournament.matches && tournament.matches.length > 0 && <TournamentBracket tournamentGames={tournament.matches}/>}
+            {tournamentMatches && tournamentMatches.length > 0 && (
+              <>
+                <Typography variant="body2" textAlign="center">
+                  Click on a bracket to check out a game!
+                </Typography>
+                <TournamentBracket tournamentGames={tournamentMatches} />
+              </>
+            )}
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>

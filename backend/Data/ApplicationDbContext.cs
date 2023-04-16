@@ -31,24 +31,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Team>().HasMany(t => t.Players).WithOne(tp => tp.Team).OnDelete(DeleteBehavior.ClientCascade);
+        builder.Entity<Team>().HasMany(t => t.Players).WithOne(tp => tp.Team).OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<Game>().HasMany(g => g.Sets).WithOne(s => s.Game).OnDelete(DeleteBehavior.ClientCascade);
-        builder.Entity<Game>().HasOne(g => g.FirstTeam).WithOne(gt => gt.GameWhereFirst).HasForeignKey<GameTeam>("GameWhereFirstId").OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<Game>().HasOne(g => g.SecondTeam).WithOne(gt => gt.GameWhereSecond).HasForeignKey<GameTeam>("GameWhereSecondId").OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Game>().HasMany(g => g.Sets).WithOne(s => s.Game).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Game>().HasOne(g => g.FirstTeam).WithOne().HasForeignKey<GameTeam>("GameWhereFirstId").OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Game>().HasOne(g => g.SecondTeam).WithOne().HasForeignKey<GameTeam>("GameWhereSecondId").OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Game>().HasOne(g => g.Winner).WithOne().HasForeignKey<GameTeam>("GameWhereWinnerId").OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<GameTeam>().HasMany(gt => gt.Players).WithOne(g => g.GameTeam).OnDelete(DeleteBehavior.Cascade);
 
-        builder.Entity<Set>().HasMany(s => s.Players).WithOne(s => s.Set).OnDelete(DeleteBehavior.ClientCascade);
+        builder.Entity<Set>().HasMany(s => s.Players).WithOne().HasForeignKey("SetId").OnDelete(DeleteBehavior.Cascade);
         
         builder.Entity<Tournament>().HasMany(t => t.RequestedTeams);
         builder.Entity<Tournament>().HasMany(t => t.AcceptedTeams).WithOne(at => at.Tournament)
-            .OnDelete(DeleteBehavior.ClientCascade);
-        builder.Entity<Tournament>().HasMany(t => t.Matches).WithOne(m => m.Tournament).OnDelete(DeleteBehavior.ClientCascade);
-        builder.Entity<TournamentMatch>().HasOne(tm => tm.Game).WithOne(g => g.TournamentMatch).HasForeignKey<Game>("TournamentMatchId").OnDelete(DeleteBehavior.ClientCascade).IsRequired(false);
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Tournament>().HasMany(t => t.Matches).WithOne(m => m.Tournament)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Tournament>().HasOne(t => t.Winner).WithOne().HasForeignKey<GameTeam>("TournamentWhereWinner").OnDelete(DeleteBehavior.Restrict).IsRequired(false);
         
-        builder.Entity<TournamentMatch>().HasOne(tm => tm.FirstParent);
-        builder.Entity<TournamentMatch>().HasOne(tm => tm.SecondParent);
+        builder.Entity<TournamentMatch>().HasOne(tm => tm.Game).WithOne(g => g.TournamentMatch).HasForeignKey<Game>("TournamentMatchId").OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<TournamentMatch>().HasMany(tm => tm.Parents).WithOne(tm => tm.Child).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
+        builder.Entity<TournamentMatch>().HasOne(tm => tm.Child).WithMany(tm => tm.Parents).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
 
     }
 }

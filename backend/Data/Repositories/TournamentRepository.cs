@@ -26,8 +26,7 @@ public class TournamentRepository : ITournamentRepository
             .Include(x => x.RequestedTeams)
                 .ThenInclude(x => x.Players)
             .Include(x => x.AcceptedTeams)
-            .Include(x => x.Matches)
-                .ThenInclude(x => x.Game)
+                .ThenInclude(x => x.Players)
             .Include(x => x.Winner)
             .FirstOrDefaultAsync(x => x.Id == tournamentId);
     }

@@ -18,7 +18,7 @@ const MapGameDataToFrontEnd = (tournamentMatch: TournamentMatch) => {
     gameId: tournamentMatch.game?.id ?? "",
     name: tournamentMatch.game?.title ?? "",
     bracketLabel: "",
-    scheduled: Number(new Date(tournamentMatch.game?.createDate ?? "")),
+    scheduled: Math.max(Number(new Date(tournamentMatch.game?.createDate ?? "")), Number(new Date(tournamentMatch.game?.startDate ?? -8640000000000000))),
     sides: {
       home: {
         team: {
@@ -48,9 +48,7 @@ const MapTournamentDataToFrontEnd = (tournamentGames: TournamentMatch[]) => {
     return undefined;
   }
 
-  const finalGame = tournamentGames.reduce((prev, current) => {
-    return prev.round > current.round ? prev : current;
-  });
+  const finalGame = tournamentGames.filter(x => !x.child)[0];
 
   const mappedFinalGame = MapGameToParentGames(
     MapGameDataToFrontEnd(finalGame),
@@ -69,23 +67,23 @@ const MapGameToParentGames = (
     return mappedGame;
   }
 
-  if (tournamentGame.firstParent) {
+  if (tournamentGame.parents[0]) {
     mappedGame.sides.home.seed = {
       displayName: "",
       rank: 1,
       sourceGame: MapGameToParentGames(
-        MapGameDataToFrontEnd(tournamentGame.firstParent),
+        MapGameDataToFrontEnd(tournamentGame.parents[0]),
         tournamentGames
       ),
       sourcePool: {},
     };
   }
-  if (tournamentGame.secondParent) {
+  if (tournamentGame.parents[1]) {
     mappedGame.sides.visitor.seed = {
       displayName: "",
       rank: 1,
       sourceGame: MapGameToParentGames(
-        MapGameDataToFrontEnd(tournamentGame.secondParent),
+        MapGameDataToFrontEnd(tournamentGame.parents[1]),
         tournamentGames
       ),
       sourcePool: {},
@@ -116,7 +114,7 @@ const TournamentBracket = (props: TournamentBracketProps) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TournamentBracketGameComponent = (props: any) => {
   const navigate = useNavigate();
-  return <BracketGame {...props} onClick={() => { console.log(props); navigate(`/game/${props.game.gameId}`); }} />;
+  return <BracketGame {...props} onClick={() => navigate(`/game/${props.game.gameId}`)} />;
 };
 
 export default TournamentBracket;

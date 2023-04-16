@@ -1,8 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Backend.Auth.Model;
 using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
+using Backend.Data.Entities.Tournament;
 using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
@@ -17,19 +20,25 @@ namespace Backend.Controllers;
 [Route("api/[controller]")]
 public class GamesController : ControllerBase
 {
+    private readonly ITournamentService _tournamentService;
     private readonly IGameService _gameService;
     private readonly IAuthorizationService _authorizationService;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ITournamentRepository _tournamentRepository;
+    private readonly ITournamentMatchRepository _tournamentMatchRepository;
     private readonly IGameRepository _gameRepository;
     private readonly ISetRepository _setRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IGameTeamRepository _gameTeamRepository;
 
-    public GamesController(IGameService gameService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, IGameRepository gameRepository, ISetRepository setRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository)
+    public GamesController(ITournamentService tournamentService, IGameService gameService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, IGameRepository gameRepository, ISetRepository setRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository)
     {
+        _tournamentService = tournamentService;
         _gameService = gameService;
         _authorizationService = authorizationService;
         _userManager = userManager;
+        _tournamentRepository = tournamentRepository;
+        _tournamentMatchRepository = tournamentMatchRepository;
         _gameRepository = gameRepository;
         _setRepository = setRepository;
         _teamRepository = teamRepository;
@@ -221,6 +230,10 @@ public class GamesController : ControllerBase
 
         if (editGameDto.PointsToWin != null)
         {
+            if (game.TournamentMatch != null)
+            {
+                return BadRequest("Cannot edit tournament game points to win");
+            }
             if (game.Status < GameStatus.Started)
             {
                 game.PointsToWin = editGameDto.PointsToWin ?? game.PointsToWin;
@@ -229,6 +242,10 @@ public class GamesController : ControllerBase
 
         if (editGameDto.PointDifferenceToWin != null)
         {
+            if (game.TournamentMatch != null)
+            {
+                return BadRequest("Cannot edit tournament game points");
+            }
             if (game.Status < GameStatus.Started)
             {
                 game.PointDifferenceToWin = editGameDto.PointDifferenceToWin ?? game.PointDifferenceToWin;
@@ -589,6 +606,17 @@ public class GamesController : ControllerBase
             }
         }
 
+        Tournament tournament = null;
+        TournamentMatch tournamentMatch = null;
+        ICollection<TournamentMatch> tournamentMatchesToUpdate = new List<TournamentMatch>();
+
+        if (game.TournamentMatch != null)
+        {
+            tournament = await _tournamentRepository.GetAsync(game.TournamentMatch.Tournament.Id);
+            tournamentMatch = (await _tournamentMatchRepository.GetAllTournamentAsync(tournament.Id, true)).FirstOrDefault(x => x.Id == game.TournamentMatch.Id);
+        }
+        
+
         var set = game.Sets.FirstOrDefault(x => x.Id == setId);
         if (set == null)
         {
@@ -623,6 +651,11 @@ public class GamesController : ControllerBase
                     {
                         game.Winner = game.FirstTeam;
                         game.Status = GameStatus.Finished;
+                        if (tournament != null)
+                        {
+                            (tournament, tournamentMatchesToUpdate) =
+                                _tournamentService.MatchesToUpdateInTournamentAfterWonMatch(tournament, tournamentMatch);
+                        }
                     }
                     else
                     {
@@ -649,6 +682,11 @@ public class GamesController : ControllerBase
                     {
                         game.Winner = game.SecondTeam;
                         game.Status = GameStatus.Finished;
+                        if (tournament != null)
+                        {
+                            (tournament, tournamentMatchesToUpdate) =
+                                _tournamentService.MatchesToUpdateInTournamentAfterWonMatch(tournament, tournamentMatch);
+                        }
                     }
                     else
                     {
@@ -686,6 +724,20 @@ public class GamesController : ControllerBase
             set.Players[index] = player;
         
         game.LastEditDate = DateTime.Now;
+
+        if (tournament != null)
+        {
+            await _tournamentRepository.UpdateAsync(tournament);
+            foreach (var matchToUpdate in tournamentMatchesToUpdate)
+            {
+                await _tournamentMatchRepository.UpdateAsync(matchToUpdate);
+                foreach (var gameTeam in new [] {matchToUpdate.Game.FirstTeam, matchToUpdate.Game.SecondTeam})
+                {
+                    if(gameTeam != null)
+                        await _gameTeamRepository.UpdateAsync(gameTeam);
+                }
+            }
+        }
 
         await _setRepository.UpdateAsync(set);
 

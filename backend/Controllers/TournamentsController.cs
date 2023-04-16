@@ -284,7 +284,7 @@ public class TournamentsController : ControllerBase
         {
             return NotFound();
         }
-        
+
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -479,24 +479,104 @@ public class TournamentsController : ControllerBase
 
         if (tournament.AcceptedTeams.Count < 2)
         {
-            return BadRequest("Tournament does not two teams");
+            return BadRequest("Tournament does not have at least two teams");
         }
 
         tournament.Status = TournamentStatus.Started;
 
         var roundCount = tournament.AcceptedTeams.CountTournamentRounds();
+        tournament.FinalRound = roundCount;
         var generatedMatches = _tournamentService.GenerateEmptyBracket(tournament, roundCount).ToList();
 
-        foreach (var tournamentMatch in generatedMatches)
-        {
-            tournament.Matches.Add(tournamentMatch);
-        }
-        
+        var populatedMatches = _tournamentService.PopulateEmptyBrackets(generatedMatches, tournament.AcceptedTeams);
+
         tournament.LastEditDate = DateTime.Now;
+
+        tournament.Matches = populatedMatches;
 
         await _tournamentRepository.UpdateAsync(tournament);
 
-        return Ok();
+        return NoContent();
+    }
+
+    [HttpGet("/api/[controller]/{tournamentId}/Matches")]
+    public async Task<IActionResult> GetTournamentMatches(Guid tournamentId)
+    {
+        var tournamentMatches = await _tournamentMatchRepository.GetAllTournamentAsync(tournamentId, false);
+
+        Tournament tournament = await _tournamentRepository.GetAsync(tournamentId);
+
+        if (tournament == null)
+        {
+            return NotFound();
+        }
+
+        if (tournament.IsPrivate)
+        {
+            // Only if it's user owned resource or user is admin
+            if (!User.IsInRole(ApplicationUserRoles.Admin))
+            {
+                var authorization =
+                    await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                if (!authorization.Succeeded)
+                {
+                    return NotFound();
+                }
+            }
+        }
+
+        return Ok(tournamentMatches);
+    }
+
+    [Authorize]
+    [HttpPatch("/api/[controller]/{tournamentId}/Matches/{matchId}/Brackets")]
+    public async Task<IActionResult> MoveBracket(Guid tournamentId, Guid matchId)
+    {
+        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+
+        if (tournament == null)
+        {
+            return NotFound();
+        }
+        
+        var tournamentMatches = await _tournamentMatchRepository.GetAllTournamentAsync(tournamentId, true);
+
+        var match = tournamentMatches.FirstOrDefault(x => x.Id == matchId);
+
+        if (match == null)
+        {
+            return NotFound();
+        }
+
+        if (match.Round == tournament.FinalRound)
+        {
+            return BadRequest("Cannot move down from the final round");
+        }
+        
+        // Only if it's user owned resource or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+        
+        try
+        {
+            var matchesToUpdate = _tournamentService.MoveMatchTeamDown(tournamentMatches, match);
+            foreach (var tournamentMatch in matchesToUpdate)
+            {
+                await _tournamentMatchRepository.UpdateAsync(tournamentMatch);
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
     
     [Authorize(Roles = ApplicationUserRoles.Admin)]
@@ -519,8 +599,8 @@ public class TournamentsController : ControllerBase
 
         var tournament = new Tournament()
         {
-            Title = "Tournament" + generatedNamePrefix,
-            Description = "Generated" + generatedNamePrefix + " very good tournament",
+            Title = "Tournament " + generatedNamePrefix,
+            Description = "Tournament is generated for testing purposes only",
             Type = TournamentType.SingleElimination,
             MaxTeams = 128,
             IsPrivate = false,
@@ -529,10 +609,10 @@ public class TournamentsController : ControllerBase
             Status = TournamentStatus.Open,
             RequestedTeams = new List<Team>(),
             AcceptedTeams = new List<GameTeam>(),
-            PointsToWin = 25,
-            PointDifferenceToWin = 2,
-            MaxSets = 5,
-            PlayersPerTeam = 6,
+            PointsToWin = 1,
+            PointDifferenceToWin = 0,
+            MaxSets = 1,
+            PlayersPerTeam = 0,
             OwnerId = user.Id
         };
 
@@ -540,15 +620,15 @@ public class TournamentsController : ControllerBase
         {
             var team = new GameTeam()
             {
-                Title = "Team" + generatedNamePrefix + (i+1),
-                Description = "Generated" + generatedNamePrefix + " very good team " + (i+1),
+                Title = "Team " + generatedNamePrefix + " " + (i+1),
+                Description = "Team is generated for testing purposes only",
                 Players = new List<GameTeamPlayer>(),
             };
             for (int j = 0; j < 6; j++)
             {
                 var player = new GameTeamPlayer()
                 {
-                    Name = "Player" + (j+1)
+                    Name = "Player " + (j+1)
                 };
                 team.Players.Add(player);
             }

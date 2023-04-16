@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class intial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -222,6 +222,7 @@ namespace Backend.Migrations
                     CreateDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastEditDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    FinalRound = table.Column<int>(type: "int", nullable: false),
                     PointsToWin = table.Column<int>(type: "int", nullable: false),
                     PointDifferenceToWin = table.Column<int>(type: "int", nullable: false),
                     MaxSets = table.Column<int>(type: "int", nullable: false),
@@ -247,28 +248,24 @@ namespace Backend.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Round = table.Column<int>(type: "int", nullable: false),
-                    FirstParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    SecondParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    ChildId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     TournamentId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TournamentMatches", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TournamentMatches_TournamentMatches_FirstParentId",
-                        column: x => x.FirstParentId,
+                        name: "FK_TournamentMatches_TournamentMatches_ChildId",
+                        column: x => x.ChildId,
                         principalTable: "TournamentMatches",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_TournamentMatches_TournamentMatches_SecondParentId",
-                        column: x => x.SecondParentId,
-                        principalTable: "TournamentMatches",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TournamentMatches_Tournaments_TournamentId",
                         column: x => x.TournamentId,
                         principalTable: "Tournaments",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -294,7 +291,6 @@ namespace Backend.Migrations
                     LastEditDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    WinnerId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     FinishDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     TournamentMatchId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     OwnerId = table.Column<string>(type: "varchar(255)", nullable: false)
@@ -313,7 +309,8 @@ namespace Backend.Migrations
                         name: "FK_Games_TournamentMatches_TournamentMatchId",
                         column: x => x.TournamentMatchId,
                         principalTable: "TournamentMatches",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -328,9 +325,12 @@ namespace Backend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Duplicate = table.Column<bool>(type: "tinyint(1)", nullable: true),
+                    TournamentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     GameWhereFirstId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     GameWhereSecondId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    TournamentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
+                    GameWhereWinnerId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    TournamentWhereWinner = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -348,10 +348,23 @@ namespace Backend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_GameTeams_Games_GameWhereWinnerId",
+                        column: x => x.GameWhereWinnerId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_GameTeams_Tournaments_TournamentId",
                         column: x => x.TournamentId,
                         principalTable: "Tournaments",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GameTeams_Tournaments_TournamentWhereWinner",
+                        column: x => x.TournamentWhereWinner,
+                        principalTable: "Tournaments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -456,7 +469,8 @@ namespace Backend.Migrations
                         name: "FK_Sets_Games_GameId",
                         column: x => x.GameId,
                         principalTable: "Games",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -476,7 +490,8 @@ namespace Backend.Migrations
                         name: "FK_TeamPlayers_Teams_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Teams",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -489,7 +504,7 @@ namespace Backend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Score = table.Column<int>(type: "int", nullable: false),
                     Team = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    SetId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    SetId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -498,7 +513,8 @@ namespace Backend.Migrations
                         name: "FK_SetPlayers_Sets_SetId",
                         column: x => x.SetId,
                         principalTable: "Sets",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -551,11 +567,6 @@ namespace Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Games_WinnerId",
-                table: "Games",
-                column: "WinnerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_GameTeamPlayers_GameTeamId",
                 table: "GameTeamPlayers",
                 column: "GameTeamId");
@@ -573,9 +584,21 @@ namespace Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_GameTeams_GameWhereWinnerId",
+                table: "GameTeams",
+                column: "GameWhereWinnerId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GameTeams_TournamentId",
                 table: "GameTeams",
                 column: "TournamentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameTeams_TournamentWhereWinner",
+                table: "GameTeams",
+                column: "TournamentWhereWinner",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SetPlayers_SetId",
@@ -623,14 +646,9 @@ namespace Backend.Migrations
                 column: "TournamentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TournamentMatches_FirstParentId",
+                name: "IX_TournamentMatches_ChildId",
                 table: "TournamentMatches",
-                column: "FirstParentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TournamentMatches_SecondParentId",
-                table: "TournamentMatches",
-                column: "SecondParentId");
+                column: "ChildId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TournamentMatches_TournamentId",
@@ -641,30 +659,11 @@ namespace Backend.Migrations
                 name: "IX_Tournaments_OwnerId",
                 table: "Tournaments",
                 column: "OwnerId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Games_GameTeams_WinnerId",
-                table: "Games",
-                column: "WinnerId",
-                principalTable: "GameTeams",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Games_AspNetUsers_OwnerId",
-                table: "Games");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Tournaments_AspNetUsers_OwnerId",
-                table: "Tournaments");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Games_GameTeams_WinnerId",
-                table: "Games");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -699,9 +698,6 @@ namespace Backend.Migrations
                 name: "Teams");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "GameTeams");
 
             migrationBuilder.DropTable(
@@ -712,6 +708,9 @@ namespace Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tournaments");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

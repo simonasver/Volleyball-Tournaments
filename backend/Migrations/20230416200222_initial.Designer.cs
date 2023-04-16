@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230415141924_added winner to tournament")]
-    partial class addedwinnertotournament
+    [Migration("20230416200222_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,17 +164,12 @@ namespace Backend.Migrations
                     b.Property<Guid?>("TournamentMatchId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("WinnerId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
 
                     b.HasIndex("TournamentMatchId")
                         .IsUnique();
-
-                    b.HasIndex("WinnerId");
 
                     b.ToTable("Games");
                 });
@@ -188,10 +183,16 @@ namespace Backend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
+                    b.Property<bool?>("Duplicate")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<Guid?>("GameWhereFirstId")
                         .HasColumnType("char(36)");
 
                     b.Property<Guid?>("GameWhereSecondId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("GameWhereWinnerId")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("ProfilePicture")
@@ -204,6 +205,9 @@ namespace Backend.Migrations
                     b.Property<Guid?>("TournamentId")
                         .HasColumnType("char(36)");
 
+                    b.Property<Guid?>("TournamentWhereWinner")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GameWhereFirstId")
@@ -212,7 +216,13 @@ namespace Backend.Migrations
                     b.HasIndex("GameWhereSecondId")
                         .IsUnique();
 
+                    b.HasIndex("GameWhereWinnerId")
+                        .IsUnique();
+
                     b.HasIndex("TournamentId");
+
+                    b.HasIndex("TournamentWhereWinner")
+                        .IsUnique();
 
                     b.ToTable("GameTeams");
                 });
@@ -299,7 +309,7 @@ namespace Backend.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("SetId")
+                    b.Property<Guid?>("SetId")
                         .HasColumnType("char(36)");
 
                     b.Property<bool>("Team")
@@ -387,6 +397,9 @@ namespace Backend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("FinalRound")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsPrivate")
                         .HasColumnType("tinyint(1)");
 
@@ -425,14 +438,9 @@ namespace Backend.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("WinnerId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("WinnerId");
 
                     b.ToTable("Tournaments");
                 });
@@ -443,23 +451,18 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("FirstParentId")
+                    b.Property<Guid?>("ChildId")
                         .HasColumnType("char(36)");
 
                     b.Property<int>("Round")
                         .HasColumnType("int");
-
-                    b.Property<Guid?>("SecondParentId")
-                        .HasColumnType("char(36)");
 
                     b.Property<Guid>("TournamentId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FirstParentId");
-
-                    b.HasIndex("SecondParentId");
+                    b.HasIndex("ChildId");
 
                     b.HasIndex("TournamentId");
 
@@ -605,39 +608,39 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "TournamentMatch")
                         .WithOne("Game")
                         .HasForeignKey("Backend.Data.Entities.Game.Game", "TournamentMatchId")
-                        .OnDelete(DeleteBehavior.ClientCascade);
-
-                    b.HasOne("Backend.Data.Entities.Game.GameTeam", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId");
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Owner");
 
                     b.Navigation("TournamentMatch");
-
-                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Game.GameTeam", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Game.Game", "GameWhereFirst")
+                    b.HasOne("Backend.Data.Entities.Game.Game", null)
                         .WithOne("FirstTeam")
                         .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "GameWhereFirstId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Backend.Data.Entities.Game.Game", "GameWhereSecond")
+                    b.HasOne("Backend.Data.Entities.Game.Game", null)
                         .WithOne("SecondTeam")
                         .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "GameWhereSecondId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("Backend.Data.Entities.Game.Game", null)
+                        .WithOne("Winner")
+                        .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "GameWhereWinnerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
                         .WithMany("AcceptedTeams")
                         .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.ClientCascade);
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("GameWhereFirst");
-
-                    b.Navigation("GameWhereSecond");
+                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", null)
+                        .WithOne("Winner")
+                        .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "TournamentWhereWinner")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Tournament");
                 });
@@ -664,7 +667,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Data.Entities.Game.Game", "Game")
                         .WithMany("Sets")
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Backend.Data.Entities.Game.GameTeam", "SecondTeam")
@@ -688,13 +691,10 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Game.SetPlayer", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Game.Set", "Set")
+                    b.HasOne("Backend.Data.Entities.Game.Set", null)
                         .WithMany("Players")
                         .HasForeignKey("SetId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("Set");
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Team.Team", b =>
@@ -721,7 +721,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Data.Entities.Team.Team", "Team")
                         .WithMany("Players")
                         .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Team");
@@ -735,34 +735,23 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Data.Entities.Game.GameTeam", "Winner")
-                        .WithMany()
-                        .HasForeignKey("WinnerId");
-
                     b.Navigation("Owner");
-
-                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Tournament.TournamentMatch", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "FirstParent")
-                        .WithMany()
-                        .HasForeignKey("FirstParentId");
-
-                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "SecondParent")
-                        .WithMany()
-                        .HasForeignKey("SecondParentId");
+                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "Child")
+                        .WithMany("Parents")
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
                         .WithMany("Matches")
                         .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FirstParent");
-
-                    b.Navigation("SecondParent");
+                    b.Navigation("Child");
 
                     b.Navigation("Tournament");
                 });
@@ -827,6 +816,8 @@ namespace Backend.Migrations
                     b.Navigation("SecondTeam");
 
                     b.Navigation("Sets");
+
+                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Game.GameTeam", b =>
@@ -851,12 +842,16 @@ namespace Backend.Migrations
                     b.Navigation("Matches");
 
                     b.Navigation("RequestedTeams");
+
+                    b.Navigation("Winner");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Tournament.TournamentMatch", b =>
                 {
                     b.Navigation("Game")
                         .IsRequired();
+
+                    b.Navigation("Parents");
                 });
 #pragma warning restore 612, 618
         }

@@ -20,8 +20,8 @@ export interface TournamentMatch {
   id: string;
   round: number;
   game?: Game;
-  firstParent?: TournamentMatch;
-  secondParent?: TournamentMatch;
+  child?: TournamentMatch;
+  parents: TournamentMatch[];
   tournament: Tournament;
 }
 
@@ -78,6 +78,7 @@ export interface GameTeam {
   title: string;
   profilePicture: string;
   description: string;
+  duplicate: boolean;
   players: GameTeamPlayer[];
 }
 

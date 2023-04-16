@@ -90,12 +90,22 @@ export const joinTournament = async (tournamentId: string, teamId: string) => {
     return res.data;
   };
   
-  export const removeTeamFromTournament = async (gameId: string, team: string) => {
-    const res = await api.delete(`/Tournaments/${gameId}/AcceptedTeams?teamId=${team}`);
+  export const removeTeamFromTournament = async (tournamentId: string, team: string) => {
+    const res = await api.delete(`/Tournaments/${tournamentId}/AcceptedTeams?teamId=${team}`);
     return res.data;
   };
   
-  export const startTournament = async (gameId: string) => {
-    const res = await api.patch(`/Tournaments/${gameId}/Status`);
+  export const startTournament = async (tournamentId: string) => {
+    const res = await api.patch(`/Tournaments/${tournamentId}/Status`);
     return res.data;
   };
+
+  export const getTournamentMatches = async (tournamentId: string, signal?: AbortSignal) => {
+    const res = await api.get(`/Tournaments/${tournamentId}/Matches`, { signal: signal });
+    return res.data;
+  };
+
+  export const moveTeamDown = async (tournamentId: string, matchId: string) => {
+    const res = await api.patch(`/Tournaments/${tournamentId}/Matches/${matchId}/Brackets`);
+    return res.data;
+  }

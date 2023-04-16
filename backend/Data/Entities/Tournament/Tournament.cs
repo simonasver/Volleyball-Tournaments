@@ -33,8 +33,9 @@ public class Tournament
     public DateTime LastEditDate { get; set; }
     public TournamentStatus Status { get; set; }
     public ICollection<Team.Team> RequestedTeams { get; set; }
-    public ICollection<GameTeam> AcceptedTeams { get; set; }
+    public IList<GameTeam> AcceptedTeams { get; set; }
     public GameTeam? Winner { get; set; }
+    public int FinalRound { get; set; }
     // TOURNAMENT GAME SETTINGS
     public int PointsToWin { get; set; }
     public int PointDifferenceToWin { get; set; }

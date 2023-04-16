@@ -19,15 +19,51 @@ public class TournamentMatchRepository : ITournamentMatchRepository
         return await _dbContext.TournamentMatches.ToListAsync();
     }
 
-    public async Task<IEnumerable<TournamentMatch>> GetAllTournamentAsync(Guid tournamentId)
+    public async Task<IList<TournamentMatch>> GetAllTournamentAsync(Guid tournamentId, bool allData)
     {
-        return await _dbContext.TournamentMatches.Include(x => x.Tournament).Where(x => x.Tournament.Id == tournamentId)
+        if (allData)
+        {
+            return await _dbContext.TournamentMatches
+            .Include(x => x.Tournament)
+            .Include(x => x.Parents)
+            .Include(x => x.Child)
+            .Include(x => x.Game)
+                .ThenInclude(x => x.FirstTeam)
+                    .ThenInclude(x => x.Players)
+            .Include(x => x.Game)
+                .ThenInclude(x => x.SecondTeam)
+                    .ThenInclude(x => x.Players)
+            .Where(x => x.Tournament.Id == tournamentId)
             .ToListAsync();
+        }
+        else
+        {
+            return await _dbContext.TournamentMatches
+                .Include(x => x.Tournament)
+                .Include(x => x.Parents)
+                .Include(x => x.Child)
+                .Include(x => x.Game)
+                    .ThenInclude(x => x.FirstTeam)
+                .Include(x => x.Game)
+                    .ThenInclude(x => x.SecondTeam)
+                .Where(x => x.Tournament.Id == tournamentId)
+                .ToListAsync();
+        }
     }
 
     public async Task<TournamentMatch?> GetAsync(Guid tournamentMatchId)
     {
-        return await _dbContext.TournamentMatches.FirstOrDefaultAsync(x => x.Id == tournamentMatchId);
+        return await _dbContext.TournamentMatches
+            .Include(x => x.Tournament)
+            .Include(x => x.Parents)
+            .Include(x => x.Child)
+            .Include(x => x.Game)
+            .ThenInclude(x => x.FirstTeam)
+            .ThenInclude(x => x.Players)
+            .Include(x => x.Game)
+            .ThenInclude(x => x.SecondTeam)
+            .ThenInclude(x => x.Players)
+            .FirstOrDefaultAsync(x => x.Id == tournamentMatchId);
     }
 
     public async Task<TournamentMatch> CreateAsync(TournamentMatch tournamentMatch)

@@ -13,7 +13,7 @@ public static class TournamentExtensions
         return (int)Math.Log2(closestPowerOf2);
     }
 
-    public static ICollection<TournamentMatch> ToList(this TournamentMatch tournamentMatches)
+    public static IList<TournamentMatch> ToList(this TournamentMatch tournamentMatches)
     {
         var tournamentMatchesList = new List<TournamentMatch>();
         AddTournamentMatchesToList(tournamentMatches, tournamentMatchesList);
@@ -30,8 +30,11 @@ public static class TournamentExtensions
         else
         {
             tournamentMatchesList.Add(currentMatch);
-            AddTournamentMatchesToList(currentMatch.FirstParent, tournamentMatchesList);
-            AddTournamentMatchesToList(currentMatch.SecondParent, tournamentMatchesList);
+            if (currentMatch.Parents.Count > 0)
+            {
+                AddTournamentMatchesToList(currentMatch.Parents[0], tournamentMatchesList);
+                AddTournamentMatchesToList(currentMatch.Parents[1], tournamentMatchesList);
+            }
         }
     }
 }

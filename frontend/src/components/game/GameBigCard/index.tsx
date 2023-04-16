@@ -8,6 +8,13 @@ import {
   Divider,
   Grid,
   IconButton,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tabs,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -26,7 +33,7 @@ import {
   removeTeamFromGame,
   startGame,
 } from "../../../services/game.service";
-import { errorMessageFromAxiosError } from "../../../utils/helpers";
+import { errorMessageFromAxiosError, isGameFull } from "../../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RequestJoinGameModal from "./RequestJoinGameModal";
@@ -38,6 +45,8 @@ import GameSets from "./GameSets";
 import Loader from "../../layout/Loader";
 import { alertActions } from "../../../store/alert-slice";
 import BackButton from "../../layout/BackButton";
+import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
+import { moveTeamDown } from "../../../services/tournament.service";
 
 interface GameBigCardProps {
   id: string;
@@ -72,6 +81,39 @@ const GameBigCard = (props: GameBigCardProps) => {
   const [requestJoinError, setRequestJoinError] = React.useState("");
   const [startError, setStartError] = React.useState("");
   const [acceptTeamError, setAcceptTeamError] = React.useState("");
+
+  const [currentTab, setCurrentTab] = React.useState<number>(0);
+
+  const tableSettings = React.useMemo(() => {
+    return [
+      {
+        name: "Points to win",
+        value: game?.pointsToWin,
+      },
+      {
+        name: "Point difference to win",
+        value: game?.pointDifferenceToWin,
+      },
+      {
+        name: "Best of x",
+        value: game?.maxSets,
+      },
+      {
+        name: "Players per team",
+        value:
+          game?.playersPerTeam === 0 ? "unrestricted" : game?.playersPerTeam,
+      },
+    ];
+  }, [
+    game?.pointsToWin,
+    game?.pointDifferenceToWin,
+    game?.maxSets,
+    game?.playersPerTeam,
+  ]);
+
+  const onTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -237,6 +279,21 @@ const GameBigCard = (props: GameBigCardProps) => {
     });
   };
 
+  const onMoveTeamDownSubmit = () => {
+    if (!game?.tournamentMatch) {
+      return;
+    }
+    moveTeamDown(game?.tournamentMatch.tournament.id, game?.tournamentMatch.id)
+      .then(() => {
+        dispatch(alertActions.changeAlert({ type: "success", message: "Successfully moved the game down the bracket" }));
+      })
+      .catch((e) => {
+        console.log(e);
+        const errorMessage = errorMessageFromAxiosError(e);
+        dispatch(alertActions.changeAlert({ type: "error", message: errorMessage }));
+      });
+  };
+
   const onChangeScore = (setId: string, playerId: string, change: boolean) => {
     changeGameSetScore(id, setId, playerId, change)
       .then(() => {
@@ -282,6 +339,10 @@ const GameBigCard = (props: GameBigCardProps) => {
       })
       .catch((e) => {
         console.log(e);
+        const errorMessage = errorMessageFromAxiosError(e);
+        dispatch(
+          alertActions.changeAlert({ type: "error", message: errorMessage })
+        );
       });
   };
 
@@ -332,8 +393,15 @@ const GameBigCard = (props: GameBigCardProps) => {
         justifyContent="flex-start"
       >
         <Grid item>
-          {game?.tournamentMatch && <BackButton title="Tournament" address={`/tournament/${game.tournamentMatch.tournament.id}`} />}
-          {!game?.tournamentMatch && <BackButton title="All games" address="/games" />}
+          {game?.tournamentMatch && (
+            <BackButton
+              title="Tournament"
+              address={`/tournament/${game.tournamentMatch.tournament.id}`}
+            />
+          )}
+          {!game?.tournamentMatch && (
+            <BackButton title="All games" address="/games" />
+          )}
         </Grid>
       </Grid>
       <br />
@@ -357,157 +425,224 @@ const GameBigCard = (props: GameBigCardProps) => {
                 <br />
               </>
             )}
-            <Grid
-              container
-              spacing={0}
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
+            <Tabs
+              value={currentTab}
+              onChange={onTabChange}
+              variant="fullWidth"
+              centered
             >
-              <Grid item>
-                {game.firstTeam && (
-                  <Grid
-                    container
-                    spacing={0}
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Grid item>
-                      <Typography
-                        variant="body1"
-                        color={
-                          game.winner
-                            ? game.winner.id === game.firstTeam.id
-                              ? "green"
-                              : "red"
-                            : "default"
-                        }
-                      >
-                        {game.firstTeam.title}
-                      </Typography>
+              <Tab value={0} label="Game information" />
+              <Tab value={1} label="Game settings" />
+            </Tabs>
+            <br />
+            <div hidden={currentTab !== 0}>
+              <Grid
+                container
+                spacing={0}
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Grid item>
+                  {game.firstTeam && (
+                    <Grid
+                      container
+                      spacing={0}
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <Grid item>
+                        <Typography
+                          variant="body1"
+                          fontWeight="bold"
+                          color={
+                            game.winner
+                              ? game.winner.id === game.firstTeam.id
+                                ? "green"
+                                : "red"
+                              : "default"
+                          }
+                        >
+                          {game.firstTeam.title}
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        {user?.id === game.ownerId &&
+                          !game.tournamentMatch &&
+                          game.status < GameStatus.Started && (
+                            <IconButton
+                              centerRipple={false}
+                              color="error"
+                              onClick={() => onRemoveTeamFromGameSubmit(false)}
+                              size="small"
+                            >
+                              <Tooltip title="Remove first team">
+                                <DeleteForeverIcon />
+                              </Tooltip>
+                            </IconButton>
+                          )}
+                        {user?.id === game.ownerId &&
+                          game.tournamentMatch &&
+                          game.status != GameStatus.Started && !isGameFull(game) && (
+                            <IconButton
+                              centerRipple={false}
+                              color="success"
+                              onClick={() => onMoveTeamDownSubmit()}
+                              size="small"
+                            >
+                              <Tooltip title="Move team down a bracket">
+                                <ArrowCircleRightIcon />
+                              </Tooltip>
+                            </IconButton>
+                          )}
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      {user?.id === game.ownerId &&
-                        game.status < GameStatus.Started && (
-                          <IconButton
-                            centerRipple={false}
-                            color="error"
-                            onClick={() => onRemoveTeamFromGameSubmit(false)}
-                            size="small"
-                          >
-                            <Tooltip title="Remove first team">
-                              <DeleteForeverIcon />
-                            </Tooltip>
-                          </IconButton>
-                        )}
+                  )}
+                </Grid>
+                <Grid item>
+                  {game.secondTeam && (
+                    <Grid
+                      container
+                      spacing={0}
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      <Grid item>
+                        {user?.id === game.ownerId &&
+                          game.tournamentMatch &&
+                          game.status != GameStatus.Started && !isGameFull(game) && (
+                            <IconButton
+                              centerRipple={false}
+                              color="success"
+                              onClick={() => onMoveTeamDownSubmit()}
+                              size="small"
+                            >
+                              <Tooltip title="Move team down a bracket">
+                                <ArrowCircleRightIcon />
+                              </Tooltip>
+                            </IconButton>
+                          )}
+                        {user?.id === game.ownerId &&
+                          !game.tournamentMatch &&
+                          game.status < GameStatus.Started && (
+                            <IconButton
+                              centerRipple={false}
+                              color="error"
+                              onClick={() => onRemoveTeamFromGameSubmit(true)}
+                              size="small"
+                            >
+                              <Tooltip title="Remove second team">
+                                <DeleteForeverIcon />
+                              </Tooltip>
+                            </IconButton>
+                          )}
+                      </Grid>
+                      <Grid item>
+                        <Typography
+                          variant="body1"
+                          fontWeight="bold"
+                          color={
+                            game.winner
+                              ? game.winner.id === game.secondTeam.id
+                                ? "green"
+                                : "red"
+                              : "default"
+                          }
+                        >
+                          {game.secondTeam.title}
+                        </Typography>
+                      </Grid>
                     </Grid>
-                  </Grid>
-                )}
+                  )}
+                </Grid>
               </Grid>
-              <Grid item>
-                {game.secondTeam && (
-                  <Grid
-                    container
-                    spacing={0}
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Grid item>
-                      {user?.id === game.ownerId &&
-                        game.status < GameStatus.Started && (
-                          <IconButton
-                            centerRipple={false}
-                            color="error"
-                            onClick={() => onRemoveTeamFromGameSubmit(true)}
-                            size="small"
-                          >
-                            <Tooltip title="Remove second team">
-                              <DeleteForeverIcon />
-                            </Tooltip>
-                          </IconButton>
-                        )}
-                    </Grid>
-                    <Grid item>
-                      <Typography
-                        variant="body1"
-                        color={
-                          game.winner
-                            ? game.winner.id === game.secondTeam.id
-                              ? "green"
-                              : "red"
-                            : "default"
-                        }
-                      >
-                        {game.secondTeam.title}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                )}
+              <Grid
+                container
+                spacing={0}
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Grid item>
+                  {game.status >= GameStatus.Started && (
+                    <Typography
+                      variant="h3"
+                      display="inline"
+                      width="100%"
+                      textAlign="left"
+                      color={
+                        game.winner
+                          ? game.winner.id === game.firstTeam.id
+                            ? "green"
+                            : "red"
+                          : "default"
+                      }
+                    >
+                      {game.firstTeamScore}
+                    </Typography>
+                  )}
+                </Grid>
+                <Grid item>
+                  {game.status >= GameStatus.Started && (
+                    <Typography
+                      variant="h3"
+                      display="inline"
+                      width="100%"
+                      textAlign="right"
+                      color={
+                        game.winner
+                          ? game.winner.id === game.secondTeam.id
+                            ? "green"
+                            : "red"
+                          : "default"
+                      }
+                    >
+                      {game.secondTeamScore}
+                    </Typography>
+                  )}
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid
-              container
-              spacing={0}
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Grid item>
-                {game.status >= GameStatus.Started && (
-                  <Typography
-                    variant="h3"
-                    display="inline"
-                    width="100%"
-                    textAlign="left"
-                    color={
-                      game.winner
-                        ? game.winner.id === game.firstTeam.id
-                          ? "green"
-                          : "red"
-                        : "default"
-                    }
-                  >
-                    {game.firstTeamScore}
-                  </Typography>
-                )}
-              </Grid>
-              <Grid item>
-                {game.status >= GameStatus.Started && (
-                  <Typography
-                    variant="h3"
-                    display="inline"
-                    width="100%"
-                    textAlign="right"
-                    color={
-                      game.winner
-                        ? game.winner.id === game.secondTeam.id
-                          ? "green"
-                          : "red"
-                        : "default"
-                    }
-                  >
-                    {game.secondTeamScore}
-                  </Typography>
-                )}
-              </Grid>
-            </Grid>
-            <Typography variant="body1">{game.description}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Created at: {new Date(game.createDate).toLocaleString()}
-            </Typography>
-            {user?.id === game.ownerId && (
+              <br />
+              <Typography variant="body1">{game.description}</Typography>
               <Typography variant="body2" color="text.secondary">
-                Last edited at: {new Date(game.lastEditDate).toLocaleString()}
+                Created at: {new Date(game.createDate).toLocaleString()}
               </Typography>
-            )}
-            <Divider />
-            <GameSets
-              isOwner={user?.id === game.ownerId}
-              sets={sets ?? []}
-              onChangeScore={onChangeScore}
-            />
+              {user?.id === game.ownerId && (
+                <Typography variant="body2" color="text.secondary">
+                  Last edited at: {new Date(game.lastEditDate).toLocaleString()}
+                </Typography>
+              )}
+              <Divider />
+              <GameSets
+                isOwner={user?.id === game.ownerId}
+                sets={sets ?? []}
+                onChangeScore={onChangeScore}
+              />
+            </div>
+            <div hidden={currentTab !== 1}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <b>Setting</b>
+                    </TableCell>
+                    <TableCell>
+                      <b>Value</b>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {tableSettings.map((setting) => (
+                    <TableRow key={setting.name}>
+                      <TableCell>{setting.name}</TableCell>
+                      <TableCell>{setting.value}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>

@@ -37,6 +37,8 @@ const EditGameForm = () => {
   const [playersPerTeam, setPlayersPerTeam] = React.useState(5);
   const [isPrivate, setIsPrivate] = React.useState(false);
 
+  const [isTournamentGame, setIsTournamentGame] = React.useState(false);
+
   const [gameStatus, setGameStatus] = React.useState(0);
 
   const user = useAppSelector((state) => state.auth.user);
@@ -60,6 +62,8 @@ const EditGameForm = () => {
           setLimitPlayers(res.playersPerTeam !== 0);
           setIsPrivate(res.isPrivate);
           setGameStatus(res.status);
+
+          setIsTournamentGame(!!res.tournamentMatch);
 
           setIsLoading(false);
         })
@@ -130,17 +134,19 @@ const EditGameForm = () => {
       <Typography variant="subtitle2">Change your game information!</Typography>
       <br />
       <form onSubmit={onSubmitHandler}>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isPrivate}
-                onChange={() => setIsPrivate((state) => !state)}
-              />
-            }
-            label="Private game"
-          />
-        </FormGroup>
+        {!isTournamentGame && (
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isPrivate}
+                  onChange={() => setIsPrivate((state) => !state)}
+                />
+              }
+              label="Private game"
+            />
+          </FormGroup>
+        )}
         <br />
         <TextField
           value={title}
@@ -221,33 +227,37 @@ const EditGameForm = () => {
         />
         <br />
         <br />
-        <FormGroup>
-          <FormControlLabel
-            checked={limitPlayers}
-            control={
-              <Switch
-                value={limitPlayers}
-                onChange={() => setLimitPlayers((state) => !state)}
-                disabled={gameStatus > GameStatus.New}
+        {!isTournamentGame && (
+          <>
+            <FormGroup>
+              <FormControlLabel
+                checked={limitPlayers}
+                control={
+                  <Switch
+                    value={limitPlayers}
+                    onChange={() => setLimitPlayers((state) => !state)}
+                    disabled={gameStatus > GameStatus.New}
+                  />
+                }
+                label="Limit players (player count in both teams must be equal)"
               />
-            }
-            label="Limit players (player count in both teams must be equal)"
-          />
-        </FormGroup>
-        <br />
-        <TextField
-          value={playersPerTeam}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setPlayersPerTeam(parseInt(e.target.value) ?? 1)
-          }
-          type="number"
-          label="Amount of players in each team"
-          variant="outlined"
-          inputProps={{ min: 1, max: 12 }}
-          fullWidth
-          disabled={gameStatus > GameStatus.New || !limitPlayers}
-        />
-        <br />
+            </FormGroup>
+            <br />
+            <TextField
+              value={playersPerTeam}
+              onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setPlayersPerTeam(parseInt(e.target.value) ?? 1)
+              }
+              type="number"
+              label="Amount of players in each team"
+              variant="outlined"
+              inputProps={{ min: 1, max: 12 }}
+              fullWidth
+              disabled={gameStatus > GameStatus.New || !limitPlayers}
+            />
+            <br />
+          </>
+        )}
         <br />
         <Grid item xs={12}>
           <Button
