@@ -73,9 +73,7 @@ public class TournamentService : ITournamentService
             return null;
         }
 
-        childMatch.Parents = new List<TournamentMatch>();
-
-        childMatch.Parents.Add(
+        childMatch.FirstParent = (
             GenerateParentGames(
                 tournament,
                 new TournamentMatch()
@@ -97,10 +95,9 @@ public class TournamentService : ITournamentService
                         Status = GameStatus.New,
                         OwnerId = tournament.OwnerId
                     },
-                    Child = childMatch
                 }, currentRound - 1));
 
-        childMatch.Parents.Add(
+        childMatch.SecondParent = (
             GenerateParentGames(
                 tournament,
                 new TournamentMatch()
@@ -122,10 +119,7 @@ public class TournamentService : ITournamentService
                         Status = GameStatus.New,
                         OwnerId = tournament.OwnerId
                     },
-                    Child = childMatch
                 }, currentRound - 1));
-
-        childMatch.Parents = childMatch.Parents.Where(x => x != null).ToList();
 
         return childMatch;
     }
@@ -156,15 +150,15 @@ public class TournamentService : ITournamentService
             throw new InvalidOperationException("Cannot move down a team if it has an opponent");
         }
 
-        if (tournamentMatch.Game.FirstTeam == null && tournamentMatch.Parents.Count > 0 && HasDirectAncestor(tournamentMatch.Parents.OrderBy(x => x.Game.CreateDate).ToList()[0]) || 
-            tournamentMatch.Game.SecondTeam == null && tournamentMatch.Parents.Count > 0 && HasDirectAncestor(tournamentMatch.Parents.OrderBy(x => x.Game.CreateDate).ToList()[1]))
+        if (tournamentMatch.Game.FirstTeam == null && tournamentMatch.FirstParent != null && HasDirectAncestor(tournamentMatch.FirstParent) || 
+            tournamentMatch.Game.SecondTeam == null && tournamentMatch.SecondParent != null && HasDirectAncestor(tournamentMatch.SecondParent))
         {
             throw new InvalidOperationException("Cannot move down a team that will have an opponent");
         }
 
         if (tournamentMatch.Game.SecondTeam == null)
         {
-            var childMatchOf = FindChildMatchOf(tournamentMatch);
+            var childMatchOf = FindChildMatchOf(tournamentMatches, tournamentMatch);
             if (!childMatchOf.Item2)
             {
                 if (childMatchOf.Item1.Game.FirstTeam.Title == tournamentMatch.Game.FirstTeam.Title)
@@ -175,18 +169,20 @@ public class TournamentService : ITournamentService
             }
             else
             {
-                if (childMatchOf.Item1.Game.SecondTeam.Title == tournamentMatch.Game.FirstTeam.Title)
+                if (childMatchOf.Item1.Game.SecondTeam?.Title == tournamentMatch.Game.FirstTeam?.Title)
                 {
                     throw new InvalidOperationException("The team was already moved down");
                 }
                 childMatchOf.Item1.Game.SecondTeam = tournamentMatch.Game.FirstTeam.Copy();
             }
 
+            childMatchOf.Item1.Game = CheckIfGameIsReady(childMatchOf.Item1);
+
             yield return childMatchOf.Item1;
         }
         else if (tournamentMatch.Game.FirstTeam == null)
         {
-            var childMatchOf = FindChildMatchOf(tournamentMatch);
+            var childMatchOf = FindChildMatchOf(tournamentMatches, tournamentMatch);
             if (!childMatchOf.Item2)
             {
                 if (childMatchOf.Item1.Game.FirstTeam.Title == tournamentMatch.Game.SecondTeam.Title)
@@ -204,18 +200,20 @@ public class TournamentService : ITournamentService
                 childMatchOf.Item1.Game.SecondTeam = tournamentMatch.Game.SecondTeam.Copy();
             }
 
+            childMatchOf.Item1.Game = CheckIfGameIsReady(childMatchOf.Item1);
+
             yield return childMatchOf.Item1;
         }
     }
 
     private bool HasDirectAncestor(TournamentMatch tournamentMatch)
     {
-        if (tournamentMatch.Parents.Count == 0)
+        if (tournamentMatch.FirstParent == null && tournamentMatch.SecondParent == null)
         {
             return (tournamentMatch.Game.FirstTeam != null && tournamentMatch.Game.SecondTeam != null);
         }
         
-        return tournamentMatch.Parents.Count != 0 ? (HasDirectAncestor(tournamentMatch.Parents?[0]) || HasDirectAncestor(tournamentMatch.Parents?[1])) : false;
+        return (HasDirectAncestor(tournamentMatch.FirstParent) || HasDirectAncestor(tournamentMatch.SecondParent));
     }
 
     /// <summary>
@@ -236,7 +234,7 @@ public class TournamentService : ITournamentService
         }
         else
         {
-            var childMatch = FindChildMatchOf(tournamentMatch);
+            var childMatch = FindChildMatchOf(tournament.Matches, tournamentMatch);
             if (!childMatch.Item2)
             {
                 childMatch.Item1.Game.FirstTeam = tournamentMatch.Game.Winner.Copy();
@@ -260,19 +258,20 @@ public class TournamentService : ITournamentService
     /// <param name="tournamentMatches"></param>
     /// <param name="parentMatch"></param>
     /// <returns>Child match and from which parent it came</returns>
-    private (TournamentMatch, bool) FindChildMatchOf(TournamentMatch parentMatch)
+    private (TournamentMatch, bool) FindChildMatchOf(ICollection<TournamentMatch> tournamentMatches, TournamentMatch parentMatch)
     {
-        var parents = parentMatch.Child?.Parents.OrderBy(x => x.Game.CreateDate).ToList();
-        if (parents[0] == parentMatch)
+        var child = tournamentMatches.FirstOrDefault(x => x.FirstParent?.Id == parentMatch.Id);
+        if (child != null)
         {
-            return (parentMatch.Child, false);
+            return (child, false);
         }
-        else if(parents[1] == parentMatch)
+
+        child = tournamentMatches.FirstOrDefault(x => x.SecondParent?.Id == parentMatch.Id);
+        if (child != null)
         {
-            return (parentMatch.Child, true);
+            return (child, true);
         }
         
-
         return (null, false);
     }
 

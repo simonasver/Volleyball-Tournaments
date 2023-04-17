@@ -103,6 +103,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
 
           getTournamentMatches(id, abortController.signal)
           .then((res) => {
+            console.log(res);
             setTournamentMatches(res);
             setTeamsExpand(!(res && res.length > 0));
             setError("");

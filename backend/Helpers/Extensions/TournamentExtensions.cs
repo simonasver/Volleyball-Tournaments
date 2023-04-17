@@ -30,10 +30,10 @@ public static class TournamentExtensions
         else
         {
             tournamentMatchesList.Add(currentMatch);
-            if (currentMatch.Parents.Count > 0)
+            if (currentMatch.FirstParent != null && currentMatch.SecondParent != null)
             {
-                AddTournamentMatchesToList(currentMatch.Parents[0], tournamentMatchesList);
-                AddTournamentMatchesToList(currentMatch.Parents[1], tournamentMatchesList);
+                AddTournamentMatchesToList(currentMatch.FirstParent, tournamentMatchesList);
+                AddTournamentMatchesToList(currentMatch.SecondParent, tournamentMatchesList);
             }
         }
     }

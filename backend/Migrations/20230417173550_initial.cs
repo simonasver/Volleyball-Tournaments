@@ -248,18 +248,23 @@ namespace Backend.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Round = table.Column<int>(type: "int", nullable: false),
-                    ChildId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    FirstParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    SecondParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     TournamentId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TournamentMatches", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TournamentMatches_TournamentMatches_ChildId",
-                        column: x => x.ChildId,
+                        name: "FK_TournamentMatches_TournamentMatches_FirstParentId",
+                        column: x => x.FirstParentId,
                         principalTable: "TournamentMatches",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TournamentMatches_TournamentMatches_SecondParentId",
+                        column: x => x.SecondParentId,
+                        principalTable: "TournamentMatches",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TournamentMatches_Tournaments_TournamentId",
                         column: x => x.TournamentId,
@@ -330,7 +335,7 @@ namespace Backend.Migrations
                     GameWhereFirstId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     GameWhereSecondId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     GameWhereWinnerId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    TournamentWhereWinner = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
+                    TournamentWhereWinnerId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
                 },
                 constraints: table =>
                 {
@@ -352,7 +357,7 @@ namespace Backend.Migrations
                         column: x => x.GameWhereWinnerId,
                         principalTable: "Games",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_GameTeams_Tournaments_TournamentId",
                         column: x => x.TournamentId,
@@ -360,11 +365,11 @@ namespace Backend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GameTeams_Tournaments_TournamentWhereWinner",
-                        column: x => x.TournamentWhereWinner,
+                        name: "FK_GameTeams_Tournaments_TournamentWhereWinnerId",
+                        column: x => x.TournamentWhereWinnerId,
                         principalTable: "Tournaments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -595,9 +600,9 @@ namespace Backend.Migrations
                 column: "TournamentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GameTeams_TournamentWhereWinner",
+                name: "IX_GameTeams_TournamentWhereWinnerId",
                 table: "GameTeams",
-                column: "TournamentWhereWinner",
+                column: "TournamentWhereWinnerId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -646,9 +651,16 @@ namespace Backend.Migrations
                 column: "TournamentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TournamentMatches_ChildId",
+                name: "IX_TournamentMatches_FirstParentId",
                 table: "TournamentMatches",
-                column: "ChildId");
+                column: "FirstParentId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TournamentMatches_SecondParentId",
+                table: "TournamentMatches",
+                column: "SecondParentId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TournamentMatches_TournamentId",

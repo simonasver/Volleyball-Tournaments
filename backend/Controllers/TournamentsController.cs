@@ -1,5 +1,7 @@
-﻿using Backend.Auth.Model;
-using Backend.Data.Dtos.Game;
+﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Xml;
+using Backend.Auth.Model;
 using Backend.Data.Dtos.Tournament;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
@@ -575,6 +577,7 @@ public class TournamentsController : ControllerBase
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return BadRequest(ex.Message);
         }
     }

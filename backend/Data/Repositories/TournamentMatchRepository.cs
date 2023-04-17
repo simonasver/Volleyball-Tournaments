@@ -1,4 +1,5 @@
-﻿using Backend.Data.Entities.Tournament;
+﻿using Backend.Data.Entities.Game;
+using Backend.Data.Entities.Tournament;
 using Backend.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,8 +26,8 @@ public class TournamentMatchRepository : ITournamentMatchRepository
         {
             return await _dbContext.TournamentMatches
             .Include(x => x.Tournament)
-            .Include(x => x.Parents)
-            .Include(x => x.Child)
+            .Include(x => x.FirstParent)
+            .Include(x => x.SecondParent)
             .Include(x => x.Game)
                 .ThenInclude(x => x.FirstTeam)
                     .ThenInclude(x => x.Players)
@@ -39,14 +40,19 @@ public class TournamentMatchRepository : ITournamentMatchRepository
         else
         {
             return await _dbContext.TournamentMatches
-                .Include(x => x.Tournament)
-                .Include(x => x.Parents)
-                .Include(x => x.Child)
                 .Include(x => x.Game)
-                    .ThenInclude(x => x.FirstTeam)
-                .Include(x => x.Game)
-                    .ThenInclude(x => x.SecondTeam)
+                .Include(x => x.Game.FirstTeam)
+                .Include(x => x.Game.SecondTeam)
                 .Where(x => x.Tournament.Id == tournamentId)
+                .Select(x => new TournamentMatch()
+                {
+                    Id = x.Id,
+                    Round = x.Round,
+                    Game = x.Game,
+                    FirstParentId = x.FirstParentId,
+                    SecondParentId = x.SecondParentId,
+                    TournamentId = x.TournamentId
+                })
                 .ToListAsync();
         }
     }
@@ -55,8 +61,8 @@ public class TournamentMatchRepository : ITournamentMatchRepository
     {
         return await _dbContext.TournamentMatches
             .Include(x => x.Tournament)
-            .Include(x => x.Parents)
-            .Include(x => x.Child)
+            .Include(x => x.FirstParent)
+            .Include(x => x.SecondParent)
             .Include(x => x.Game)
             .ThenInclude(x => x.FirstTeam)
             .ThenInclude(x => x.Players)

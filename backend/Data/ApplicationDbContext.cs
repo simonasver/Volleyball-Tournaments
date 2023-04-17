@@ -36,7 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Game>().HasMany(g => g.Sets).WithOne(s => s.Game).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.FirstTeam).WithOne().HasForeignKey<GameTeam>("GameWhereFirstId").OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.SecondTeam).WithOne().HasForeignKey<GameTeam>("GameWhereSecondId").OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<Game>().HasOne(g => g.Winner).WithOne().HasForeignKey<GameTeam>("GameWhereWinnerId").OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Game>().HasOne(g => g.Winner).WithOne().HasForeignKey<GameTeam>("GameWhereWinnerId").OnDelete(DeleteBehavior.SetNull);
 
         builder.Entity<GameTeam>().HasMany(gt => gt.Players).WithOne(g => g.GameTeam).OnDelete(DeleteBehavior.Cascade);
 
@@ -47,11 +47,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Tournament>().HasMany(t => t.Matches).WithOne(m => m.Tournament)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<Tournament>().HasOne(t => t.Winner).WithOne().HasForeignKey<GameTeam>("TournamentWhereWinner").OnDelete(DeleteBehavior.Restrict).IsRequired(false);
+        builder.Entity<Tournament>().HasOne(t => t.Winner).WithOne().HasForeignKey<GameTeam>("TournamentWhereWinnerId").OnDelete(DeleteBehavior.SetNull).IsRequired(false);
         
         builder.Entity<TournamentMatch>().HasOne(tm => tm.Game).WithOne(g => g.TournamentMatch).HasForeignKey<Game>("TournamentMatchId").OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<TournamentMatch>().HasMany(tm => tm.Parents).WithOne(tm => tm.Child).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
-        builder.Entity<TournamentMatch>().HasOne(tm => tm.Child).WithMany(tm => tm.Parents).OnDelete(DeleteBehavior.Cascade).IsRequired(false);
+        builder.Entity<TournamentMatch>().HasOne(x => x.FirstParent).WithOne().HasForeignKey<TournamentMatch>("FirstParentId").IsRequired(false);
+        builder.Entity<TournamentMatch>().HasOne(x => x.SecondParent).WithOne().HasForeignKey<TournamentMatch>("SecondParentId").IsRequired(false);
 
     }
 }

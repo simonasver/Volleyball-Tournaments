@@ -202,7 +202,7 @@ namespace Backend.Migrations
                     b.Property<Guid?>("TournamentId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("TournamentWhereWinner")
+                    b.Property<Guid?>("TournamentWhereWinnerId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
@@ -218,7 +218,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("TournamentId");
 
-                    b.HasIndex("TournamentWhereWinner")
+                    b.HasIndex("TournamentWhereWinnerId")
                         .IsUnique();
 
                     b.ToTable("GameTeams");
@@ -448,18 +448,25 @@ namespace Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("ChildId")
+                    b.Property<Guid?>("FirstParentId")
                         .HasColumnType("char(36)");
 
                     b.Property<int>("Round")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("SecondParentId")
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid>("TournamentId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChildId");
+                    b.HasIndex("FirstParentId")
+                        .IsUnique();
+
+                    b.HasIndex("SecondParentId")
+                        .IsUnique();
 
                     b.HasIndex("TournamentId");
 
@@ -627,7 +634,7 @@ namespace Backend.Migrations
                     b.HasOne("Backend.Data.Entities.Game.Game", null)
                         .WithOne("Winner")
                         .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "GameWhereWinnerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
                         .WithMany("AcceptedTeams")
@@ -636,8 +643,8 @@ namespace Backend.Migrations
 
                     b.HasOne("Backend.Data.Entities.Tournament.Tournament", null)
                         .WithOne("Winner")
-                        .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "TournamentWhereWinner")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("Backend.Data.Entities.Game.GameTeam", "TournamentWhereWinnerId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Tournament");
                 });
@@ -737,10 +744,13 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Tournament.TournamentMatch", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "Child")
-                        .WithMany("Parents")
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "FirstParent")
+                        .WithOne()
+                        .HasForeignKey("Backend.Data.Entities.Tournament.TournamentMatch", "FirstParentId");
+
+                    b.HasOne("Backend.Data.Entities.Tournament.TournamentMatch", "SecondParent")
+                        .WithOne()
+                        .HasForeignKey("Backend.Data.Entities.Tournament.TournamentMatch", "SecondParentId");
 
                     b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
                         .WithMany("Matches")
@@ -748,7 +758,9 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Child");
+                    b.Navigation("FirstParent");
+
+                    b.Navigation("SecondParent");
 
                     b.Navigation("Tournament");
                 });
@@ -847,8 +859,6 @@ namespace Backend.Migrations
                 {
                     b.Navigation("Game")
                         .IsRequired();
-
-                    b.Navigation("Parents");
                 });
 #pragma warning restore 612, 618
         }

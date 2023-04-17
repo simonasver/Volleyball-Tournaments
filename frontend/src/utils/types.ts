@@ -20,8 +20,11 @@ export interface TournamentMatch {
   id: string;
   round: number;
   game?: Game;
-  child?: TournamentMatch;
-  parents: TournamentMatch[];
+  firstParentId: string;
+  firstParent?: TournamentMatch;
+  secondParentId: string;
+  secondParent?: TournamentMatch;
+  tournamentId: string;
   tournament: Tournament;
 }
 

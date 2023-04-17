@@ -48,7 +48,9 @@ const MapTournamentDataToFrontEnd = (tournamentGames: TournamentMatch[]) => {
     return undefined;
   }
 
-  const finalGame = tournamentGames.filter(x => !x.child)[0];
+  const finalGame = tournamentGames.reduce((prev, current) => {
+    return prev.round > current.round ? prev : current;
+  });
 
   const mappedFinalGame = MapGameToParentGames(
     MapGameDataToFrontEnd(finalGame),
@@ -67,23 +69,25 @@ const MapGameToParentGames = (
     return mappedGame;
   }
 
-  if (tournamentGame.parents[0]) {
+  const firstParent = tournamentGames.find(x => x.id === tournamentGame.firstParentId);
+  if (firstParent) {
     mappedGame.sides.home.seed = {
       displayName: "",
       rank: 1,
       sourceGame: MapGameToParentGames(
-        MapGameDataToFrontEnd(tournamentGame.parents[0]),
+        MapGameDataToFrontEnd(firstParent),
         tournamentGames
       ),
       sourcePool: {},
     };
   }
-  if (tournamentGame.parents[1]) {
+  const secondParent = tournamentGames.find(x => x.id === tournamentGame.secondParentId);
+  if (secondParent) {
     mappedGame.sides.visitor.seed = {
       displayName: "",
       rank: 1,
       sourceGame: MapGameToParentGames(
-        MapGameDataToFrontEnd(tournamentGame.parents[1]),
+        MapGameDataToFrontEnd(secondParent),
         tournamentGames
       ),
       sourcePool: {},

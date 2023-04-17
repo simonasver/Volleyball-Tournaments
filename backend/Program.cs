@@ -69,6 +69,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    options.LogTo(Console.WriteLine, LogLevel.Information);
 });
 
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
