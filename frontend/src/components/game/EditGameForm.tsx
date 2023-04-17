@@ -124,7 +124,7 @@ const EditGameForm = () => {
         justifyContent="flex-start"
       >
         <Grid item>
-          <BackButton title="Games" address={`/game/${gameId}`} />
+          <BackButton title="Game" address={`/game/${gameId}`} />
         </Grid>
       </Grid>
       <Loader isOpen={isLoading} />

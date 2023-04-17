@@ -84,7 +84,7 @@ const EditTeamForm = () => {
         justifyContent="flex-start"
       >
         <Grid item>
-          <BackButton address={`/team/${teamId}`} />
+          <BackButton title="Team" address={`/team/${teamId}`} />
         </Grid>
       </Grid>
       <Loader isOpen={isLoading}/>

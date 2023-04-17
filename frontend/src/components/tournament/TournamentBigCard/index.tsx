@@ -435,7 +435,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                 </IconButton>
               )}
             {user?.id === tournament.ownerId &&
-              tournament.status < GameStatus.Finished && (
+              tournament.status < TournamentStatus.Finished && (
                 <IconButton
                   centerRipple={false}
                   onClick={() => navigate(`/edittournament/${id}`)}

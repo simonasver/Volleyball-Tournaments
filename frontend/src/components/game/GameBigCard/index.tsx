@@ -661,7 +661,7 @@ const GameBigCard = (props: GameBigCardProps) => {
               {user &&
                 userTeams &&
                 !game.tournamentMatch &&
-                game.status < GameStatus.Started && (
+                game.status < GameStatus.Ready && (
                   <IconButton
                     centerRipple={false}
                     onClick={() => setModalStatus(Modal.Join)}

@@ -161,11 +161,11 @@ public class TournamentService : ITournamentService
             var childMatchOf = FindChildMatchOf(tournamentMatches, tournamentMatch);
             if (!childMatchOf.Item2)
             {
-                if (childMatchOf.Item1.Game.FirstTeam.Title == tournamentMatch.Game.FirstTeam.Title)
+                if (childMatchOf.Item1.Game.FirstTeam?.Title == tournamentMatch.Game.FirstTeam?.Title)
                 {
                     throw new InvalidOperationException("The team was already moved down");
                 }
-                childMatchOf.Item1.Game.FirstTeam = tournamentMatch.Game.FirstTeam.Copy();
+                childMatchOf.Item1.Game.FirstTeam = tournamentMatch.Game.FirstTeam?.Copy();
             }
             else
             {
@@ -173,7 +173,7 @@ public class TournamentService : ITournamentService
                 {
                     throw new InvalidOperationException("The team was already moved down");
                 }
-                childMatchOf.Item1.Game.SecondTeam = tournamentMatch.Game.FirstTeam.Copy();
+                childMatchOf.Item1.Game.SecondTeam = tournamentMatch.Game.FirstTeam?.Copy();
             }
 
             childMatchOf.Item1.Game = CheckIfGameIsReady(childMatchOf.Item1);
@@ -185,7 +185,7 @@ public class TournamentService : ITournamentService
             var childMatchOf = FindChildMatchOf(tournamentMatches, tournamentMatch);
             if (!childMatchOf.Item2)
             {
-                if (childMatchOf.Item1.Game.FirstTeam.Title == tournamentMatch.Game.SecondTeam.Title)
+                if (childMatchOf.Item1.Game.FirstTeam?.Title == tournamentMatch.Game.SecondTeam.Title)
                 {
                     throw new InvalidOperationException("The team was already moved down");
                 }
@@ -193,7 +193,7 @@ public class TournamentService : ITournamentService
             }
             else
             {
-                if (childMatchOf.Item1.Game.SecondTeam.Title == tournamentMatch.Game.SecondTeam.Title)
+                if (childMatchOf.Item1.Game.SecondTeam?.Title == tournamentMatch.Game.SecondTeam.Title)
                 {
                     throw new InvalidOperationException("The team was already moved down");
                 }

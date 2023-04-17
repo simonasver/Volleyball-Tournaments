@@ -145,7 +145,7 @@ const EditTournamentForm = () => {
         justifyContent="flex-start"
       >
         <Grid item>
-          <BackButton title="My tournaments" address="/mytournaments" />
+          <BackButton title="Tournament" address={`/tournament/${tournamentId}`} />
         </Grid>
       </Grid>
       <br />
