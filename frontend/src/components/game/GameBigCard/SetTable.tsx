@@ -20,6 +20,7 @@ interface SetTableProps {
   winner: boolean | undefined;
   players: SetPlayer[];
   team: boolean;
+  basic: boolean;
   onChangeScore: (setId: string, playerId: string, change: boolean) => void;
 }
 
@@ -33,6 +34,7 @@ const SetTable = (props: SetTableProps) => {
     winner,
     players,
     team,
+    basic,
     onChangeScore,
   } = props;
 
@@ -64,13 +66,35 @@ const SetTable = (props: SetTableProps) => {
       <TableContainer component={Paper} sx={{ marginY: "20px" }}>
         <Table size="small">
           <colgroup>
-            <col width="30%" />
-            <col width="70%" />
+            {basic && (
+              <>
+                <col width="50%" />
+                <col width="50%" />
+              </>
+            )}
+            {!basic && (
+              <>
+                <col width="30%" />
+              </>
+            )}
           </colgroup>
           <TableHead>
             <TableRow>
               <TableCell>Player</TableCell>
               <TableCell>Score</TableCell>
+              {!basic && (<>
+                <TableCell>Kills</TableCell>
+                <TableCell>Errors</TableCell>
+                <TableCell>Attempts</TableCell>
+                <TableCell>Successful blocks</TableCell>
+                <TableCell>Blocks</TableCell>
+                <TableCell>Touches</TableCell>
+                <TableCell>Blocking errors</TableCell>
+                <TableCell>Total serves</TableCell>
+                <TableCell>Successful digs</TableCell>
+                <TableCell>Ball touches</TableCell>
+                <TableCell>Ball misses</TableCell>
+              </>)}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -87,6 +111,7 @@ const SetTable = (props: SetTableProps) => {
                       score={player.score}
                       isOwner={isOwner}
                       status={status}
+                      basic={basic}
                       onChangeScore={onChangeScore}
                     />
                   );

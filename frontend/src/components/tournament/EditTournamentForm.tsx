@@ -2,14 +2,9 @@ import React from "react";
 import {
   Alert,
   Button,
-  FormControl,
   FormControlLabel,
   FormGroup,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   Switch,
   Tab,
   Tabs,
@@ -17,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import BackButton from "../layout/BackButton";
-import { TournamentStatus, TournamentType } from "../../utils/types";
+import { TournamentStatus } from "../../utils/types";
 import {
   editTournament,
   getTournament,
@@ -36,15 +31,16 @@ const EditTournamentForm = () => {
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [status, setStatus] = React.useState<TournamentStatus>(TournamentStatus.Open);
+  const [status, setStatus] = React.useState<TournamentStatus>(
+    TournamentStatus.Open
+  );
   const [title, setTitle] = React.useState("");
   const [pictureUrl, setPictureUrl] = React.useState("");
+  const [isBasic, setIsBasic] = React.useState(true);
   const [description, setDescription] = React.useState("");
-  const [type, setType] = React.useState<TournamentType>(
-    TournamentType.SingleElimination
-  );
   const [maxTeams, setMaxTeams] = React.useState(128);
   const [pointsToWin, setPointsToWin] = React.useState(25);
+  const [pointsToWinLastSet, setPointsToWinLastSet] = React.useState(15);
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
   const [maxSets, setMaxSets] = React.useState(5);
   const [limitPlayers, setLimitPlayers] = React.useState(true);
@@ -72,9 +68,10 @@ const EditTournamentForm = () => {
           setTitle(res.title);
           setPictureUrl(res.pictureUrl);
           setDescription(res.description);
-          setType(res.type);
+          setIsBasic(res.basic);
           setMaxTeams(res.maxTeams);
           setPointsToWin(res.pointsToWin);
+          setPointsToWinLastSet(res.pointsToWinLastSet);
           setPointDifferenceToWin(res.pointDifferenceToWin);
           setMaxSets(res.maxSets);
           setLimitPlayers(res.playersPerTeam !== 0);
@@ -107,9 +104,10 @@ const EditTournamentForm = () => {
       title,
       pictureUrl,
       description,
-      type,
+      isBasic,
       maxTeams,
       pointsToWin,
+      pointsToWinLastSet,
       pointDifferenceToWin,
       maxSets,
       limitPlayers ? playersPerTeam : 0,
@@ -145,7 +143,10 @@ const EditTournamentForm = () => {
         justifyContent="flex-start"
       >
         <Grid item>
-          <BackButton title="Tournament" address={`/tournament/${tournamentId}`} />
+          <BackButton
+            title="Tournament"
+            address={`/tournament/${tournamentId}`}
+          />
         </Grid>
       </Grid>
       <br />
@@ -217,35 +218,6 @@ const EditTournamentForm = () => {
           />
           <br />
           <br />
-          <FormControl fullWidth>
-            <InputLabel>Tournament type</InputLabel>
-            <Select
-              value={type}
-              label="Tournament type"
-              onChange={(e: SelectChangeEvent<TournamentType>) =>
-                setType(e.target.value as TournamentType)
-              }
-              disabled={status >= TournamentStatus.Started}
-            >
-              {[
-                {
-                  id: TournamentType.SingleElimination,
-                  value: "Single elimination",
-                },
-                {
-                  id: TournamentType.DoubleElimination,
-                  value: "Double elimination",
-                },
-                { id: TournamentType.RoundRobin, value: "Round robin" },
-              ].map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <br />
-          <br />
           <TextField
             value={maxTeams}
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -262,6 +234,19 @@ const EditTournamentForm = () => {
           <br />
         </div>
         <div hidden={currentTab !== 1}>
+          <FormGroup>
+            <FormControlLabel
+              checked={!isBasic}
+              control={
+                <Switch
+                  value={!isBasic}
+                  onChange={() => setIsBasic((state) => !state)}
+                />
+              }
+              label="Game player scoreboard has extended options"
+            />
+          </FormGroup>
+          <br />
           <TextField
             value={pointsToWin}
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -271,6 +256,20 @@ const EditTournamentForm = () => {
             label="Points needed to win a set"
             variant="outlined"
             inputProps={{ min: 1 }}
+            fullWidth
+            disabled={status >= TournamentStatus.Started}
+          />
+          <br />
+          <br />
+          <TextField
+            value={pointsToWinLastSet}
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPointsToWinLastSet(parseInt(e.target.value) ?? 1)
+            }
+            type="number"
+            label="Points needed to win the last set"
+            variant="outlined"
+            inputProps={{ min: 0 }}
             fullWidth
             disabled={status >= TournamentStatus.Started}
           />

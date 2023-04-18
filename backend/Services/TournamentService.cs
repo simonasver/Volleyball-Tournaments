@@ -50,7 +50,9 @@ public class TournamentService : ITournamentService
                 Game = new Game()
                 {
                     Title = tournament.Title + " game " + roundCount,
+                    Basic = tournament.Basic,
                     PointsToWin = tournament.PointsToWin,
+                    PointsToWinLastSet = tournament.PointsToWinLastSet,
                     PointDifferenceToWin = tournament.PointDifferenceToWin,
                     MaxSets = tournament.MaxSets,
                     PlayersPerTeam = tournament.PlayersPerTeam,
@@ -83,7 +85,9 @@ public class TournamentService : ITournamentService
                     Game = new Game()
                     {
                         Title = "Empty " + tournament.Title + " game",
+                        Basic = tournament.Basic,
                         PointsToWin = tournament.PointsToWin,
+                        PointsToWinLastSet = tournament.PointsToWinLastSet,
                         PointDifferenceToWin = tournament.PointDifferenceToWin,
                         MaxSets = tournament.MaxSets,
                         PlayersPerTeam = tournament.PlayersPerTeam,
@@ -107,7 +111,9 @@ public class TournamentService : ITournamentService
                     Game = new Game()
                     {
                         Title = "Empty " + tournament.Title + " game",
+                        Basic = tournament.Basic,
                         PointsToWin = tournament.PointsToWin,
+                        PointsToWinLastSet = tournament.PointsToWinLastSet,
                         PointDifferenceToWin = tournament.PointDifferenceToWin,
                         MaxSets = tournament.MaxSets,
                         PlayersPerTeam = tournament.PlayersPerTeam,

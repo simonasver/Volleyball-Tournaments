@@ -153,9 +153,11 @@ public class TournamentsController : ControllerBase
             Title = addTournamentDto.Title,
             PictureUrl = addTournamentDto.PictureUrl,
             Description = addTournamentDto.Description,
-            Type = addTournamentDto.Type,
+            Basic = addTournamentDto.Basic,
+            SingleThirdPlace = addTournamentDto.SingleThirdPlace,
             MaxTeams = addTournamentDto.MaxTeams,
             PointsToWin = addTournamentDto.PointsToWin,
+            PointsToWinLastSet = addTournamentDto.PointsToWinLastSet,
             PointDifferenceToWin = addTournamentDto.PointDifferenceToWin,
             MaxSets = addTournamentDto.MaxSets,
             PlayersPerTeam = addTournamentDto.PlayersPerTeam,
@@ -222,9 +224,14 @@ public class TournamentsController : ControllerBase
             tournament.Description = editTournamentDto.Description;
         }
 
-        if (editTournamentDto.Type != null)
+        if (editTournamentDto.SingleThirdPlace != null)
         {
-            tournament.Type = editTournamentDto.Type ?? tournament.Type;
+            tournament.SingleThirdPlace = editTournamentDto.SingleThirdPlace ?? false;
+        }
+        
+        if (editTournamentDto.Basic != null)
+        {
+            tournament.Basic = editTournamentDto.Basic ?? false;
         }
 
         if (editTournamentDto.MaxTeams != null)
@@ -237,6 +244,14 @@ public class TournamentsController : ControllerBase
             if (tournament.Status < TournamentStatus.Started)
             {
                 tournament.PointsToWin = editTournamentDto.PointsToWin ?? tournament.PointsToWin;
+            }
+        }
+
+        if (editTournamentDto.PointsToWinLastSet != null)
+        {
+            if (tournament.Status < TournamentStatus.Started)
+            {
+                tournament.PointsToWinLastSet = editTournamentDto.PointsToWinLastSet ?? tournament.PointsToWinLastSet;
             }
         }
 
@@ -604,7 +619,8 @@ public class TournamentsController : ControllerBase
         {
             Title = "Tournament " + generatedNamePrefix,
             Description = "Tournament is generated for testing purposes only",
-            Type = TournamentType.SingleElimination,
+            SingleThirdPlace = false,
+            Basic = true,
             MaxTeams = 128,
             IsPrivate = false,
             CreateDate = DateTime.Now,
@@ -613,6 +629,7 @@ public class TournamentsController : ControllerBase
             RequestedTeams = new List<Team>(),
             AcceptedTeams = new List<GameTeam>(),
             PointsToWin = 1,
+            PointsToWinLastSet = 1,
             PointDifferenceToWin = 0,
             MaxSets = 1,
             PlayersPerTeam = 0,

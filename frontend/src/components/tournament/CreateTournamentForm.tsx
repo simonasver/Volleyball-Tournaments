@@ -2,14 +2,9 @@ import React from "react";
 import {
   Alert,
   Button,
-  FormControl,
   FormControlLabel,
   FormGroup,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   Switch,
   Tab,
   Tabs,
@@ -17,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import BackButton from "../layout/BackButton";
-import { TournamentType } from "../../utils/types";
+import { GamePreset } from "../../utils/types";
 import { addTournament } from "../../services/tournament.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
@@ -33,11 +28,11 @@ const CreateTournamentForm = () => {
   const [title, setTitle] = React.useState("");
   const [pictureUrl, setPictureUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
-  const [type, setType] = React.useState<TournamentType>(
-    TournamentType.SingleElimination
-  );
+  const [isBasic, setIsBasic] = React.useState(true);
+  const [singleThirdPlace, setSingleThirdPlace] = React.useState(false);
   const [maxTeams, setMaxTeams] = React.useState(128);
   const [pointsToWin, setPointsToWin] = React.useState(25);
+  const [pointsToWinLastSet, setPointsToWinLastSet] = React.useState(15);
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
   const [maxSets, setMaxSets] = React.useState(5);
   const [limitPlayers, setLimitPlayers] = React.useState(true);
@@ -45,6 +40,8 @@ const CreateTournamentForm = () => {
   const [isPrivate, setIsPrivate] = React.useState(false);
 
   const [currentTab, setCurrentTab] = React.useState<number>(0);
+
+  const [currentPreset, setCurrentPreset] = React.useState(GamePreset.Regular);
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -58,15 +55,40 @@ const CreateTournamentForm = () => {
     setCurrentTab(newValue);
   };
 
+  const onChangePreset = (event: React.SyntheticEvent, newValue: number) => {
+    switch (newValue) {
+      case 0:
+        setCurrentPreset(GamePreset.Regular);
+        setPointsToWin(25);
+        setPointsToWinLastSet(15);
+        setPointDifferenceToWin(2);
+        setMaxSets(5);
+        setPlayersPerTeam(6);
+        break;
+      case 1:
+        setCurrentPreset(GamePreset.Beach);
+        setPointsToWin(21);
+        setPointsToWinLastSet(15);
+        setPointDifferenceToWin(2);
+        setMaxSets(3);
+        setPlayersPerTeam(2);
+        break;
+      case 2:
+        setCurrentPreset(GamePreset.None);
+        break;
+    }
+  };
+
   const onSubmitHandler = (event: React.FormEvent) => {
     event.preventDefault();
     addTournament(
       title,
       pictureUrl,
       description,
-      type,
+      isBasic,
       maxTeams,
       pointsToWin,
+      pointsToWinLastSet,
       pointDifferenceToWin,
       maxSets,
       limitPlayers ? playersPerTeam : 0,
@@ -137,6 +159,19 @@ const CreateTournamentForm = () => {
             />
           </FormGroup>
           <br />
+          <FormGroup>
+            <FormControlLabel
+              checked={singleThirdPlace}
+              control={
+                <Switch
+                  value={singleThirdPlace}
+                  onChange={() => setSingleThirdPlace((state) => !state)}
+                />
+              }
+              label="Match for third place"
+            />
+          </FormGroup>
+          <br />
           <TextField
             value={title}
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -174,34 +209,6 @@ const CreateTournamentForm = () => {
           />
           <br />
           <br />
-          <FormControl fullWidth>
-            <InputLabel>Tournament type</InputLabel>
-            <Select
-              value={type}
-              label="Tournament type"
-              onChange={(e: SelectChangeEvent<TournamentType>) =>
-                setType(e.target.value as TournamentType)
-              }
-            >
-              {[
-                {
-                  id: TournamentType.SingleElimination,
-                  value: "Single elimination",
-                },
-                {
-                  id: TournamentType.DoubleElimination,
-                  value: "Double elimination",
-                },
-                { id: TournamentType.RoundRobin, value: "Round robin" },
-              ].map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <br />
-          <br />
           <TextField
             value={maxTeams}
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -217,6 +224,26 @@ const CreateTournamentForm = () => {
           <br />
         </div>
         <div hidden={currentTab !== 1}>
+          <br />
+          <Tabs value={currentPreset} onChange={onChangePreset}>
+            <Tab label="Regular" />
+            <Tab label="Beach" />
+            <Tab label="Custom" />
+          </Tabs>
+          <br />
+          <FormGroup>
+            <FormControlLabel
+              checked={!isBasic}
+              control={
+                <Switch
+                  value={!isBasic}
+                  onChange={() => setIsBasic((state) => !state)}
+                />
+              }
+              label="Game player scoreboard has extended options"
+            />
+          </FormGroup>
+          <br />
           <TextField
             value={pointsToWin}
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -227,6 +254,21 @@ const CreateTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 1 }}
             fullWidth
+            disabled={currentPreset !== GamePreset.None}
+          />
+          <br />
+          <br />
+          <TextField
+            value={pointsToWinLastSet}
+            onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPointsToWinLastSet(parseInt(e.target.value) ?? 0)
+            }
+            type="number"
+            label="Points needed to win the last set"
+            variant="outlined"
+            inputProps={{ min: 0 }}
+            fullWidth
+            disabled={currentPreset !== GamePreset.None}
           />
           <br />
           <br />
@@ -240,6 +282,7 @@ const CreateTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 0, max: 10 }}
             fullWidth
+            disabled={currentPreset !== GamePreset.None}
           />
           <br />
           <br />
@@ -253,6 +296,7 @@ const CreateTournamentForm = () => {
             variant="outlined"
             inputProps={{ min: 1, max: 5 }}
             fullWidth
+            disabled={currentPreset !== GamePreset.None}
           />
           <br />
           <br />
@@ -266,6 +310,7 @@ const CreateTournamentForm = () => {
                 />
               }
               label="Limit players (player count in teams must be equal to a set number)"
+              disabled={currentPreset !== GamePreset.None}
             />
           </FormGroup>
           <br />
@@ -278,7 +323,7 @@ const CreateTournamentForm = () => {
             label="Amount of players in each team"
             variant="outlined"
             inputProps={{ min: 1, max: 12 }}
-            disabled={!limitPlayers}
+            disabled={!limitPlayers || currentPreset !== GamePreset.None}
             fullWidth
           />
           <br />

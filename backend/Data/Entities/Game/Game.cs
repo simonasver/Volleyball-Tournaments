@@ -18,7 +18,9 @@ public class Game
     public string Title { get; set; }
     public string? PictureUrl { get; set; }
     public string? Description { get; set; }
+    public bool Basic { get; set; }
     public int PointsToWin { get; set; }
+    public int PointsToWinLastSet { get; set; }
     public int PointDifferenceToWin { get; set; }
     public int MaxSets { get; set; }
     public int PlayersPerTeam { get; set; }

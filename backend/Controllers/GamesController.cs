@@ -160,7 +160,9 @@ public class GamesController : ControllerBase
             Title = addGameDto.Title,
             PictureUrl = addGameDto.PictureUrl,
             Description = addGameDto.Description,
+            Basic = addGameDto.Basic,
             PointsToWin = addGameDto.PointsToWin,
+            PointsToWinLastSet = addGameDto.PointsToWinLastSet,
             PointDifferenceToWin = addGameDto.PointDifferenceToWin,
             MaxSets = addGameDto.MaxSets,
             PlayersPerTeam = addGameDto.PlayersPerTeam,
@@ -228,6 +230,11 @@ public class GamesController : ControllerBase
             game.Description = editGameDto.Description;
         }
 
+        if (editGameDto.Basic != null)
+        {
+            game.Basic = editGameDto.Basic ?? false;
+        }
+
         if (editGameDto.PointsToWin != null)
         {
             if (game.TournamentMatch != null)
@@ -237,6 +244,19 @@ public class GamesController : ControllerBase
             if (game.Status < GameStatus.Started)
             {
                 game.PointsToWin = editGameDto.PointsToWin ?? game.PointsToWin;
+            }
+        }
+
+        if (editGameDto.PointsToWinLastSet != null)
+        {
+            if (game.TournamentMatch != null)
+            {
+                return BadRequest("Cannot edit tournament game points to win");
+            }
+
+            if (game.Status < GameStatus.Started)
+            {
+                game.PointsToWinLastSet = editGameDto.PointsToWinLastSet ?? game.PointsToWinLastSet;
             }
         }
 
@@ -640,8 +660,9 @@ public class GamesController : ControllerBase
             if (!player.Team)
             {
                 set.FirstTeamScore++;
-                if (set.FirstTeamScore >= game.PointsToWin &&
-                    (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin)
+                if (GameUtils.IsFinalSet(game, set) && (set.FirstTeamScore >= game.PointsToWinLastSet &&
+                                                        (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin) || set.Number != game.MaxSets && (set.FirstTeamScore >= game.PointsToWin &&
+                        (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin))
                 {
                     set.Winner = set.FirstTeam;
                     set.Status = GameStatus.Finished;
@@ -671,8 +692,9 @@ public class GamesController : ControllerBase
             else
             {
                 set.SecondTeamScore++;
-                if (set.SecondTeamScore >= game.PointsToWin &&
-                    (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin)
+                if (GameUtils.IsFinalSet(game, set) && (set.SecondTeamScore >= game.PointsToWinLastSet &&
+                    (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin) || set.Number != game.MaxSets && ((set.SecondTeamScore >= game.PointsToWin &&
+                        (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin)))
                 {
                     set.Winner = set.SecondTeam;
                     set.Status = GameStatus.Finished;

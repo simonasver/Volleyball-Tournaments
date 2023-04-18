@@ -6,6 +6,8 @@ import {
   FormGroup,
   Grid,
   Switch,
+  Tab,
+  Tabs,
   TextField,
   Typography,
 } from "@mui/material";
@@ -15,6 +17,7 @@ import { errorMessageFromAxiosError } from "../../utils/helpers";
 import { useNavigate } from "react-router-dom";
 import { alertActions } from "../../store/alert-slice";
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
+import { GamePreset } from "../../utils/types";
 
 const CreateGameForm = () => {
   const navigate = useNavigate();
@@ -25,7 +28,9 @@ const CreateGameForm = () => {
   const [title, setTitle] = React.useState("");
   const [pictureUrl, setPictureUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const [isBasic, setIsBasic] = React.useState(true);
   const [pointsToWin, setPointsToWin] = React.useState(25);
+  const [pointsToWinLastSet, setPointsToWinLastSet] = React.useState(15);
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
   const [maxSets, setMaxSets] = React.useState(5);
   const [limitPlayers, setLimitPlayers] = React.useState(true);
@@ -34,11 +39,37 @@ const CreateGameForm = () => {
 
   const user = useAppSelector((state) => state.auth.user);
 
+  const [currentPreset, setCurrentPreset] = React.useState(GamePreset.Regular);
+
   React.useEffect(() => {
     if (!user) {
       return navigate("/", { replace: true });
     }
   }, []);
+
+  const onChangePreset = (event: React.SyntheticEvent, newValue: number) => {
+    switch(newValue) {
+      case 0:
+        setCurrentPreset(GamePreset.Regular);
+        setPointsToWin(25);
+        setPointsToWinLastSet(15);
+        setPointDifferenceToWin(2);
+        setMaxSets(5);
+        setPlayersPerTeam(6);
+        break;
+      case 1:
+        setCurrentPreset(GamePreset.Beach);
+        setPointsToWin(21);
+        setPointsToWinLastSet(15);
+        setPointDifferenceToWin(2);
+        setMaxSets(3);
+        setPlayersPerTeam(2);
+        break;
+      case 2:
+        setCurrentPreset(GamePreset.None);
+        break;
+    }
+  };
 
   const onSubmitHandler = (event: React.FormEvent) => {
     event.preventDefault();
@@ -46,7 +77,9 @@ const CreateGameForm = () => {
       title,
       pictureUrl,
       description,
+      isBasic,
       pointsToWin,
+      pointsToWinLastSet,
       pointDifferenceToWin,
       maxSets,
       limitPlayers ? playersPerTeam : 0,
@@ -105,6 +138,18 @@ const CreateGameForm = () => {
             label="Private game"
           />
         </FormGroup>
+        <FormGroup>
+          <FormControlLabel
+            checked={!isBasic}
+            control={
+              <Switch
+                value={!isBasic}
+                onChange={() => setIsBasic((state) => !state)}
+              />
+            }
+            label="Game player scoreboard has extended options"
+          />
+        </FormGroup>
         <br />
         <TextField
           value={title}
@@ -142,6 +187,11 @@ const CreateGameForm = () => {
           fullWidth
         />
         <br />
+        <Tabs value={currentPreset} onChange={onChangePreset}>
+          <Tab label="Regular" />
+          <Tab label="Beach" />
+          <Tab label="Custom" />
+        </Tabs>
         <br />
         <TextField
           value={pointsToWin}
@@ -153,6 +203,21 @@ const CreateGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1 }}
           fullWidth
+          disabled={currentPreset !== GamePreset.None}
+        />
+        <br />
+        <br />
+        <TextField
+          value={pointsToWinLastSet}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPointsToWinLastSet(parseInt(e.target.value) ?? 0)
+          }
+          type="number"
+          label="Points needed to win the last set"
+          variant="outlined"
+          inputProps={{ min: 0 }}
+          fullWidth
+          disabled={currentPreset !== GamePreset.None}
         />
         <br />
         <br />
@@ -166,6 +231,7 @@ const CreateGameForm = () => {
           variant="outlined"
           inputProps={{ min: 0, max: 10 }}
           fullWidth
+          disabled={currentPreset !== GamePreset.None}
         />
         <br />
         <br />
@@ -179,6 +245,7 @@ const CreateGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1, max: 5 }}
           fullWidth
+          disabled={currentPreset !== GamePreset.None}
         />
         <br />
         <br />
@@ -192,6 +259,7 @@ const CreateGameForm = () => {
               />
             }
             label="Limit players (player count in teams must be equal to a set number)"
+            disabled={currentPreset !== GamePreset.None}
           />
         </FormGroup>
         <br />
@@ -204,7 +272,7 @@ const CreateGameForm = () => {
           label="Amount of players in each team"
           variant="outlined"
           inputProps={{ min: 1, max: 12 }}
-          disabled={!limitPlayers}
+          disabled={!limitPlayers || currentPreset !== GamePreset.None}
           fullWidth
         />
         <br />

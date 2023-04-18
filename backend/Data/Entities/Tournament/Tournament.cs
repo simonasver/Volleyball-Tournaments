@@ -25,7 +25,7 @@ public class Tournament
     public string Title { get; set; }
     public string? PictureUrl { get; set; }
     public string? Description { get; set; }
-    public TournamentType Type { get; set; }
+    public bool SingleThirdPlace { get; set; }
     [Range(minimum: 2, maximum: 128, ErrorMessage = "Team limit must be between 2 and 128")]
     public int MaxTeams { get; set; }
     public bool IsPrivate { get; set; }
@@ -37,7 +37,9 @@ public class Tournament
     public GameTeam? Winner { get; set; }
     public int FinalRound { get; set; }
     // TOURNAMENT GAME SETTINGS
+    public bool Basic { get; set; }
     public int PointsToWin { get; set; }
+    public int PointsToWinLastSet { get; set; }
     public int PointDifferenceToWin { get; set; }
     public int MaxSets { get; set; }
     public int PlayersPerTeam { get; set; }

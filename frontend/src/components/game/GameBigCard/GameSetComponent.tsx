@@ -16,6 +16,7 @@ interface GameSet {
   players: SetPlayer[];
   status: GameStatus;
   startDate: string;
+  basic: boolean;
   onChangeScore: (setId: string, playerId: string, change: boolean) => void;
   winner?: boolean;
 }
@@ -31,6 +32,7 @@ const GameSetComponent = React.memo(function GameSetComponent(props: GameSet) {
     players,
     status,
     startDate,
+    basic,
     onChangeScore,
     winner,
   } = props;
@@ -42,9 +44,9 @@ const GameSetComponent = React.memo(function GameSetComponent(props: GameSet) {
         Started at: {startDate}
       </Typography>
       <br />
-      <SetTable setId={setId} isOwner={isOwner} status={status} teamName={firstTeamName} teamScore={firstTeamScore} winner={winner} players={players} team={false} onChangeScore={onChangeScore} />
+      <SetTable setId={setId} isOwner={isOwner} status={status} teamName={firstTeamName} teamScore={firstTeamScore} winner={winner} players={players} team={false} basic={basic} onChangeScore={onChangeScore} />
       <br />
-      <SetTable setId={setId} isOwner={isOwner} status={status} teamName={secondTeamName} teamScore={secondTeamScore} winner={winner} players={players} team={true} onChangeScore={onChangeScore} />
+      <SetTable setId={setId} isOwner={isOwner} status={status} teamName={secondTeamName} teamScore={secondTeamScore} winner={winner} players={players} team={true} basic={basic} onChangeScore={onChangeScore} />
     </>
   );
 });

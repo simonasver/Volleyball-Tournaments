@@ -91,6 +91,10 @@ const GameBigCard = (props: GameBigCardProps) => {
         value: game?.pointsToWin,
       },
       {
+        name: "Points to win last set",
+        value: game?.pointsToWinLastSet,
+      },
+      {
         name: "Point difference to win",
         value: game?.pointDifferenceToWin,
       },
@@ -618,6 +622,7 @@ const GameBigCard = (props: GameBigCardProps) => {
               <GameSets
                 isOwner={user?.id === game.ownerId}
                 sets={sets ?? []}
+                basic={game.basic}
                 onChangeScore={onChangeScore}
               />
             </div>

@@ -6,11 +6,12 @@ import { GameSet, GameStatus } from "../../../utils/types";
 interface GameSetsProps {
   isOwner: boolean;
   sets: GameSet[];
+  basic: boolean;
   onChangeScore: (setId: string, playerId: string, change: boolean) => void;
 }
 
 const GameSets = (props: GameSetsProps) => {
-  const { isOwner, sets, onChangeScore } = props;
+  const { isOwner, sets, basic, onChangeScore } = props;
 
   const [selectedSet, setSelectedSet] = React.useState(0);
 
@@ -54,6 +55,7 @@ const GameSets = (props: GameSetsProps) => {
                   startDate={new Date(set.startDate).toDateString()}
                   winner={set.winner ? set.winner.id === set.firstTeam.id ? false : true : undefined}
                   onChangeScore={onChangeScore}
+                  basic={basic}
                 />
               </div>
             );

@@ -3,6 +3,7 @@ export interface Tournament {
   title: string;
   pictureUrl: string;
   description: string;
+  basic: boolean;
   type: TournamentType;
   maxTeams: number;
   isPrivate: boolean;
@@ -44,9 +45,11 @@ export enum TournamentStatus {
 export interface Game {
   id: string;
   title: string;
-  description: string;
   pictureUrl: string;
+  description: string;
+  basic: boolean;
   pointsToWin: number;
+  pointsToWinLastSet: number;
   pointDifferenceToWin: number;
   maxSets: number;
   playersPerTeam: number;
@@ -124,4 +127,10 @@ export interface Team {
 export interface TeamPlayer {
   id: string;
   name: string;
+}
+
+export enum GamePreset {
+  Regular = 0,
+  Beach = 1,
+  None = 2
 }

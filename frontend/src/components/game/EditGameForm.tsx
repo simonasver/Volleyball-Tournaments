@@ -30,7 +30,9 @@ const EditGameForm = () => {
   const [title, setTitle] = React.useState("");
   const [pictureUrl, setPictureUrl] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const [isBasic, setIsBasic] = React.useState(true);
   const [pointsToWin, setPointsToWin] = React.useState(25);
+  const [pointsToWinLastSet, setPointsToWinLastSet] = React.useState(15);
   const [pointDifferenceToWin, setPointDifferenceToWin] = React.useState(2);
   const [maxSets, setMaxSets] = React.useState(5);
   const [limitPlayers, setLimitPlayers] = React.useState(true);
@@ -55,7 +57,9 @@ const EditGameForm = () => {
           setError("");
           setTitle(res.title);
           setDescription(res.description);
+          setIsBasic(res.basic);
           setPointsToWin(res.pointsToWin);
+          setPointsToWinLastSet(res.pointsToWinLastSet);
           setPointDifferenceToWin(res.pointDifferenceToWin);
           setMaxSets(res.maxSets);
           setPlayersPerTeam(res.playersPerTeam);
@@ -89,7 +93,9 @@ const EditGameForm = () => {
       title,
       pictureUrl,
       description,
+      isBasic,
       pointsToWin,
+      pointsToWinLastSet,
       pointDifferenceToWin,
       maxSets,
       limitPlayers ? playersPerTeam : 0,
@@ -147,6 +153,23 @@ const EditGameForm = () => {
             />
           </FormGroup>
         )}
+        {!isTournamentGame && (
+          <>
+            <FormGroup>
+              <FormControlLabel
+                checked={!isBasic}
+                control={
+                  <Switch
+                    value={!isBasic}
+                    onChange={() => setIsBasic((state) => !state)}
+                  />
+                }
+                label="Game player scoreboard has extended options"
+              />
+            </FormGroup>
+            <br />
+          </>
+        )}
         <br />
         <TextField
           value={title}
@@ -196,6 +219,19 @@ const EditGameForm = () => {
           inputProps={{ min: 1 }}
           fullWidth
           disabled={gameStatus >= GameStatus.Started}
+        />
+        <br />
+        <br />
+        <TextField
+          value={pointsToWinLastSet}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPointsToWinLastSet(parseInt(e.target.value) ?? 0)
+          }
+          type="number"
+          label="Points needed to win the last set"
+          variant="outlined"
+          inputProps={{ min: 0 }}
+          fullWidth
         />
         <br />
         <br />

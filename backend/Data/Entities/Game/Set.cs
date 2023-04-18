@@ -20,6 +20,19 @@ public class SetPlayer
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public int Score { get; set; }
+    public uint Score { get; set; }
+    public uint? Kills { get; set; }
+    public uint? Errors { get; set; }
+    public uint? Attempts { get; set; }
+    public uint? SuccessfulBlocks { get; set; }
+    public uint? Blocks { get; set; }
+    public uint? Touches { get; set; }
+    public uint? BlockingErrors { get; set; }
+    public uint? Aces { get; set; }
+    public uint? ServingErrors { get; set; }
+    public uint? TotalServes { get; set; }
+    public uint? SuccessfulDigs { get; set; }
+    public uint? BallTouches { get; set; }
+    public uint? BallMisses { get; set; }
     public bool Team { get; set; }
 }

@@ -110,6 +110,7 @@ const TournamentBracket = (props: TournamentBracketProps) => {
             GameComponent={TournamentBracketGameComponent}
           />
         )}
+        {/* <BracketGame game={MapGameDataToFrontEnd(tournamentGames[0])} /> */}
       </Box>
     </Box>
   );
