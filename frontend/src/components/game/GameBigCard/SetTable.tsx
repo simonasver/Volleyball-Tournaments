@@ -7,6 +7,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  makeStyles,
 } from "@mui/material";
 import SetPlayerComponent from "./SetPlayerComponent";
 import { GameStatus, SetPlayer } from "../../../utils/types";
@@ -65,22 +66,9 @@ const SetTable = (props: SetTableProps) => {
       </Typography>
       <TableContainer component={Paper} sx={{ marginY: "20px" }}>
         <Table size="small">
-          <colgroup>
-            {basic && (
-              <>
-                <col width="50%" />
-                <col width="50%" />
-              </>
-            )}
-            {!basic && (
-              <>
-                <col width="30%" />
-              </>
-            )}
-          </colgroup>
           <TableHead>
             <TableRow>
-              <TableCell>Player</TableCell>
+              <TableCell sx={{ left: 0, position: "sticky", backgroundColor: "#ebeced", minWidth: { md: "200px", xs: "100px" } }}>Player</TableCell>
               <TableCell>Score</TableCell>
               {!basic && (<>
                 <TableCell>Kills</TableCell>
@@ -109,6 +97,19 @@ const SetTable = (props: SetTableProps) => {
                       setId={setId}
                       name={player.name}
                       score={player.score}
+                      kills={player.kills}
+                      errors={player.errors}
+                      attempts={player.attempts}
+                      successfulBlocks={player.successfulBlocks}
+                      blocks={player.blocks}
+                      touches={player.touches}
+                      blockingErrors={player.blockingErrors}
+                      aces={player.aces}
+                      servingErrors={player.servingErrors}
+                      totalServes={player.totalServes}
+                      successfulDigs={player.successfulDigs}
+                      ballTouches={player.ballTouches}
+                      ballMisses={player.ballMisses}
                       isOwner={isOwner}
                       status={status}
                       basic={basic}

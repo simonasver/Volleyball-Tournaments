@@ -84,6 +84,10 @@ builder.Services.AddTransient<IGameService, GameService>();
 builder.Services.AddTransient<IGameRepository, GameRepository>();
 builder.Services.AddTransient<IGameTeamRepository, GameTeamRepository>();
 builder.Services.AddTransient<ISetRepository, SetRepository>();
+
+builder.Services.AddTransient<ILogRepository, LogRepository>();
+builder.Services.AddTransient<ILogService, LogService>();
+
 builder.Services.AddScoped<AuthDbSeeder>();
 
 builder.Services.AddAuthorization(options =>

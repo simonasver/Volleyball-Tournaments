@@ -71,6 +71,23 @@ export interface Game {
   ownerId: string;
 }
 
+export enum GameScore {
+  Score = 0,
+  Kills = 1,
+  Errors = 2,
+  Attempts = 3,
+  SuccessfulBlocks = 4,
+  Blocks = 5,
+  Touches = 6,
+  BlockingErrors = 7,
+  Aces = 8,
+  ServingErrors = 9,
+  TotalServes = 10,
+  SuccessfulDigs = 11,
+  BallTouches = 12,
+  BallMisses = 13
+}
+
 export enum GameStatus {
   New = 0,
   SingleTeam = 1,
@@ -95,6 +112,7 @@ export interface GameTeamPlayer {
 
 export interface GameSet {
   id: string;
+  number: number;
   firstTeam: GameTeam;
   secondTeam: GameTeam;
   players: SetPlayer[];
@@ -110,6 +128,19 @@ export interface SetPlayer {
   id: string;
   name: string;
   score: number;
+  kills: number,
+  errors: number,
+  attempts: number,
+  successfulBlocks: number,
+  blocks: number,
+  touches: number,
+  blockingErrors: number,
+  aces: number,
+  servingErrors: number,
+  totalServes : number,
+  successfulDigs : number,
+  ballTouches : number,
+  ballMisses : number
   team: boolean;
 }
 
@@ -133,4 +164,14 @@ export enum GamePreset {
   Regular = 0,
   Beach = 1,
   None = 2
+}
+
+export interface Log {
+  id: string;
+  isPrivate: boolean;
+  message: string;
+  ownerId: string;
+  time: string;
+  tournament: Tournament;
+  game: Game;
 }

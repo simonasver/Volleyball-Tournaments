@@ -30,8 +30,9 @@ public class GamesController : ControllerBase
     private readonly ISetRepository _setRepository;
     private readonly ITeamRepository _teamRepository;
     private readonly IGameTeamRepository _gameTeamRepository;
+    private readonly ILogService _logService;
 
-    public GamesController(ITournamentService tournamentService, IGameService gameService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, IGameRepository gameRepository, ISetRepository setRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository)
+    public GamesController(ITournamentService tournamentService, IGameService gameService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, IGameRepository gameRepository, ISetRepository setRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository, ILogService logService)
     {
         _tournamentService = tournamentService;
         _gameService = gameService;
@@ -43,6 +44,7 @@ public class GamesController : ControllerBase
         _setRepository = setRepository;
         _teamRepository = teamRepository;
         _gameTeamRepository = gameTeamRepository;
+        _logService = logService;
     }
     
     [AllowAnonymous]
@@ -175,7 +177,7 @@ public class GamesController : ControllerBase
         };
 
         var createdGame = await _gameRepository.CreateAsync(newGame);
-        
+
         return CreatedAtAction(nameof(Post), createdGame.Id);
     }
 
@@ -189,7 +191,7 @@ public class GamesController : ControllerBase
         {
             return NotFound();
         }
-        
+
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -294,7 +296,7 @@ public class GamesController : ControllerBase
         }
         
         game.LastEditDate = DateTime.Now;
-
+        
         await _gameRepository.UpdateAsync(game);
         
         return NoContent();
@@ -310,7 +312,7 @@ public class GamesController : ControllerBase
         {
             return NotFound();
         }
-        
+
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -326,7 +328,7 @@ public class GamesController : ControllerBase
         {
             return BadRequest("Cannot delete tournament game without deleting the tournament");
         }
-
+        
         await _gameRepository.DeleteAsync(gameId);
 
         return NoContent();
@@ -399,7 +401,7 @@ public class GamesController : ControllerBase
         {
             return NotFound();
         }
-        
+
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -433,7 +435,7 @@ public class GamesController : ControllerBase
         game = _gameService.AddTeamToGame(game, team);
         
         game.LastEditDate = DateTime.Now;
-
+        
         await _gameRepository.UpdateAsync(game);
         
         return Ok(game);
@@ -449,7 +451,7 @@ public class GamesController : ControllerBase
         {
             return NotFound();
         }
-        
+
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -519,6 +521,13 @@ public class GamesController : ControllerBase
             return NotFound();
         }
         
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        
+        if (user == null)
+        {
+            return Forbid();
+        }
+        
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -569,7 +578,7 @@ public class GamesController : ControllerBase
 
         game.LastEditDate = DateTime.Now;
         game.StartDate = DateTime.Now;
-
+        
         await _gameRepository.UpdateAsync(game);
 
         return Ok();
@@ -606,7 +615,7 @@ public class GamesController : ControllerBase
     }
 
     [Authorize]
-    [HttpPatch("/api/[controller]/{gameId}/Sets/{setId}/Players/{playerId}")]
+    [HttpPatch("/api/[controller]/{gameId}/Sets/{setId}/Players/{playerId}/Score")]
     public async Task<IActionResult> ChangeSetPlayerScore(Guid gameId, Guid setId, Guid playerId, [FromBody] ChangeSetPlayerScoreDto changeSetPlayerScoreDto)
     {
         var game = await _gameRepository.GetAsync(gameId);
@@ -615,6 +624,13 @@ public class GamesController : ControllerBase
             return BadRequest("Game does not exist");
         }
         
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        
+        if (user == null)
+        {
+            return Forbid();
+        }
+
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -656,6 +672,7 @@ public class GamesController : ControllerBase
 
         if (changeSetPlayerScoreDto.Change)
         {
+            await _logService.CreateLog("Player " + player.Name + " score was increased by 1", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
             player.Score++;
             if (!player.Team)
             {
@@ -664,12 +681,14 @@ public class GamesController : ControllerBase
                                                         (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin) || set.Number != game.MaxSets && (set.FirstTeamScore >= game.PointsToWin &&
                         (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin))
                 {
+                    await _logService.CreateLog("First team won the " + set.Number + "set", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
                     set.Winner = set.FirstTeam;
                     set.Status = GameStatus.Finished;
                     game.FirstTeamScore++;
                     var nextSet = game.Sets.FirstOrDefault(x => x.Number == set.Number + 1);
                     if (game.FirstTeamScore >= (game.MaxSets + 1) / 2)
                     {
+                        await _logService.CreateLog("First team won the game", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
                         game.Winner = game.FirstTeam;
                         game.Status = GameStatus.Finished;
                         if (tournament != null)
@@ -696,12 +715,14 @@ public class GamesController : ControllerBase
                     (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin) || set.Number != game.MaxSets && ((set.SecondTeamScore >= game.PointsToWin &&
                         (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin)))
                 {
+                    await _logService.CreateLog("Second team won the " + set.Number + "set", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
                     set.Winner = set.SecondTeam;
                     set.Status = GameStatus.Finished;
                     game.SecondTeamScore++;
                     var nextSet = game.Sets.FirstOrDefault(x => x.Number == set.Number + 1);
                     if (game.SecondTeamScore >= (game.MaxSets + 1) / 2)
                     {
+                        await _logService.CreateLog("Second team won the game", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
                         game.Winner = game.SecondTeam;
                         game.Status = GameStatus.Finished;
                         if (tournament != null)
@@ -725,6 +746,7 @@ public class GamesController : ControllerBase
         {
             if (player.Score > 0)
             {
+                await _logService.CreateLog("Player " + player.Name + " score was decreased by 1", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
                 player.Score--;
                 if (!player.Team)
                 {
@@ -764,6 +786,215 @@ public class GamesController : ControllerBase
         await _setRepository.UpdateAsync(set);
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPatch("/api/[controller]/{gameId}/Sets/{setId}/Players/{playerId}/Stats")]
+    public async Task<IActionResult> ChangeSetPlayerStats(Guid gameId, Guid setId, Guid playerId,
+        [FromBody] ChangeSetPlayerStatsDto changeSetPlayerStatsDto)
+    {
+        var game = await _gameRepository.GetAsync(gameId);
+        if (game == null)
+        {
+            return BadRequest("Game does not exist");
+        }
+        
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        
+        if (user == null)
+        {
+            return Forbid();
+        }
+        
+        // Only if it's user owned resource or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        if (game.Basic)
+        {
+            return BadRequest("This game does not have explicit scoreboard");
+        }
+        
+        var set = game.Sets.FirstOrDefault(x => x.Id == setId);
+        if (set == null)
+        {
+            return BadRequest("Set does not exist");
+        }
+
+        if (set.Status == GameStatus.Finished)
+        {
+            return BadRequest("Set is already finished");
+        }
+
+        var player = set.Players.FirstOrDefault(x => x.Id == playerId);
+        if (player == null)
+        {
+            return BadRequest("Player does not exist");
+        }
+
+        async Task CreateStatChangeLog(string stat)
+        {
+            await _logService.CreateLog("Player " + player.Name + " " + stat + " were " + (changeSetPlayerStatsDto.Change ? "increased" : "decreased") + " by one", false, user.Id, game: game, tournament: game.TournamentMatch?.Tournament);
+        }
+
+        string lessThanZeroMessage = "Cannot reduce to more than zero!";
+
+        switch (changeSetPlayerStatsDto.Type)
+        {
+            case SetPlayerStats.Kills:
+                if (player.Kills == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+
+                await CreateStatChangeLog("kills");
+                player.Kills = (uint)((player.Kills ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.Errors:
+                if (player.Errors == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("errors");
+                player.Errors = (uint)((player.Errors ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.Attempts:
+                if (player.Attempts == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("attempts");
+                player.Attempts = (uint)((player.Attempts ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.SuccessfulBlocks:
+                if (player.SuccessfulBlocks == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("successful blocks");
+                player.SuccessfulBlocks = (uint)((player.SuccessfulBlocks ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.Blocks:
+                if (player.Blocks == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("blocks");
+                player.Blocks = (uint)((player.Blocks ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.Touches:
+                if (player.Touches == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("touches");
+                player.Touches = (uint)((player.Touches ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.BlockingErrors:
+                if (player.BlockingErrors == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("blocking errors");
+                player.BlockingErrors = (uint)((player.BlockingErrors ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.Aces:
+                if (player.Aces == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("aces");
+                player.Aces = (uint)((player.Aces ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.ServingErrors:
+                if (player.ServingErrors == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("serving errors");
+                player.ServingErrors = (uint)((player.ServingErrors ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.TotalServes:
+                if (player.TotalServes == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("total serves");
+                player.TotalServes = (uint)((player.TotalServes ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.SuccessfulDigs:
+                if (player.SuccessfulDigs == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("successful digs");
+                player.SuccessfulDigs = (uint)((player.SuccessfulDigs ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.BallTouches:
+                if (player.BallTouches == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("ball touches");
+                player.BallTouches = (uint)((player.BallTouches ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+            case SetPlayerStats.BallMisses:
+                if (player.BallMisses == 0 && !changeSetPlayerStatsDto.Change)
+                {
+                    return BadRequest(lessThanZeroMessage);
+                }
+                await CreateStatChangeLog("ball misses");
+                player.BallMisses = (uint)((player.BallMisses ?? 0) + (changeSetPlayerStatsDto.Change ? 1 : -1));
+                break;
+        }
+
+        await _setRepository.UpdateAsync(set);
+        
+        return NoContent();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("/api/[controller]/{gameId}/Logs")]
+    public async Task<IActionResult> GetLogs(Guid gameId)
+    {
+        var game = await _gameRepository.GetAsync(gameId);
+        if (game == null)
+        {
+            return BadRequest("Game does not exist");
+        }
+        
+        var logs = await _logService.GetGameLogs(gameId);
+
+        if (!logs.IsSuccess)
+        {
+            return StatusCode(logs.ErrorStatus ?? 500, logs.ErrorMessage);
+        }
+        
+        // Only if it's user owned resource or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Ok(logs.Data.Where(x => !x.IsPrivate));
+            }
+            else
+            {
+                return Ok(logs.Data);
+            }
+        }
+        else
+        {
+            return Ok(logs.Data);
+        }
     }
 }
 

@@ -244,6 +244,7 @@ const EditTournamentForm = () => {
                 />
               }
               label="Game player scoreboard has extended options"
+              disabled={status >= TournamentStatus.Started}
             />
           </FormGroup>
           <br />

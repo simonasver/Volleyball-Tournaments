@@ -53,7 +53,13 @@ const GameSets = (props: GameSetsProps) => {
                   players={set.players}
                   status={set.status}
                   startDate={new Date(set.startDate).toDateString()}
-                  winner={set.winner ? set.winner.id === set.firstTeam.id ? false : true : undefined}
+                  winner={
+                    set.winner
+                      ? set.winner.id === set.firstTeam.id
+                        ? false
+                        : true
+                      : undefined
+                  }
                   onChangeScore={onChangeScore}
                   basic={basic}
                 />

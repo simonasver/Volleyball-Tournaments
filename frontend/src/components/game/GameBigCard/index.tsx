@@ -1,4 +1,7 @@
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Card,
   CardActions,
   CardContent,
@@ -21,14 +24,23 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { Box } from "@mui/system";
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { GameStatus, Team, Game, GameSet } from "../../../utils/types";
+import {
+  GameStatus,
+  Team,
+  Game,
+  GameSet,
+  GameScore,
+  Log,
+} from "../../../utils/types";
 import DeleteGameModal from "./DeleteGameModal";
 import {
   addTeamToGame,
   changeGameSetScore,
+  changeGameSetStats,
   getGame,
+  getGameLogs,
   joinGame,
   removeTeamFromGame,
   startGame,
@@ -47,6 +59,9 @@ import { alertActions } from "../../../store/alert-slice";
 import BackButton from "../../layout/BackButton";
 import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
 import { moveTeamDown } from "../../../services/tournament.service";
+import ChangeScoreModal from "./ChangeScoreModal";
+
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface GameBigCardProps {
   id: string;
@@ -57,6 +72,7 @@ enum Modal {
   Join = 1,
   Accept = 2,
   Delete = 3,
+  ChangeScore = 4,
 }
 
 const GameBigCard = (props: GameBigCardProps) => {
@@ -69,6 +85,9 @@ const GameBigCard = (props: GameBigCardProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [game, setGame] = React.useState<Game>();
   const [sets, setSets] = React.useState<GameSet[]>([]);
+  const [logs, setLogs] = React.useState<Log[]>();
+
+  const [logsExpanded, setLogsExpanded] = React.useState(false);
 
   const user = useAppSelector((state) => state.auth.user);
   const [userTeams, setUserTeams] = React.useState<Team[]>([]);
@@ -77,15 +96,28 @@ const GameBigCard = (props: GameBigCardProps) => {
 
   const [requestJoinInput, setRequestJoinInput] = React.useState("");
   const [acceptTeamInput, setAcceptTeamInput] = React.useState("");
+  const [changeScoreInput, setChangeScoreInput] = React.useState<GameScore>(
+    GameScore.Score
+  );
+  const [changeScorePositive, setChangeScorePositive] = React.useState(false);
+  const [changeScoreSet, setChangeScoreSet] = React.useState("");
+  const [changeScorePlayer, setChangeScorePlayer] = React.useState("");
+
+  const [changeScoreHeader, setChangeScoreHeader] = React.useState("");
 
   const [requestJoinError, setRequestJoinError] = React.useState("");
   const [startError, setStartError] = React.useState("");
   const [acceptTeamError, setAcceptTeamError] = React.useState("");
+  const [changeScoreError, setChangeScoreError] = React.useState("");
 
   const [currentTab, setCurrentTab] = React.useState<number>(0);
 
   const tableSettings = React.useMemo(() => {
     return [
+      {
+        name: "Is scoreboard complex",
+        value: !game?.basic ? "Yes" : "No",
+      },
       {
         name: "Points to win",
         value: game?.pointsToWin,
@@ -105,10 +137,11 @@ const GameBigCard = (props: GameBigCardProps) => {
       {
         name: "Players per team",
         value:
-          game?.playersPerTeam === 0 ? "unrestricted" : game?.playersPerTeam,
+          game?.playersPerTeam === 0 ? "Unrestricted" : game?.playersPerTeam,
       },
     ];
   }, [
+    game?.basic,
     game?.pointsToWin,
     game?.pointDifferenceToWin,
     game?.maxSets,
@@ -139,6 +172,15 @@ const GameBigCard = (props: GameBigCardProps) => {
             setIsLoading(false);
           }
         });
+      getGameLogs(id, abortController.signal)
+        .then((res) => {
+          setLogs(res);
+        })
+        .catch((e) => {
+          console.log(e);
+          const errorMessage = errorMessageFromAxiosError(e);
+          setError(errorMessage);
+        });
     }
     return () => abortController.abort();
   }, []);
@@ -158,6 +200,11 @@ const GameBigCard = (props: GameBigCardProps) => {
     setRequestJoinInput("");
     setAcceptTeamError("");
     setAcceptTeamInput("");
+    setChangeScoreError("");
+    setChangeScorePlayer("");
+    setChangeScoreSet("");
+    setChangeScorePositive(false);
+    setChangeScoreHeader("");
     setModalStatus(Modal.None);
   };
 
@@ -289,33 +336,44 @@ const GameBigCard = (props: GameBigCardProps) => {
     }
     moveTeamDown(game?.tournamentMatch.tournament.id, game?.tournamentMatch.id)
       .then(() => {
-        dispatch(alertActions.changeAlert({ type: "success", message: "Successfully moved the game down the bracket" }));
+        dispatch(
+          alertActions.changeAlert({
+            type: "success",
+            message: "Successfully moved the game down the bracket",
+          })
+        );
       })
       .catch((e) => {
         console.log(e);
         const errorMessage = errorMessageFromAxiosError(e);
-        dispatch(alertActions.changeAlert({ type: "error", message: errorMessage }));
+        dispatch(
+          alertActions.changeAlert({ type: "error", message: errorMessage })
+        );
       });
   };
 
-  const onChangeScore = (setId: string, playerId: string, change: boolean) => {
-    changeGameSetScore(id, setId, playerId, change)
+  const onChangeScore = (type: GameScore, change: boolean) => {
+    if (type !== GameScore.Score) {
+      return onChangePlayerStats(type, change);
+    }
+    changeGameSetScore(id, changeScoreSet, changeScorePlayer, change)
       .then(() => {
         const successMessage = `Player ${
           game?.sets
-            .find((x) => x.id === setId)
-            ?.players.find((x) => x.id === playerId)?.name
+            .find((x) => x.id === changeScoreSet)
+            ?.players.find((x) => x.id === changeScorePlayer)?.name
         } score was ${change ? "increased" : "decreased"}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        closeModal();
 
         getGame(id)
           .then((res) => {
             setError("");
             setGame(res);
             const changedIndex = res.sets.findIndex(
-              (set: GameSet) => set.id === setId
+              (set: GameSet) => set.id === changeScoreSet
             );
             if (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
@@ -340,6 +398,16 @@ const GameBigCard = (props: GameBigCardProps) => {
               setIsLoading(false);
             }
           });
+
+          getGameLogs(id)
+            .then((res) => {
+              setLogs(res);
+            })
+            .catch((e) => {
+              console.log(e);
+              const errorMessage = errorMessageFromAxiosError(e);
+              setError(errorMessage);
+            });
       })
       .catch((e) => {
         console.log(e);
@@ -348,6 +416,92 @@ const GameBigCard = (props: GameBigCardProps) => {
           alertActions.changeAlert({ type: "error", message: errorMessage })
         );
       });
+  };
+
+  const onChangePlayerStats = (type: GameScore, change: boolean) => {
+    changeGameSetStats(id, changeScoreSet, changeScorePlayer, type, change)
+      .then(() => {
+        const successMessage = `Player ${
+          game?.sets
+            .find((x) => x.id === changeScoreSet)
+            ?.players.find((x) => x.id === changeScorePlayer)?.name
+        } stat ${type} was ${change ? "increased" : "decreased"}`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+        closeModal();
+
+        getGame(id)
+          .then((res) => {
+            setError("");
+            setGame(res);
+            const changedIndex = res.sets.findIndex(
+              (set: GameSet) => set.id === changeScoreSet
+            );
+            if (
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+              res.sets[changedIndex].firstTeamScore >= game?.pointsToWin! ||
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+              res.sets[changedIndex].secondTeamScore >= game?.pointsToWin!
+            ) {
+              setSets(res.sets);
+            } else {
+              setSets((currentSets) => {
+                currentSets[changedIndex] = res.sets[changedIndex];
+                return currentSets;
+              });
+            }
+            setIsLoading(false);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
+          });
+
+        getGameLogs(id)
+          .then((res) => {
+            setLogs(res);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+        const errorMessage = errorMessageFromAxiosError(e);
+        dispatch(
+          alertActions.changeAlert({ type: "error", message: errorMessage })
+        );
+      });
+  };
+
+  /**
+   *
+   * @param setId
+   * @param playerId
+   * @param change false - decrease, true - increase
+   */
+  const onChangeScoreOpen = (
+    setId: string,
+    playerId: string,
+    change: boolean
+  ) => {
+    setChangeScoreSet(setId);
+    setChangeScorePlayer(playerId);
+    const set = game?.sets.find((x) => x.id === setId);
+    setChangeScorePositive(change);
+    setChangeScoreHeader(
+      `${change ? "Increase" : "Decrease"} ${game?.title} game ${
+        set?.players.find((x) => x.id === playerId)?.name
+      } player score in set ${set?.number}`
+    );
+    setModalStatus(Modal.ChangeScore);
   };
 
   let statusString = "";
@@ -488,7 +642,8 @@ const GameBigCard = (props: GameBigCardProps) => {
                           )}
                         {user?.id === game.ownerId &&
                           game.tournamentMatch &&
-                          game.status != GameStatus.Started && !isGameFull(game) && (
+                          game.status != GameStatus.Started &&
+                          !isGameFull(game) && (
                             <IconButton
                               centerRipple={false}
                               color="success"
@@ -516,7 +671,8 @@ const GameBigCard = (props: GameBigCardProps) => {
                       <Grid item>
                         {user?.id === game.ownerId &&
                           game.tournamentMatch &&
-                          game.status != GameStatus.Started && !isGameFull(game) && (
+                          game.status != GameStatus.Started &&
+                          !isGameFull(game) && (
                             <IconButton
                               centerRipple={false}
                               color="success"
@@ -623,7 +779,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                 isOwner={user?.id === game.ownerId}
                 sets={sets ?? []}
                 basic={game.basic}
-                onChangeScore={onChangeScore}
+                onChangeScore={onChangeScoreOpen}
               />
             </div>
             <div hidden={currentTab !== 1}>
@@ -648,6 +804,43 @@ const GameBigCard = (props: GameBigCardProps) => {
                 </TableBody>
               </Table>
             </div>
+            <Accordion
+              expanded={logsExpanded}
+              onChange={(
+                event: SyntheticEvent<Element, Event>,
+                expanded: boolean
+              ) => setLogsExpanded(expanded)}
+              variant="outlined"
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography sx={{ width: "33%", flexShrink: 0 }}>
+                  Logs
+                </Typography>
+                <Typography sx={{ color: "text.secondary" }}>
+                  Game logs
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Message</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {logs?.map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell>
+                          {new Date(log.time).toLocaleString()}
+                        </TableCell>
+                        <TableCell>{log.message}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </AccordionDetails>
+            </Accordion>
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
@@ -747,6 +940,18 @@ const GameBigCard = (props: GameBigCardProps) => {
         <DeleteGameModal
           gameId={id}
           gameTitle={game?.title ?? ""}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.ChangeScore && (
+        <ChangeScoreModal
+          errorMessage={changeScoreError}
+          basic={game?.basic ?? true}
+          header={changeScoreHeader}
+          positive={changeScorePositive}
+          changeScoreInput={changeScoreInput}
+          changeScoreInputChange={setChangeScoreInput}
+          onSubmit={onChangeScore}
           onClose={closeModal}
         />
       )}

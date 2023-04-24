@@ -10,6 +10,19 @@ interface SetPlayerComponentProps {
   setId: string;
   name: string;
   score: number;
+  kills: number,
+  errors: number,
+  attempts: number,
+  successfulBlocks: number,
+  blocks: number,
+  touches: number,
+  blockingErrors: number,
+  aces: number,
+  servingErrors: number,
+  totalServes: number,
+  successfulDigs: number,
+  ballTouches: number,
+  ballMisses: number,
   isOwner: boolean;
   status: GameStatus;
   basic: boolean;
@@ -19,13 +32,34 @@ interface SetPlayerComponentProps {
 const SetPlayerComponent = React.memo(function SetPlayer(
   props: SetPlayerComponentProps
 ) {
-  const { playerId, setId, name, score, isOwner, status, basic, onChangeScore } =
-    props;
+  const {
+    playerId,
+    setId,
+    name,
+    score,
+    kills,
+    errors,
+    attempts,
+    successfulBlocks,
+    blocks,
+    touches,
+    blockingErrors,
+    aces,
+    servingErrors,
+    totalServes,
+    successfulDigs,
+    ballTouches,
+    ballMisses,
+    isOwner,
+    status,
+    basic,
+    onChangeScore,
+  } = props;
 
   return (
     <TableRow key={playerId}>
-      <TableCell>{name}</TableCell>
-      <TableCell>
+      <TableCell sx={{ left: 0, position: "sticky", backgroundColor: "#ebeced", boxShadow: 1, minWidth: { md: "200px", xs: "100px" } }}>
+        {name}
         {isOwner &&
           status >= GameStatus.Started &&
           status < GameStatus.Finished && (
@@ -36,10 +70,9 @@ const SetPlayerComponent = React.memo(function SetPlayer(
               sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
               onClick={() => onChangeScore(setId, playerId, true)}
             >
-              <ArrowUpwardIcon fontSize="small" />
+              <ArrowUpwardIcon />
             </IconButton>
           )}
-        {score}
         {isOwner &&
           status >= GameStatus.Started &&
           status < GameStatus.Finished && (
@@ -50,23 +83,26 @@ const SetPlayerComponent = React.memo(function SetPlayer(
               sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
               onClick={() => onChangeScore(setId, playerId, false)}
             >
-              <ArrowDownwardIcon fontSize="small" />
+              <ArrowDownwardIcon />
             </IconButton>
           )}
       </TableCell>
+      <TableCell>{score}</TableCell>
       {!basic && (
         <>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
-          <TableCell>0</TableCell>
+          <TableCell>{kills}</TableCell>
+          <TableCell>{errors}</TableCell>
+          <TableCell>{attempts}</TableCell>
+          <TableCell>{successfulBlocks}</TableCell>
+          <TableCell>{blocks}</TableCell>
+          <TableCell>{touches}</TableCell>
+          <TableCell>{blockingErrors}</TableCell>
+          <TableCell>{aces}</TableCell>
+          <TableCell>{servingErrors}</TableCell>
+          <TableCell>{totalServes}</TableCell>
+          <TableCell>{successfulDigs}</TableCell>
+          <TableCell>{ballTouches}</TableCell>
+          <TableCell>{ballMisses}</TableCell>
         </>
       )}
     </TableRow>

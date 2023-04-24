@@ -61,6 +61,19 @@ public class GameService : IGameService
             {
                 Name = firstTeamPlayer.Name,
                 Score = 0,
+                Kills = 0,
+                Errors = 0,
+                Attempts = 0,
+                SuccessfulBlocks = 0,
+                Blocks = 0,
+                Touches = 0,
+                BlockingErrors = 0,
+                Aces = 0,
+                ServingErrors = 0,
+                TotalServes = 0,
+                SuccessfulDigs = 0,
+                BallTouches = 0,
+                BallMisses = 0,
                 Team = false
             };
             newSet.Players.Add(newSetPlayer);
@@ -71,6 +84,19 @@ public class GameService : IGameService
             {
                 Name = secondTeamPlayer.Name,
                 Score = 0,
+                Kills = 0,
+                Errors = 0,
+                Attempts = 0,
+                SuccessfulBlocks = 0,
+                Blocks = 0,
+                Touches = 0,
+                BlockingErrors = 0,
+                Aces = 0,
+                ServingErrors = 0,
+                TotalServes = 0,
+                SuccessfulDigs = 0,
+                BallTouches = 0,
+                BallMisses = 0,
                 Team = true
             };
             newSet.Players.Add(newSetPlayer);

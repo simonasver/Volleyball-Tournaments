@@ -9,7 +9,6 @@ export const injectStore = (storeToInject: Store<RootState>) => {
   store = storeToInject;
 };
 
-// const apiUrl = "https://goldfish-app-ibq9e.ondigitalocean.app/api";
 const apiUrl = "https://localhost:7067/api";
 
 const instance = axios.create({
@@ -58,7 +57,6 @@ instance.interceptors.response.use(
             RefreshToken: tokens.refreshToken,
           });
 
-          console.log(res.data);
           store.dispatch(authActions.changeTokens(res.data));
           return instance(originalConfig);
         } catch (_error) {

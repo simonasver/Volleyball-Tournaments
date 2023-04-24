@@ -16,6 +16,23 @@ public class Set
     public Game Game { get; set; }
 }
 
+public enum SetPlayerStats
+{
+    Kills = 0,
+    Errors = 1,
+    Attempts = 2,
+    SuccessfulBlocks = 3,
+    Blocks = 4,
+    Touches = 5,
+    BlockingErrors = 6,
+    Aces = 7,
+    ServingErrors = 8,
+    TotalServes = 9,
+    SuccessfulDigs = 10,
+    BallTouches = 11,
+    BallMisses = 12
+}
+
 public class SetPlayer
 {
     public Guid Id { get; set; }

@@ -1,3 +1,4 @@
+import { GameScore } from "../utils/types";
 import api from "./api";
 
 export const getGames = async (signal?: AbortSignal) => {
@@ -111,10 +112,24 @@ export const changeGameSetScore = async (
   change: boolean
 ) => {
   const res = await api.patch(
-    `/Games/${gameId}/Sets/${setId}/Players/${playerId}`,
+    `/Games/${gameId}/Sets/${setId}/Players/${playerId}/Score`,
     {
       Change: change,
     }
   );
+  return res.data;
+};
+
+export const changeGameSetStats = async (gameId: string, setId: string, playerId: string, type: GameScore, change: boolean) => {
+  const res = await api.patch(`/Games/${gameId}/Sets/${setId}/Players/${playerId}/Stats`, 
+  {
+    Type: type-1,
+    Change: change
+  });
+  return res.data;
+}
+
+export const getGameLogs = async (gameId: string, signal?: AbortSignal) => {
+  const res = await api.get(`/Games/${gameId}/Logs`, { signal: signal });
   return res.data;
 };

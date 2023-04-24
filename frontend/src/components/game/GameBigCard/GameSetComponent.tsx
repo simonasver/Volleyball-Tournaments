@@ -1,6 +1,4 @@
-import {
-  Typography,
-} from "@mui/material";
+import { Typography } from "@mui/material";
 import { GameStatus, SetPlayer } from "../../../utils/types";
 
 import React from "react";
@@ -44,9 +42,31 @@ const GameSetComponent = React.memo(function GameSetComponent(props: GameSet) {
         Started at: {startDate}
       </Typography>
       <br />
-      <SetTable setId={setId} isOwner={isOwner} status={status} teamName={firstTeamName} teamScore={firstTeamScore} winner={winner} players={players} team={false} basic={basic} onChangeScore={onChangeScore} />
+      <SetTable
+        setId={setId}
+        isOwner={isOwner}
+        status={status}
+        teamName={firstTeamName}
+        teamScore={firstTeamScore}
+        winner={winner}
+        players={players}
+        team={false}
+        basic={basic}
+        onChangeScore={onChangeScore}
+      />
       <br />
-      <SetTable setId={setId} isOwner={isOwner} status={status} teamName={secondTeamName} teamScore={secondTeamScore} winner={winner} players={players} team={true} basic={basic} onChangeScore={onChangeScore} />
+      <SetTable
+        setId={setId}
+        isOwner={isOwner}
+        status={status}
+        teamName={secondTeamName}
+        teamScore={secondTeamScore}
+        winner={winner}
+        players={players}
+        team={true}
+        basic={basic}
+        onChangeScore={onChangeScore}
+      />
     </>
   );
 });

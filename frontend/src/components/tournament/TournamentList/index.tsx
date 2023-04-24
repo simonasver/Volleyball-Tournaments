@@ -71,7 +71,7 @@ const TournamentList = (props: GameListProps) => {
       <Loader isOpen={isLoading} />
       {!isLoading &&
         tournaments &&
-        tournaments.map((item) => { console.log(item); return (
+        tournaments.map((item) =>
           <>
             <TournamentSmallCard
               key={item.id}
@@ -87,7 +87,7 @@ const TournamentList = (props: GameListProps) => {
             />
             <br />
           </>
-        )})}
+        )}
       {!isLoading && (!tournaments || (tournaments && tournaments.length === 0)) && (
         <Typography variant="h6">
           <br />

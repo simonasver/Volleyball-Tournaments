@@ -1,4 +1,5 @@
 ﻿using Backend.Auth.Model;
+using Backend.Data.Entities;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
@@ -10,6 +11,9 @@ namespace Backend.Data;
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     private readonly IConfiguration _configuration;
+    
+    public DbSet<Log> Logs { get; set; }
+    
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<TournamentMatch> TournamentMatches { get; set; }
     
@@ -53,5 +57,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<TournamentMatch>().HasOne(x => x.FirstParent).WithOne().HasForeignKey<TournamentMatch>("FirstParentId").IsRequired(false);
         builder.Entity<TournamentMatch>().HasOne(x => x.SecondParent).WithOne().HasForeignKey<TournamentMatch>("SecondParentId").IsRequired(false);
 
+        builder.Entity<Log>().HasOne(l => l.Tournament).WithMany().IsRequired(false);
+        builder.Entity<Log>().HasOne(l => l.Game).WithMany().IsRequired(false);
     }
 }

@@ -165,6 +165,7 @@ const EditGameForm = () => {
                   />
                 }
                 label="Game player scoreboard has extended options"
+                disabled={gameStatus >= GameStatus.Started}
               />
             </FormGroup>
             <br />
@@ -232,6 +233,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 0 }}
           fullWidth
+          disabled={gameStatus >= GameStatus.Started}
         />
         <br />
         <br />
