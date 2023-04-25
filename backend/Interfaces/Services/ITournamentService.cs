@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using Backend.Data.Entities.Game;
-using Backend.Data.Entities.Team;
-using Backend.Data.Entities.Tournament;
+﻿using Backend.Data.Entities.Tournament;
+using Backend.Data.Entities.Utils;
 
 namespace Backend.Interfaces.Services;
 
 public interface ITournamentService
 {
-    public Tournament AddTeamToTournament(Tournament tournament, Team team);
-    public TournamentMatch GenerateEmptyBracket(Tournament tournament, int roundCount);
-    public IList<TournamentMatch> PopulateEmptyBrackets(IList<TournamentMatch> tournamentMatches, IList<GameTeam> teams);
-    public (Tournament, ICollection<TournamentMatch>) MatchesToUpdateInTournamentAfterWonMatch(Tournament tournament, TournamentMatch tournamentMatch);
-
-    public IEnumerable<TournamentMatch> MoveMatchTeamDown(ICollection<TournamentMatch> tournamentMatches,
-        TournamentMatch tournamentMatch);
+    public Task<ServiceResult<IEnumerable<Tournament>>> GetAllAsync();
+    public Task<ServiceResult<IEnumerable<Tournament>>> GetUserTournamentsAsync(string userId);
+    public Task<ServiceResult<Tournament>> GetAsync(Guid tournamentId);
+    public Task<ServiceResult<IEnumerable<TournamentMatch>>> GetTournamentMatchesAsync(Guid tournamentId, bool allData);
+    public Task<ServiceResult<bool>> UpdateAsync(Tournament tournament);
+    public Task<ServiceResult<bool>> UpdateMatchAsync(TournamentMatch match);
 }

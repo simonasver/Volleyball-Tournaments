@@ -1,14 +1,21 @@
 namespace Backend.Data.Entities.Utils;
 
-public class ServiceResult
+public class ServiceResult<T>
 {
+    public T? Data { get; set; }
     public bool IsSuccess { get; set; }
-    public int? ErrorStatus { get; set; }
+    public int ErrorStatus { get; set; } = StatusCodes.Status500InternalServerError;
     public string? ErrorMessage { get; set; }
 
     public ServiceResult()
     {
         IsSuccess = true;
+    }
+
+    public ServiceResult(T data)
+    {
+        IsSuccess = true;
+        Data = data;
     }
 
     public ServiceResult(int errorStatus, string errorMessage)
@@ -18,28 +25,18 @@ public class ServiceResult
         ErrorMessage = errorMessage;
     }
 
-    public static ServiceResult Success()
+    public static ServiceResult<T> Success()
     {
-        return new ServiceResult();
+        return new ServiceResult<T>();
     }
 
-    public static ServiceResult Failure(int errorStatus, string errorMessage)
-    {
-        return new ServiceResult(errorStatus, errorMessage);
-    }
-}
-public class ServiceResult<T>: ServiceResult
-{
-    public T? Data { get; set; }
-    
-    public ServiceResult(T data)
-    {
-        IsSuccess = true;
-        Data = data;
-    }
-    
-    public static ServiceResult<T> SuccessWithData(T data)
+    public static ServiceResult<T> Success(T data)
     {
         return new ServiceResult<T>(data);
+    }
+
+    public static ServiceResult<T> Failure(int errorStatus, string errorMessage = "")
+    {
+        return new ServiceResult<T>(errorStatus, errorMessage);
     }
 }

@@ -3,6 +3,7 @@ using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;
 using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
+using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,22 +16,29 @@ public class TeamsController : ControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ITeamRepository _teamRepository;
+    private readonly ITeamService _teamService;
 
-    public TeamsController(IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ITeamRepository teamRepository)
+    public TeamsController(IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ITeamService teamService)
     {
         _authorizationService = authorizationService;
         _userManager = userManager;
-        _teamRepository = teamRepository;
+        _teamService = teamService;
     }
 
     [Authorize(Roles = ApplicationUserRoles.Admin)]
     [HttpGet("/api/[controller]")]
     public async Task<IActionResult> GetAll()
     {
-        var teams = await _teamRepository.GetAllAsync();
+        var teamsResult = await _teamService.GetAllAsync();
 
-        return Ok(teams);
+        if (teamsResult.IsSuccess)
+        {
+            return Ok(teamsResult.Data);
+        }
+        else
+        {
+            return StatusCode(teamsResult.ErrorStatus, teamsResult.ErrorMessage);
+        }
     }
 
     [Authorize]
@@ -57,25 +65,32 @@ public class TeamsController : ControllerBase
                 return Forbid();
             }
         }
-
-        var teams = await _teamRepository.GetAllAsync();
-        var userTeams = teams.Where(x => x.OwnerId == user.Id).ToList();
-
-        return Ok(userTeams);
+        
+        var userTeamsResult = await _teamService.GetUserTeamsAsync(userId);
+        if (userTeamsResult.IsSuccess)
+        {
+            return Ok(userTeamsResult.Data);
+        }
+        else
+        {
+            return StatusCode(userTeamsResult.ErrorStatus, userTeamsResult.ErrorMessage);
+        }
     }
     
     [AllowAnonymous]
     [HttpGet("/api/[controller]/{teamId}")]
     public async Task<IActionResult> Get(Guid teamId)
     {
-        var team = await _teamRepository.GetAsync(teamId);
+        var teamResult = await _teamService.GetAsync(teamId);
 
-        if (team == null)
+        if (teamResult.IsSuccess)
         {
-            return NotFound();
+            return Ok(teamResult.Data);
         }
-        
-        return Ok(team);
+        else
+        {
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
+        }
     }
 
     [Authorize]
@@ -94,42 +109,31 @@ public class TeamsController : ControllerBase
             return Forbid();
         }
 
-        var teams = await _teamRepository.GetAllAsync();
+        var createdTeamResult = await _teamService.CreateAsync(addTeamDto, user.Id);
 
-        if (teams.Any(x => x.Title == addTeamDto.Title))
+        if (createdTeamResult.IsSuccess)
         {
-            return BadRequest("Team title must be unique");
+            return CreatedAtAction(nameof(Post), createdTeamResult.Data.Id);
         }
-
-        if (!String.IsNullOrEmpty(addTeamDto.PictureUrl))
+        else
         {
-            if (!(await Utils.IsLinkImage(addTeamDto.PictureUrl)))
-            {
-                return BadRequest("Provided picture url was not an image");
-            }
+            return StatusCode(createdTeamResult.ErrorStatus, createdTeamResult.ErrorMessage);
         }
-        
-        var team = new Team
-        {
-            Title = addTeamDto.Title,
-            PictureUrl = addTeamDto.PictureUrl,
-            Description = addTeamDto.Description,
-            CreateDate = DateTime.Now,
-            LastEditDate = DateTime.Now,
-            OwnerId = user.Id
-        };
-
-        var createdTeam = await _teamRepository.CreateAsync(team);
-        
-        return CreatedAtAction(nameof(Post), createdTeam.Id);
     }
 
     [Authorize]
     [HttpPatch("/api/[controller]/{teamId}")]
     public async Task<IActionResult> Patch(Guid teamId, [FromBody] EditTeamDto editTeamDto)
     {
-        var team = await _teamRepository.GetAsync(teamId);
+        var teamResult = await _teamService.GetAsync(teamId);
 
+        if (!teamResult.IsSuccess)
+        {
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
+        }
+
+        var team = teamResult.Data;
+        
         if (team == null)
         {
             return NotFound();
@@ -145,34 +149,13 @@ public class TeamsController : ControllerBase
                 return Forbid();
             }
         }
-        
-        var teams = await _teamRepository.GetAllAsync();
 
-        if (teams.Any(x => x.Title == editTeamDto.Title))
+        var result = await _teamService.UpdateAsync(editTeamDto, team);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest("Team title must be unique");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-
-        if (editTeamDto.Title != null)
-        {
-            team.Title = editTeamDto.Title;
-        }
-
-        if (!String.IsNullOrEmpty(editTeamDto.PictureUrl))
-        {
-            if (!(await Utils.IsLinkImage(editTeamDto.PictureUrl)))
-            {
-                return BadRequest("Provided picture url was not an image");
-            }
-            team.PictureUrl = editTeamDto.PictureUrl;
-        }
-
-        if (editTeamDto.Description != null)
-        {
-            team.Description = editTeamDto.Description;
-        }
-
-        await _teamRepository.UpdateAsync(team);
         
         return NoContent();
     }
@@ -181,12 +164,14 @@ public class TeamsController : ControllerBase
     [HttpDelete("/api/[controller]/{teamId}")]
     public async Task<IActionResult> Delete(Guid teamId)
     {
-        var team = await _teamRepository.GetAsync(teamId);
+        var teamResult = await _teamService.GetAsync(teamId);
 
-        if (team == null)
+        if (!teamResult.IsSuccess)
         {
-            return NotFound();
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
         }
+
+        var team = teamResult.Data;
         
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
@@ -198,10 +183,13 @@ public class TeamsController : ControllerBase
                 return Forbid();
             }
         }
-        
-        
 
-        await _teamRepository.DeleteAsync(teamId);
+        var result = await _teamService.DeleteAsync(teamId);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
 
         return NoContent();
     }
@@ -210,12 +198,14 @@ public class TeamsController : ControllerBase
     [HttpPatch("/api/[controller]/{teamId}/Players")]
     public async Task<IActionResult> AddPlayer(Guid teamId, [FromBody] AddTeamPlayerDto addTeamPlayerDto)
     {
-        var team = await _teamRepository.GetAsync(teamId);
+        var teamResult = await _teamService.GetAsync(teamId);
 
-        if (team == null)
+        if (!teamResult.IsSuccess)
         {
-            return NotFound();
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
         }
+
+        var team = teamResult.Data;
         
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
@@ -228,39 +218,28 @@ public class TeamsController : ControllerBase
             }
         }
 
-        if (team.Players.Count >= 12)
+        var result = await _teamService.AddPlayerAsync(addTeamPlayerDto, team);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest("Team is already full (max number players is 12)");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-
-        if (team.Players.FirstOrDefault(x => x.Name == addTeamPlayerDto.Name) != null)
-        {
-            return BadRequest("Player with this name already exists");
-        }
-
-        var newTeamPlayer = new TeamPlayer
-        {
-            Name = addTeamPlayerDto.Name
-        };
-
-        team.Players.Add(newTeamPlayer);
-        team.LastEditDate = DateTime.Now;
-
-        await _teamRepository.UpdateAsync(team);
         
         return NoContent();
     }
 
     [Authorize]
     [HttpDelete("/api/[controller]/{teamId}/Players/{playerId}")]
-    public async Task<IActionResult> RemovePlayers(Guid teamId, Guid playerId)
+    public async Task<IActionResult> RemovePlayer(Guid teamId, Guid playerId)
     {
-        var team = await _teamRepository.GetAsync(teamId);
+        var teamResult = await _teamService.GetAsync(teamId);
 
-        if (team == null)
+        if (!teamResult.IsSuccess)
         {
-            return NotFound();
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
         }
+
+        var team = teamResult.Data;
         
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
@@ -272,18 +251,12 @@ public class TeamsController : ControllerBase
                 return Forbid();
             }
         }
-        
-        var playerToRemove = team.Players.FirstOrDefault(x => x.Id == playerId);
-        if (playerToRemove != null)
+
+        var result = await _teamService.RemovePlayerAsync(playerId, team);
+
+        if (!result.IsSuccess)
         {
-            team.Players.Remove(playerToRemove);
-            team.LastEditDate = DateTime.Now;
-            await _teamRepository.UpdateAsync(team);
-            return Ok();
-        }
-        else
-        {
-            BadRequest("Player doesn't exist");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
 
         return NoContent();
