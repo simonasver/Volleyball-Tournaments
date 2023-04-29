@@ -34,3 +34,13 @@ export function isAdmin(user: User | undefined): boolean {
 export function isGameFull(game: Game): boolean {
   return !!game.firstTeam && !!game.secondTeam;
 }
+
+export function getDefaultPaginationData(): { pageNumber: number, pageSize: number } {
+  return { pageNumber: 1, pageSize: getDefaultPageSize() };
+}
+
+export function formatPaginationDataToQuery(data: { pageNumber: number, pageSize: number }): string {
+  return `pageNumber=${data.pageNumber}&pageSize=${data.pageSize}`;
+}
+
+export const getDefaultPageSize = () => 10;

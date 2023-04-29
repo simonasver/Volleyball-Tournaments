@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(frontEndOrigins, policy =>
     {
-        policy.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+        policy.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Pagination");
     });
 });
 
@@ -74,6 +74,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddTransient<IJwtTokenService, JwtTokenService>();
 
+builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<ITeamRepository, TeamRepository>();
 
 builder.Services.AddTransient<ITournamentService, TournamentService>();

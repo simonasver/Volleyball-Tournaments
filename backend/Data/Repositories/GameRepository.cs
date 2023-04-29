@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using Backend.Data.Entities.Game;
+using Backend.Data.Entities.Utils;
+using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +20,24 @@ public class GameRepository : IGameRepository
     public async Task<IEnumerable<Game>> GetAllAsync()
     {
         return await _dbContext.Games.Include(x => x.TournamentMatch).OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Game>> GetAllAsync(bool all, SearchParameters searchParameters)
+    {
+        var queryable = _dbContext.Games.AsQueryable();
+        if (!all)
+        {
+            queryable = queryable.Where(x => !x.IsPrivate && x.TournamentMatch == null);
+        }
+
+        queryable = queryable.OrderByDescending(x => x.CreateDate);
+        return await PagedList<Game>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
+    }
+
+    public async Task<IEnumerable<Game>> GetAllUserAsync(SearchParameters searchParameters, string userId)
+    {
+        var queryable = _dbContext.Games.AsQueryable().OrderByDescending(x => x.CreateDate).Where(x => x.OwnerId == userId);
+        return await PagedList<Game>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<Game?> GetAsync(Guid gameId)

@@ -18,7 +18,6 @@ import {
 import React, { SyntheticEvent } from "react";
 import Loader from "../../layout/Loader";
 import {
-  GameStatus,
   Team,
   Tournament,
   TournamentMatch,
@@ -133,8 +132,8 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   React.useEffect(() => {
     const abortController = new AbortController();
     if (user) {
-      getUserTeams(user?.id, abortController.signal).then((res) => {
-        setUserTeams(res);
+      getUserTeams(user?.id, 1, 99999, abortController.signal).then((res) => {
+        setUserTeams(res.data);
       });
     }
     return () => abortController.abort();

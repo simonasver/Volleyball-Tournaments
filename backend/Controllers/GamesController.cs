@@ -6,6 +6,8 @@ using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
+using Backend.Data.Entities.Utils;
+using Backend.Helpers.Extensions;
 using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
@@ -20,16 +22,14 @@ namespace Backend.Controllers;
 [Route("api/[controller]")]
 public class GamesController : ControllerBase
 {
-    private readonly ITournamentService _tournamentService;
     private readonly IGameService _gameService;
     private readonly ITeamService _teamService;
     private readonly IAuthorizationService _authorizationService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogService _logService;
 
-    public GamesController(ITournamentService tournamentService, IGameService gameService, ITeamService teamService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ILogService logService)
+    public GamesController(IGameService gameService, ITeamService teamService, IAuthorizationService authorizationService, UserManager<ApplicationUser> userManager, ILogService logService)
     {
-        _tournamentService = tournamentService;
         _gameService = gameService;
         _teamService = teamService;
         _authorizationService = authorizationService;
@@ -38,36 +38,60 @@ public class GamesController : ControllerBase
     }
     
     [AllowAnonymous]
-    [HttpGet("/api/[controller]")]
-    public async Task<IActionResult> GetAll([FromQuery] bool all)
+    [HttpGet("/api/[controller]", Name = "GetGames")]
+    public async Task<IActionResult> GetAll([FromQuery] bool all, [FromQuery] SearchParameters searchParameters)
     {
-        var gamesResult = await _gameService.GetAllAsync();
-
-        if (gamesResult.IsSuccess)
+        if (all)
         {
-            if (all)
+            if (User.Identity == null || !User.IsInRole(ApplicationUserRoles.Admin))
             {
-                if (User.Identity == null || !User.IsInRole(ApplicationUserRoles.Admin))
-                {
-                    return Forbid();
-                }
-
-                return Ok(gamesResult.Data);
-            }
-            else
-            {
-                return Ok(gamesResult.Data.Where(x => !x.IsPrivate && x.TournamentMatch == null).ToList()); 
+                return Forbid();
             }
         }
-        else
+
+        var gamesResult = await _gameService.GetAllAsync(all, searchParameters);
+
+        if (!gamesResult.IsSuccess)
         {
             return StatusCode(gamesResult.ErrorStatus, gamesResult.ErrorMessage);
         }
+        
+        var games = (PagedList<Game>)gamesResult.Data;
+
+        var previousPageLink = games.HasPrevious
+            ? Url.Link("GetGames", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = games.HasNext
+            ? Url.Link("GetGames", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+    
+        var paginationMetadata = new
+        {
+            totalCount = games.TotalCount,
+            pageSize = games.PageSize,
+            currentPage = games.CurrentPage,
+            totalPages = games.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+    
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+        
+        return Ok(games);
     }
 
     [Authorize]
-    [HttpGet("/api/Users/{userId}/[controller]")]
-    public async Task<IActionResult> GetUserGames(string userId)
+    [HttpGet("/api/Users/{userId}/[controller]", Name = "GetUserGames")]
+    public async Task<IActionResult> GetUserGames(string userId, [FromQuery] SearchParameters searchParameters)
     {
         if (User.Identity == null)
         {
@@ -90,16 +114,44 @@ public class GamesController : ControllerBase
             }
         }
 
-        var userGamesResult = await _gameService.GetUserGamesAsync(userId);
+        var userGamesResult = await _gameService.GetUserGamesAsync(searchParameters, userId);
 
         if (!userGamesResult.IsSuccess)
         {
             return StatusCode(userGamesResult.ErrorStatus, userGamesResult.ErrorMessage);
         }
-        else
+
+        var userGames = (PagedList<Game>)userGamesResult.Data;
+        
+        var previousPageLink = userGames.HasPrevious
+            ? Url.Link("GetUserGames", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = userGames.HasNext
+            ? Url.Link("GetUserGames", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+        
+        var paginationMetadata = new
         {
-            return Ok(userGamesResult.Data);
-        }
+            totalCount = userGames.TotalCount,
+            pageSize = userGames.PageSize,
+            currentPage = userGames.CurrentPage,
+            totalPages = userGames.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+        
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+        
+        return Ok(userGames);
     }
 
     [AllowAnonymous]
@@ -120,7 +172,7 @@ public class GamesController : ControllerBase
             return NotFound();
         }
 
-        if (game.IsPrivate == true)
+        if (game.IsPrivate)
         {
             // Only if it's user owned resource or user is admin
             if (!User.IsInRole(ApplicationUserRoles.Admin))
@@ -284,7 +336,7 @@ public class GamesController : ControllerBase
             }
         }
 
-        var result = await _gameService.TeamRequestJoinAsync(requestJoinGameDto, game, team);
+        var result = await _gameService.TeamRequestJoinAsync(game, team);
 
         if (!result.IsSuccess)
         {
@@ -436,7 +488,7 @@ public class GamesController : ControllerBase
             return BadRequest("Game does not exist");
         }
     
-        if (game.IsPrivate == true)
+        if (game.IsPrivate)
         {
             // Only if it's user owned resource or user is admin
             if (!User.IsInRole(ApplicationUserRoles.Admin))
@@ -587,15 +639,11 @@ public class GamesController : ControllerBase
             {
                 return Ok(logs.Data.Where(x => !x.IsPrivate));
             }
-            else
-            {
-                return Ok(logs.Data);
-            }
-        }
-        else
-        {
+
             return Ok(logs.Data);
         }
+
+        return Ok(logs.Data);
     }
 }
 

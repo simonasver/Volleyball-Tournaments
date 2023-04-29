@@ -1,16 +1,18 @@
+import { formatPaginationDataToQuery } from "../utils/helpers";
+import { PageData, Tournament, TournamentMatch } from "../utils/types";
 import api from "./api";
 
-export const getTournaments = async (signal?: AbortSignal) => {
-  const res = await api.get("/Tournaments", { signal: signal });
+export const getTournaments = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
+  const res = await api.get(`/Tournaments?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
   return res.data;
 };
 
-export const getUserTournaments = async (userId: string, signal?: AbortSignal) => {
-    const res = await api.get(`/Users/${userId}/Tournaments`, { signal: signal });
+export const getUserTournaments = async (userId: string, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
+    const res = await api.get(`/Users/${userId}/Tournaments?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
     return res.data;
 };
 
-export const getTournament = async (tournamentId: string, signal?: AbortSignal) => {
+export const getTournament = async (tournamentId: string, signal?: AbortSignal): Promise<Tournament> => {
   const res = await api.get(`/Tournaments/${tournamentId}`, { signal: signal });
   return res.data;
 };
@@ -103,7 +105,7 @@ export const joinTournament = async (tournamentId: string, teamId: string) => {
     return res.data;
   };
 
-  export const getTournamentMatches = async (tournamentId: string, signal?: AbortSignal) => {
+  export const getTournamentMatches = async (tournamentId: string, signal?: AbortSignal): Promise<TournamentMatch[]> => {
     const res = await api.get(`/Tournaments/${tournamentId}/Matches`, { signal: signal });
     return res.data;
   };

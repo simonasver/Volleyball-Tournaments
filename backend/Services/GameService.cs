@@ -27,11 +27,11 @@ public class GameService : IGameService
         _logService = logService;
     }
     
-    public async Task<ServiceResult<IEnumerable<Game>>> GetAllAsync()
+    public async Task<ServiceResult<IEnumerable<Game>>> GetAllAsync(bool all, SearchParameters searchParameters)
     {
         try
         {
-            var games = await _gameRepository.GetAllAsync();
+            var games = await _gameRepository.GetAllAsync(all, searchParameters);
             return ServiceResult<IEnumerable<Game>>.Success(games);
         }
         catch (Exception ex)
@@ -40,12 +40,11 @@ public class GameService : IGameService
         }
     }
 
-    public async Task<ServiceResult<IEnumerable<Game>>> GetUserGamesAsync(string userId)
+    public async Task<ServiceResult<IEnumerable<Game>>> GetUserGamesAsync(SearchParameters searchParameters, string userId)
     {
         try
         {
-            var games = await _gameRepository.GetAllAsync();
-            var userGames = games.Where(x => x.OwnerId == userId && x.TournamentMatch == null).ToList();
+            var userGames = await _gameRepository.GetAllUserAsync(searchParameters, userId);
             return ServiceResult<IEnumerable<Game>>.Success(userGames);
         }
         catch (Exception ex)
@@ -244,7 +243,7 @@ public class GameService : IGameService
         }
     }
 
-    public async Task<ServiceResult<bool>> TeamRequestJoinAsync(RequestJoinGameDto requestJoinGameDto, Game game, Team team)
+    public async Task<ServiceResult<bool>> TeamRequestJoinAsync(Game game, Team team)
     {
         if (game.TournamentMatch != null)
         {

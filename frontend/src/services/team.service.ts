@@ -1,16 +1,17 @@
+import { PageData, Team } from "../utils/types";
 import api from "./api";
 
-export const getTeams = async (signal?: AbortSignal) => {
-  const res = await api.get("/Teams", { signal: signal });
+export const getTeams = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Team[], pagination: PageData }> => {
+  const res = await api.get(`/Teams?PageNumber=${pageNumber}&PageSize=${pageSize}`, { signal: signal });
   return res.data;
 };
 
-export const getUserTeams = async (userId: string, signal?: AbortSignal) => {
-  const res = await api.get(`/Users/${userId}/Teams`, { signal: signal });
+export const getUserTeams = async (userId: string, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Team[], pagination: PageData }> => {
+  const res = await api.get(`/Users/${userId}/Teams?PageNumber=${pageNumber}&PageSize=${pageSize}`, { signal: signal });
   return res.data;
 };
 
-export const getTeam = async (teamId: string, signal?: AbortSignal) => {
+export const getTeam = async (teamId: string, signal?: AbortSignal): Promise<Team> => {
   const res = await api.get(`/Teams/${teamId}`, { signal: signal });
   return res.data;
 };

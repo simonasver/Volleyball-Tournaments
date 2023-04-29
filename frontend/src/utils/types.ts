@@ -5,7 +5,12 @@ export interface Tournament {
   description: string;
   basic: boolean;
   type: TournamentType;
+  pointsToWin: number;
+  pointsToWinLastSet: number;
+  pointDifferenceToWin: number;
   maxTeams: number;
+  maxSets: number;
+  playersPerTeam: number;
   isPrivate: boolean;
   createDate: string;
   lastEditDate: string;
@@ -174,4 +179,13 @@ export interface Log {
   time: string;
   tournament: Tournament;
   game: Game;
+}
+
+export interface PageData {
+  totalCount: number,
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+  previousPageLink: string;
+  nextPageLink: string;
 }

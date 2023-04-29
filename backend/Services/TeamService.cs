@@ -1,32 +1,27 @@
-using System.Security.Claims;
-using Backend.Auth.Model;
+using System.Security.Policy;
 using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Services;
 
 public class TeamService : ITeamService
 {
     private readonly ITeamRepository _teamRepository;
-    private readonly UserManager<ApplicationUser> _userManager;
 
-    public TeamService(ITeamRepository teamRepository, UserManager<ApplicationUser> userManager)
+    public TeamService(ITeamRepository teamRepository)
     {
         _teamRepository = teamRepository;
-        _userManager = userManager;
     }
     
-    public async Task<ServiceResult<IEnumerable<Team>>> GetAllAsync()
+    public async Task<ServiceResult<IEnumerable<Team>>> GetAllAsync(SearchParameters searchParameters)
     {
         try
         {
-            var teams = await _teamRepository.GetAllAsync();
+            var teams = await _teamRepository.GetAllAsync(searchParameters);
             return ServiceResult<IEnumerable<Team>>.Success(teams);
         }
         catch (Exception ex)
@@ -35,18 +30,19 @@ public class TeamService : ITeamService
         }
     }
     
-    public async Task<ServiceResult<IEnumerable<Team>>> GetUserTeamsAsync(string userId)
+    public async Task<ServiceResult<IEnumerable<Team>>> GetUserTeamsAsync(SearchParameters searchParameters, string userId)
     {
         IEnumerable<Team> teams;
         try
         {
-            teams = await _teamRepository.GetAllAsync();
+            teams = await _teamRepository.GetAllUserAsync(searchParameters, userId);
         }
         catch (Exception ex)
         {
             return ServiceResult<IEnumerable<Team>>.Failure(StatusCodes.Status500InternalServerError, "Not found");
         }
-        return ServiceResult<IEnumerable<Team>>.Success(teams.Where(x => x.OwnerId == userId).ToList());
+        
+        return ServiceResult<IEnumerable<Team>>.Success(teams);
     }
 
     public async Task<ServiceResult<Team>> GetAsync(Guid teamId)
@@ -207,9 +203,7 @@ public class TeamService : ITeamService
                 return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        else
-        {
-            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Player doesn't exist");
-        }
+
+        return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Player doesn't exist");
     }
 }

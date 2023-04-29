@@ -6,6 +6,7 @@ using Backend.Data.Dtos.Tournament;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
+using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
 using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
@@ -22,47 +23,71 @@ public class TournamentsController : ControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly ITournamentService _tournamentService;
+    private readonly ITeamService _teamService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ITournamentRepository _tournamentRepository;
-    private readonly ITournamentMatchRepository _tournamentMatchRepository;
-    private readonly ITeamRepository _teamRepository;
-    private readonly IGameTeamRepository _gameTeamRepository;
-    public TournamentsController(IAuthorizationService authorizationService, ITournamentService tournamentService, UserManager<ApplicationUser> userManager, ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, ITeamRepository teamRepository, IGameTeamRepository gameTeamRepository)
+    public TournamentsController(IAuthorizationService authorizationService, ITournamentService tournamentService, ITeamService teamService, UserManager<ApplicationUser> userManager)
     {
         _authorizationService = authorizationService;
         _tournamentService = tournamentService;
+        _teamService = teamService;
         _userManager = userManager;
-        _tournamentRepository = tournamentRepository;
-        _tournamentMatchRepository = tournamentMatchRepository;
-        _teamRepository = teamRepository;
-        _gameTeamRepository = gameTeamRepository;
     }
     
     [AllowAnonymous]
-    [HttpGet("/api/[controller]")]
-    public async Task<IActionResult> GetAll([FromQuery] bool all)
+    [HttpGet("/api/[controller]", Name = "GetTournaments")]
+    public async Task<IActionResult> GetAll([FromQuery] bool all, [FromQuery] SearchParameters searchParameters)
     {
-        IEnumerable<Tournament> tournaments;
         if (all)
         {
             if (User.Identity == null || !User.IsInRole(ApplicationUserRoles.Admin))
             {
                 return Forbid();
             }
-
-            tournaments = await _tournamentRepository.GetAllAsync();
         }
-        else
+        
+        var tournamentsResult = await _tournamentService.GetAllAsync(all, searchParameters);
+
+        if (!tournamentsResult.IsSuccess)
         {
-            tournaments = (await _tournamentRepository.GetAllAsync()).Where(x => !x.IsPrivate).ToList(); 
+            return StatusCode(tournamentsResult.ErrorStatus, tournamentsResult.ErrorMessage);
         }
 
+        var tournaments = (PagedList<Tournament>)tournamentsResult.Data;
+        
+        var previousPageLink = tournaments.HasPrevious
+            ? Url.Link("GetTournaments", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = tournaments.HasNext
+            ? Url.Link("GetTournaments", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+        
+        var paginationMetadata = new
+        {
+            totalCount = tournaments.TotalCount,
+            pageSize = tournaments.PageSize,
+            currentPage = tournaments.CurrentPage,
+            totalPages = tournaments.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+        
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+        
         return Ok(tournaments);
     }
     
     [Authorize]
-    [HttpGet("/api/Users/{userId}/[controller]")]
-    public async Task<IActionResult> GetUserTournaments(string userId)
+    [HttpGet("/api/Users/{userId}/[controller]", Name = "GetUserTournaments")]
+    public async Task<IActionResult> GetUserTournaments(string userId, [FromQuery] SearchParameters searchParameters)
     {
         if (User.Identity == null)
         {
@@ -84,9 +109,42 @@ public class TournamentsController : ControllerBase
                 return Forbid();
             }
         }
+        
+        var userTournamentsResult = await _tournamentService.GetUserTournamentsAsync(searchParameters, user.Id);
+        if (!userTournamentsResult.IsSuccess)
+        {
+            return StatusCode(userTournamentsResult.ErrorStatus, userTournamentsResult.ErrorMessage);
+        }
 
-        var tournaments = await _tournamentRepository.GetAllAsync();
-        var userTournaments = tournaments.Where(x => x.OwnerId == user.Id).ToList();
+        var userTournaments = (PagedList<Tournament>)userTournamentsResult.Data;
+        
+        var previousPageLink = userTournaments.HasPrevious
+            ? Url.Link("GetUserTournaments", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = userTournaments.HasNext
+            ? Url.Link("GetUserTournaments", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+        
+        var paginationMetadata = new
+        {
+            totalCount = userTournaments.TotalCount,
+            pageSize = userTournaments.PageSize,
+            currentPage = userTournaments.CurrentPage,
+            totalPages = userTournaments.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+        
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
 
         return Ok(userTournaments);
     }
@@ -95,7 +153,14 @@ public class TournamentsController : ControllerBase
     [HttpGet("/api/[controller]/{tournamentId}")]
     public async Task<IActionResult> Get(Guid tournamentId)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -134,50 +199,29 @@ public class TournamentsController : ControllerBase
         {
             return Forbid();
         }
-        
-        if (addTournamentDto.MaxSets % 2 == 0)
+
+        var createdTournamentResult = await _tournamentService.CreateAsync(addTournamentDto, user.Id);
+
+        if (!createdTournamentResult.IsSuccess)
         {
-            return BadRequest("Max sets must be an odd number");
+            return StatusCode(createdTournamentResult.ErrorStatus, createdTournamentResult.ErrorMessage);
         }
-
-        if (!String.IsNullOrEmpty(addTournamentDto.PictureUrl))
-        {
-            if (!(await Utils.IsLinkImage(addTournamentDto.PictureUrl)))
-            {
-                return BadRequest("Provided picture url was not an image");
-            }
-        }
-
-        var newTournament = new Tournament()
-        {
-            Title = addTournamentDto.Title,
-            PictureUrl = addTournamentDto.PictureUrl,
-            Description = addTournamentDto.Description,
-            Basic = addTournamentDto.Basic,
-            SingleThirdPlace = addTournamentDto.SingleThirdPlace,
-            MaxTeams = addTournamentDto.MaxTeams,
-            PointsToWin = addTournamentDto.PointsToWin,
-            PointsToWinLastSet = addTournamentDto.PointsToWinLastSet,
-            PointDifferenceToWin = addTournamentDto.PointDifferenceToWin,
-            MaxSets = addTournamentDto.MaxSets,
-            PlayersPerTeam = addTournamentDto.PlayersPerTeam,
-            IsPrivate = addTournamentDto.IsPrivate,
-            CreateDate = DateTime.Now,
-            LastEditDate = DateTime.Now,
-            Status = TournamentStatus.Open,
-            OwnerId = user.Id
-        };
-
-        var createdTournament = await _tournamentRepository.CreateAsync(newTournament);
         
-        return CreatedAtAction(nameof(Post), createdTournament.Id);
+        return CreatedAtAction(nameof(Post), createdTournamentResult.Data.Id);
     }
 
     [Authorize]
     [HttpPatch("/api/[controller]/{tournamentId}")]
     public async Task<IActionResult> Patch(Guid tournamentId, [FromBody] EditTournamentDto editTournamentDto)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -195,98 +239,12 @@ public class TournamentsController : ControllerBase
             }
         }
 
-        if (tournament.Status == TournamentStatus.Finished)
-        {
-            return BadRequest("Cannot edit finished tournament");
-        }
+        var result = await _tournamentService.UpdateAsync(editTournamentDto, tournament);
 
-        if (editTournamentDto.MaxSets % 2 == 0)
+        if (!result.IsSuccess)
         {
-            return BadRequest("Max sets must be an odd number");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-
-        if (editTournamentDto.Title != null)
-        {
-            tournament.Title = editTournamentDto.Title;
-        }
-
-        if (!String.IsNullOrEmpty(editTournamentDto.PictureUrl))
-        {
-            if (!(await Utils.IsLinkImage(editTournamentDto.PictureUrl)))
-            {
-                return BadRequest("Provided picture url was not an image");
-            }
-            tournament.PictureUrl = editTournamentDto.PictureUrl;
-        }
-
-        if (editTournamentDto.Description != null)
-        {
-            tournament.Description = editTournamentDto.Description;
-        }
-
-        if (editTournamentDto.SingleThirdPlace != null)
-        {
-            tournament.SingleThirdPlace = editTournamentDto.SingleThirdPlace ?? false;
-        }
-        
-        if (editTournamentDto.Basic != null)
-        {
-            tournament.Basic = editTournamentDto.Basic ?? false;
-        }
-
-        if (editTournamentDto.MaxTeams != null)
-        {
-            tournament.MaxTeams = editTournamentDto.MaxTeams ?? tournament.MaxTeams;
-        }
-
-        if (editTournamentDto.PointsToWin != null)
-        {
-            if (tournament.Status < TournamentStatus.Started)
-            {
-                tournament.PointsToWin = editTournamentDto.PointsToWin ?? tournament.PointsToWin;
-            }
-        }
-
-        if (editTournamentDto.PointsToWinLastSet != null)
-        {
-            if (tournament.Status < TournamentStatus.Started)
-            {
-                tournament.PointsToWinLastSet = editTournamentDto.PointsToWinLastSet ?? tournament.PointsToWinLastSet;
-            }
-        }
-
-        if (editTournamentDto.PointDifferenceToWin != null)
-        {
-            if (tournament.Status < TournamentStatus.Started)
-            {
-                tournament.PointDifferenceToWin = editTournamentDto.PointDifferenceToWin ?? tournament.PointDifferenceToWin;
-            }
-        }
-
-        if (editTournamentDto.MaxSets != null)
-        {
-            if (tournament.Status < TournamentStatus.Started)
-            {
-                tournament.MaxSets = editTournamentDto.MaxSets ?? tournament.MaxSets;
-            }
-        }
-        
-        if (editTournamentDto.PlayersPerTeam != null)
-        {
-            if (tournament.Status < TournamentStatus.Started)
-            {
-                tournament.PlayersPerTeam = editTournamentDto.PlayersPerTeam ?? tournament.PlayersPerTeam;
-            }
-        }
-
-        if (editTournamentDto.IsPrivate != null)
-        {
-            tournament.IsPrivate = editTournamentDto.IsPrivate ?? tournament.IsPrivate;
-        }
-        
-        tournament.LastEditDate = DateTime.Now;
-
-        await _tournamentRepository.UpdateAsync(tournament);
         
         return NoContent();
     }
@@ -295,7 +253,14 @@ public class TournamentsController : ControllerBase
     [HttpDelete("/api/[controller]/{tournamentId}")]
     public async Task<IActionResult> Delete(Guid tournamentId)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -313,7 +278,12 @@ public class TournamentsController : ControllerBase
             }
         }
 
-        await _tournamentRepository.DeleteAsync(tournamentId);
+        var result = await _tournamentService.DeleteAsync(tournament);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
 
         return NoContent();
     }
@@ -322,14 +292,28 @@ public class TournamentsController : ControllerBase
     [HttpPost("/api/[controller]/{tournamentId}/RequestedTeams")]
     public async Task<IActionResult> RequestJoinTeam(Guid tournamentId, [FromBody] RequestJoinTournamentDto requestJoinTournamentDto)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
             return NotFound();
         }
 
-        var team = await _teamRepository.GetAsync(requestJoinTournamentDto.TeamId);
+        var teamResult = await _teamService.GetAsync(requestJoinTournamentDto.TeamId);
+
+        if (!teamResult.IsSuccess)
+        {
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
+        }
+
+        var team = teamResult.Data;
 
         if (team == null)
         {
@@ -347,24 +331,12 @@ public class TournamentsController : ControllerBase
             }
         }
 
-        if (tournament.RequestedTeams.Any(x => x.Id == team.Id) || tournament.AcceptedTeams.Any(x => x.Title == team.Title))
+        var result = await _tournamentService.TeamRequestJoinAsync(tournament, team);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest("Team already requested to join this game");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-
-        if (team.Players.Count != tournament.PlayersPerTeam && tournament.PlayersPerTeam != 0)
-        {
-            return BadRequest("Teams in this tournament are required to have " + tournament.PlayersPerTeam + " players");
-        }
-
-        if (team.Players.Count == 0)
-        {
-            return BadRequest("Team must have at least 1 player");
-        }
-
-        tournament.RequestedTeams.Add(team);
-
-        await _tournamentRepository.UpdateAsync(tournament);
 
         return Ok();
     }
@@ -373,7 +345,14 @@ public class TournamentsController : ControllerBase
     [HttpPost("/api/[controller]/{tournamentId}/AcceptedTeams")]
     public async Task<IActionResult> AddTeam(Guid tournamentId, [FromBody] AddTeamToTournamentDto addTeamToTournamentDto)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -391,30 +370,12 @@ public class TournamentsController : ControllerBase
             }
         }
 
-        if (tournament.AcceptedTeams.Count >= tournament.MaxTeams)
+        var result = await _tournamentService.AddTeamAsync(addTeamToTournamentDto, tournament);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest("Tournament is already full");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-
-        if (!tournament.RequestedTeams.Any(x => x.Id == addTeamToTournamentDto.TeamId))
-        {
-            return BadRequest("Team has not requested to join the game");
-        }
-
-        var team = tournament.RequestedTeams.FirstOrDefault(x => x.Id == addTeamToTournamentDto.TeamId);
-        
-        if ((team.Players.Count != tournament.PlayersPerTeam && tournament.PlayersPerTeam != 0) || team.Players.Count == 0)
-        {
-            tournament.RequestedTeams.Remove(team);
-            await _tournamentRepository.UpdateAsync(tournament);
-            return BadRequest("Team has 0 or another incompatible number of players for this game");
-        }
-
-        tournament = _tournamentService.AddTeamToTournament(tournament, team);
-        
-        tournament.LastEditDate = DateTime.Now;
-
-        await _tournamentRepository.UpdateAsync(tournament);
         
         return Ok(tournament);
     }
@@ -423,7 +384,14 @@ public class TournamentsController : ControllerBase
     [HttpDelete("/api/[controller]/{tournamentId}/AcceptedTeams")]
     public async Task<IActionResult> RemoveTeam(Guid tournamentId, [FromQuery] Guid teamId)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -441,23 +409,12 @@ public class TournamentsController : ControllerBase
             }
         }
 
-        if (tournament.Status >= TournamentStatus.Started)
+        var result = await _tournamentService.RemoveTeamAsync(tournament, teamId);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest("Game is already started");
+            return StatusCode(result.ErrorStatus, result);
         }
-
-        var team = tournament.AcceptedTeams.FirstOrDefault(x => x.Id == teamId);
-
-        if (team != null)
-        {
-            tournament.AcceptedTeams.Remove(team);
-        }
-
-        await _gameTeamRepository.DeleteAsync(team.Id);
-        
-        tournament.LastEditDate = DateTime.Now;
-
-        await _tournamentRepository.UpdateAsync(tournament);
         
         return NoContent();
     }
@@ -466,7 +423,14 @@ public class TournamentsController : ControllerBase
     [HttpPatch("/api/[controller]/{tournamentId}/Status")]
     public async Task<IActionResult> Start(Guid tournamentId)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -484,34 +448,12 @@ public class TournamentsController : ControllerBase
             }
         }
 
-        if (tournament.Status == TournamentStatus.Started)
+        var result = await _tournamentService.StartAsync(tournament);
+
+        if (!result.IsSuccess)
         {
-            return BadRequest("Tournament is already started");
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-
-        if (tournament.Status == TournamentStatus.Finished)
-        {
-            return BadRequest(("Tournament is already finished"));
-        }
-
-        if (tournament.AcceptedTeams.Count < 2)
-        {
-            return BadRequest("Tournament does not have at least two teams");
-        }
-
-        tournament.Status = TournamentStatus.Started;
-
-        var roundCount = tournament.AcceptedTeams.CountTournamentRounds();
-        tournament.FinalRound = roundCount;
-        var generatedMatches = _tournamentService.GenerateEmptyBracket(tournament, roundCount).ToList();
-
-        var populatedMatches = _tournamentService.PopulateEmptyBrackets(generatedMatches, tournament.AcceptedTeams);
-
-        tournament.LastEditDate = DateTime.Now;
-
-        tournament.Matches = populatedMatches;
-
-        await _tournamentRepository.UpdateAsync(tournament);
 
         return NoContent();
     }
@@ -519,9 +461,23 @@ public class TournamentsController : ControllerBase
     [HttpGet("/api/[controller]/{tournamentId}/Matches")]
     public async Task<IActionResult> GetTournamentMatches(Guid tournamentId)
     {
-        var tournamentMatches = await _tournamentMatchRepository.GetAllTournamentAsync(tournamentId, false);
+        var tournamentMatchesResult = await _tournamentService.GetTournamentMatchesAsync(tournamentId, false);
 
-        Tournament tournament = await _tournamentRepository.GetAsync(tournamentId);
+        if (!tournamentMatchesResult.IsSuccess)
+        {
+            return StatusCode(tournamentMatchesResult.ErrorStatus, tournamentMatchesResult.ErrorMessage);
+        }
+
+        var tournamentMatches = tournamentMatchesResult.Data;
+
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
@@ -549,27 +505,20 @@ public class TournamentsController : ControllerBase
     [HttpPatch("/api/[controller]/{tournamentId}/Matches/{matchId}/Brackets")]
     public async Task<IActionResult> MoveBracket(Guid tournamentId, Guid matchId)
     {
-        var tournament = await _tournamentRepository.GetAsync(tournamentId);
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data;
 
         if (tournament == null)
         {
             return NotFound();
         }
-        
-        var tournamentMatches = await _tournamentMatchRepository.GetAllTournamentAsync(tournamentId, true);
 
-        var match = tournamentMatches.FirstOrDefault(x => x.Id == matchId);
-
-        if (match == null)
-        {
-            return NotFound();
-        }
-
-        if (match.Round == tournament.FinalRound)
-        {
-            return BadRequest("Cannot move down from the final round");
-        }
-        
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
@@ -580,32 +529,21 @@ public class TournamentsController : ControllerBase
                 return Forbid();
             }
         }
-        
-        try
+
+        var result = await _tournamentService.MoveBracketAsync(tournament, matchId);
+
+        if (!result.IsSuccess)
         {
-            var matchesToUpdate = _tournamentService.MoveMatchTeamDown(tournamentMatches, match);
-            foreach (var tournamentMatch in matchesToUpdate)
-            {
-                await _tournamentMatchRepository.UpdateAsync(tournamentMatch);
-            }
-            return NoContent();
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            return BadRequest(ex.Message);
-        }
+
+        return NoContent();
     }
     
     [Authorize(Roles = ApplicationUserRoles.Admin)]
     [HttpPost("/api/[controller]/generate")]
     public async Task<IActionResult> Generate([FromQuery] int teamAmount)
     {
-        if (teamAmount == null || teamAmount < 0 || teamAmount > 128)
-        {
-            return BadRequest("Team amount must be between 1 and 128");
-        }
-        
         var user = await _userManager.FindByNameAsync(User.Identity.Name);
         
         if (user == null)
@@ -613,51 +551,13 @@ public class TournamentsController : ControllerBase
             return Forbid();
         }
 
-        var generatedNamePrefix = DateTime.Now.ToShortTimeString();
+        var result = await _tournamentService.GenerateAsync(teamAmount, user.Id);
 
-        var tournament = new Tournament()
+        if (!result.IsSuccess)
         {
-            Title = "Tournament " + generatedNamePrefix,
-            Description = "Tournament is generated for testing purposes only",
-            SingleThirdPlace = false,
-            Basic = true,
-            MaxTeams = 128,
-            IsPrivate = false,
-            CreateDate = DateTime.Now,
-            LastEditDate = DateTime.Now,
-            Status = TournamentStatus.Open,
-            RequestedTeams = new List<Team>(),
-            AcceptedTeams = new List<GameTeam>(),
-            PointsToWin = 1,
-            PointsToWinLastSet = 1,
-            PointDifferenceToWin = 0,
-            MaxSets = 1,
-            PlayersPerTeam = 0,
-            OwnerId = user.Id
-        };
-
-        for (int i = 0; i < teamAmount; i++)
-        {
-            var team = new GameTeam()
-            {
-                Title = "Team " + generatedNamePrefix + " " + (i+1),
-                Description = "Team is generated for testing purposes only",
-                Players = new List<GameTeamPlayer>(),
-            };
-            for (int j = 0; j < 6; j++)
-            {
-                var player = new GameTeamPlayer()
-                {
-                    Name = "Player " + (j+1)
-                };
-                team.Players.Add(player);
-            }
-            tournament.AcceptedTeams.Add(team);
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
         
-        
-
-        await _tournamentRepository.CreateAsync(tournament);
         return Ok();
     }
 }

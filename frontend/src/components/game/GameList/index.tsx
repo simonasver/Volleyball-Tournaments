@@ -1,12 +1,12 @@
 import React from "react";
 import { useAppSelector } from "../../../utils/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getGames, getUserGames } from "../../../services/game.service";
-import { errorMessageFromAxiosError } from "../../../utils/helpers";
-import { Alert, Typography } from "@mui/material";
+import { errorMessageFromAxiosError, formatPaginationDataToQuery, getDefaultPageSize, getDefaultPaginationData } from "../../../utils/helpers";
+import { Alert, Pagination, Typography } from "@mui/material";
 import Loader from "../../layout/Loader";
 import GameSmallCard from "./GameSmallCard";
-import { Game } from "../../../utils/types";
+import { Game, PageData } from "../../../utils/types";
 
 interface GameListProps {
   all?: boolean;
@@ -23,15 +23,37 @@ const GameList = (props: GameListProps) => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [games, setGames] = React.useState<Game[]>();
 
+  const [query, setQuery] = useSearchParams();
+  const [currentPage, setCurrentPage] = React.useState<{ pageNumber: number, pageSize: number }>({ pageNumber: 1, pageSize: getDefaultPageSize() });
+  const [pagination, setPagination] = React.useState<PageData>();
+
+  const setSearchParams = (pageNumber: number, pageSize: number) => {
+    query.set("pageNumber", pageNumber.toString());
+    query.set("pageSize", pageSize.toString());
+    setQuery(query, { replace: true });
+    setCurrentPage({ pageNumber, pageSize });
+  };
+
+  React.useEffect(() => {
+    const pageNumber: number = parseInt(query.get("pageNumber") ?? "") ?? getDefaultPageSize();
+    const pageSize: number = parseInt(query.get("pageSize") ?? "") ?? 1;
+    if(!pageNumber && !pageSize) {
+      navigate(`/${all ? "games" : "mygames"}?${formatPaginationDataToQuery(getDefaultPaginationData())}`);
+    } else {
+      setSearchParams(pageNumber, pageSize);
+    }
+  }, [query]);
+
   React.useEffect(() => {
     const abortController = new AbortController();
     if (!all) {
       if (!user) {
         return navigate("/", { replace: true });
       } else {
-        getUserGames(user.id, abortController.signal)
+        getUserGames(user.id, currentPage?.pageNumber, currentPage?.pageSize, abortController.signal)
           .then((res) => {
-            setGames(res);
+            setGames(res.data);
+            setPagination(res.pagination);
             setIsLoading(false);
           })
           .catch((e) => {
@@ -44,9 +66,10 @@ const GameList = (props: GameListProps) => {
           });
       }
     } else {
-      getGames(abortController.signal)
+      getGames(currentPage?.pageNumber, currentPage?.pageSize, abortController.signal)
         .then((res) => {
-          setGames(res);
+          setGames(res.data);
+          setPagination(res.pagination);
           setIsLoading(false);
         })
         .catch((e) => {
@@ -59,7 +82,7 @@ const GameList = (props: GameListProps) => {
         });
     }
     return () => abortController.abort();
-  }, []);
+  }, [currentPage]);
 
   return (
     <>
@@ -95,6 +118,7 @@ const GameList = (props: GameListProps) => {
           There are no games yet. Create one!
         </Typography>
       )}
+      {pagination && <Pagination defaultPage={currentPage?.pageNumber} count={pagination.totalPages} onChange={(event: React.ChangeEvent<unknown>, page: number) => setSearchParams(page, currentPage.pageSize)} color="primary"/>}
     </>
   );
 };

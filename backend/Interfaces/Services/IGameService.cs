@@ -8,13 +8,13 @@ namespace Backend.Interfaces.Services;
 
 public interface IGameService
 {
-    public Task<ServiceResult<IEnumerable<Game>>> GetAllAsync();
-    public Task<ServiceResult<IEnumerable<Game>>> GetUserGamesAsync(string userId);
+    public Task<ServiceResult<IEnumerable<Game>>> GetAllAsync(bool all, SearchParameters searchParameters);
+    public Task<ServiceResult<IEnumerable<Game>>> GetUserGamesAsync(SearchParameters searchParameters, string userId);
     public Task<ServiceResult<Game>> GetAsync(Guid gameId);
     public Task<ServiceResult<Game>> CreateAsync(AddGameDto addGameDto, string userId);
     public Task<ServiceResult<bool>> UpdateAsync(EditGameDto editGameDto, Game game);
     public Task<ServiceResult<bool>> DeleteAsync(Game game);
-    public Task<ServiceResult<bool>> TeamRequestJoinAsync(RequestJoinGameDto requestJoinGameDto, Game game, Team team);
+    public Task<ServiceResult<bool>> TeamRequestJoinAsync(Game game, Team team);
     public Task<ServiceResult<Game>> AddTeamAsync(AddTeamToGameDto addTeamToGameDto, Game game);
     public Task<ServiceResult<bool>> RemoveTeamAsync(bool team, Game game);
     public Task<ServiceResult<bool>> StartAsync(Game game);

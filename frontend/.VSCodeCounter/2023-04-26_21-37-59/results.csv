@@ -1,0 +1,88 @@
+"filename", "language", "TypeScript", "TypeScript JSX", "CSS", "comment", "blank", "total"
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\App.tsx", "TypeScript JSX", 0, 61, 0, 0, 9, 70
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\auth\LoginForm.tsx", "TypeScript JSX", 0, 118, 0, 0, 7, 125
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\auth\LogoutForm.tsx", "TypeScript JSX", 0, 25, 0, 0, 3, 28
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\auth\RegisterForm.tsx", "TypeScript JSX", 0, 133, 0, 0, 8, 141
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\CreateGameForm.tsx", "TypeScript JSX", 0, 285, 0, 0, 11, 296
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\EditGameForm.tsx", "TypeScript JSX", 0, 302, 0, 0, 14, 316
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\AcceptGameTeamModal.tsx", "TypeScript JSX", 0, 74, 0, 0, 5, 79
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\ChangeScoreModal.tsx", "TypeScript JSX", 0, 144, 0, 0, 5, 149
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\DeleteGameModal.tsx", "TypeScript JSX", 0, 63, 0, 0, 8, 71
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\GameSetComponent.tsx", "TypeScript JSX", 0, 69, 0, 0, 6, 75
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\GameSets.tsx", "TypeScript JSX", 0, 69, 0, 0, 7, 76
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\RequestJoinGameModal.tsx", "TypeScript JSX", 0, 74, 0, 0, 5, 79
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\SetPlayerComponent.tsx", "TypeScript JSX", 0, 107, 0, 0, 6, 113
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\SetTable.tsx", "TypeScript JSX", 0, 124, 0, 0, 5, 129
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameBigCard\index.tsx", "TypeScript JSX", 0, 914, 0, 10, 39, 963
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameList\GameSmallCard.tsx", "TypeScript JSX", 0, 65, 0, 0, 6, 71
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\game\GameList\index.tsx", "TypeScript JSX", 0, 94, 0, 0, 9, 103
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\BackButton.tsx", "TypeScript JSX", 0, 13, 0, 0, 4, 17
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\Footer.tsx", "TypeScript JSX", 0, 28, 0, 0, 9, 37
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\Layout.tsx", "TypeScript JSX", 0, 27, 0, 0, 7, 34
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\Loader.tsx", "TypeScript JSX", 0, 18, 0, 0, 5, 23
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\MainContent.tsx", "TypeScript JSX", 0, 15, 0, 0, 4, 19
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\Navbar.tsx", "TypeScript JSX", 0, 230, 0, 0, 19, 249
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\layout\NotificationSnackbar.tsx", "TypeScript JSX", 0, 23, 0, 1, 6, 30
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\profile\EditProfile.tsx", "TypeScript JSX", 0, 143, 0, 0, 10, 153
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\profile\Profile.tsx", "TypeScript JSX", 0, 177, 0, 0, 8, 185
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\CreateTeamForm.tsx", "TypeScript JSX", 0, 116, 0, 0, 9, 125
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\EditTeamForm.tsx", "TypeScript JSX", 0, 141, 0, 0, 9, 150
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\TeamBigCard\AddPlayerModal.tsx", "TypeScript JSX", 0, 56, 0, 0, 5, 61
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\TeamBigCard\DeleteTeamModal.tsx", "TypeScript JSX", 0, 66, 0, 0, 9, 75
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\TeamBigCard\RemovePlayerModal.tsx", "TypeScript JSX", 0, 74, 0, 0, 5, 79
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\TeamBigCard\index.tsx", "TypeScript JSX", 0, 257, 0, 0, 18, 275
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\TeamList\TeamSmallCard.tsx", "TypeScript JSX", 0, 41, 0, 0, 5, 46
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\team\TeamList\index.tsx", "TypeScript JSX", 0, 99, 0, 0, 10, 109
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\CreateTournamentForm.tsx", "TypeScript JSX", 0, 335, 0, 0, 14, 349
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\EditTournamentForm.tsx", "TypeScript JSX", 0, 339, 0, 0, 14, 353
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentBigCard\AcceptTournamentTeamModal.tsx", "TypeScript JSX", 0, 74, 0, 0, 5, 79
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentBigCard\DeleteTournamentModal.tsx", "TypeScript JSX", 0, 63, 0, 0, 8, 71
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentBigCard\RemoveTournamentTeamModal.tsx", "TypeScript JSX", 0, 74, 0, 0, 5, 79
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentBigCard\RequestJoinTournamentModal.tsx", "TypeScript JSX", 0, 74, 0, 0, 5, 79
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentBigCard\TournamentBracket.tsx", "TypeScript JSX", 0, 109, 0, 2, 15, 126
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentBigCard\index.tsx", "TypeScript JSX", 0, 483, 0, 0, 29, 512
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentList\TournamentSmallCard.tsx", "TypeScript JSX", 0, 44, 0, 0, 6, 50
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\components\tournament\TournamentList\index.tsx", "TypeScript JSX", 0, 94, 0, 0, 8, 102
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\index.css", "CSS", 0, 0, 25, 0, 6, 31
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\index.tsx", "TypeScript JSX", 0, 36, 0, 3, 5, 44
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\AdminPanel.tsx", "TypeScript JSX", 0, 55, 0, 0, 8, 63
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Auth\LoginPage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Auth\LogoutPage.tsx", "TypeScript JSX", 0, 20, 0, 0, 6, 26
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Auth\RegisterPage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\EmptyPage.tsx", "TypeScript JSX", 0, 5, 0, 0, 3, 8
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Game\AllGamesPage.tsx", "TypeScript JSX", 0, 49, 0, 0, 4, 53
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Game\CreateGamePage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Game\EditGamePage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Game\GamePage.tsx", "TypeScript JSX", 0, 30, 0, 0, 5, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Game\MyGamesPage.tsx", "TypeScript JSX", 0, 57, 0, 0, 6, 63
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\NotFoundPage.tsx", "TypeScript JSX", 0, 18, 0, 0, 4, 22
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Profile\EditProfilePage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Profile\ProfilePage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\StartingPage.tsx", "TypeScript JSX", 0, 114, 0, 0, 5, 119
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Team\CreateTeamPage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Team\EditTeamPage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Team\MyTeamsPage.tsx", "TypeScript JSX", 0, 57, 0, 0, 6, 63
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Team\TeamPage.tsx", "TypeScript JSX", 0, 43, 0, 0, 5, 48
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Tournament\AllTournamentsPage.tsx", "TypeScript JSX", 0, 49, 0, 0, 4, 53
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Tournament\CreateTournamentPage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Tournament\EditTournamentPage.tsx", "TypeScript JSX", 0, 29, 0, 0, 6, 35
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Tournament\MyTournamentsPage.tsx", "TypeScript JSX", 0, 57, 0, 0, 6, 63
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\pages\Tournament\TournamentPage.tsx", "TypeScript JSX", 0, 43, 0, 0, 5, 48
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\react-app-env.d.ts", "TypeScript", 0, 0, 0, 1, 1, 2
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\reportWebVitals.ts", "TypeScript", 13, 0, 0, 0, 3, 16
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\admin.service.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\api.ts", "TypeScript", 62, 0, 0, 0, 11, 73
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\auth.service.ts", "TypeScript", 40, 0, 0, 0, 5, 45
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\game.service.ts", "TypeScript", 121, 0, 0, 0, 15, 136
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\set.service.ts", "TypeScript", 5, 0, 0, 0, 1, 6
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\team.service.ts", "TypeScript", 55, 0, 0, 0, 9, 64
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\tournament.service.ts", "TypeScript", 102, 0, 0, 0, 13, 115
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\services\user.service.ts", "TypeScript", 21, 0, 0, 0, 3, 24
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\setupTests.ts", "TypeScript", 1, 0, 0, 4, 1, 6
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\store\alert-slice.ts", "TypeScript", 27, 0, 0, 0, 5, 32
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\store\auth-slice.ts", "TypeScript", 40, 0, 0, 0, 7, 47
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\store\index.ts", "TypeScript", 44, 0, 0, 0, 8, 52
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\utils\helpers.ts", "TypeScript", 31, 0, 0, 1, 5, 37
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\utils\hooks.ts", "TypeScript", 5, 0, 0, 0, 2, 7
+"c:\Stuff\KTU\8 semestras\bakalauras\tournaments\frontend\src\utils\types.ts", "TypeScript", 163, 0, 0, 0, 15, 178
+"Total", "-", 735, 6857, 25, 22, 647, 8286

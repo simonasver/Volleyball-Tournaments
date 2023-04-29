@@ -27,14 +27,12 @@ public static class TournamentExtensions
         {
             return;
         }
-        else
+
+        tournamentMatchesList.Add(currentMatch);
+        if (currentMatch.FirstParent != null && currentMatch.SecondParent != null)
         {
-            tournamentMatchesList.Add(currentMatch);
-            if (currentMatch.FirstParent != null && currentMatch.SecondParent != null)
-            {
-                AddTournamentMatchesToList(currentMatch.FirstParent, tournamentMatchesList);
-                AddTournamentMatchesToList(currentMatch.SecondParent, tournamentMatchesList);
-            }
+            AddTournamentMatchesToList(currentMatch.FirstParent, tournamentMatchesList);
+            AddTournamentMatchesToList(currentMatch.SecondParent, tournamentMatchesList);
         }
     }
 }

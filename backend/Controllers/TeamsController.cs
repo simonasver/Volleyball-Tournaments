@@ -1,6 +1,9 @@
-﻿using Backend.Auth.Model;
+﻿using System.Text.Json;
+using Backend.Auth.Model;
 using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;
+using Backend.Data.Entities.Utils;
+using Backend.Helpers.Extensions;
 using Backend.Helpers.Utils;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
@@ -26,24 +29,52 @@ public class TeamsController : ControllerBase
     }
 
     [Authorize(Roles = ApplicationUserRoles.Admin)]
-    [HttpGet("/api/[controller]")]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("/api/[controller]", Name = "GetTeams")]
+    public async Task<IActionResult> GetAll([FromQuery] SearchParameters searchParameters)
     {
-        var teamsResult = await _teamService.GetAllAsync();
+        var teamsResult = await _teamService.GetAllAsync(searchParameters);
 
-        if (teamsResult.IsSuccess)
-        {
-            return Ok(teamsResult.Data);
-        }
-        else
+        if (!teamsResult.IsSuccess)
         {
             return StatusCode(teamsResult.ErrorStatus, teamsResult.ErrorMessage);
         }
+
+        var teams = (PagedList<Team>)teamsResult.Data;
+
+        var previousPageLink = teams.HasPrevious
+            ? Url.Link("GetTeams", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = teams.HasNext
+            ? Url.Link("GetTeams", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+        
+        var paginationMetadata = new
+        {
+            totalCount = teams.TotalCount,
+            pageSize = teams.PageSize,
+            currentPage = teams.CurrentPage,
+            totalPages = teams.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+        
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        return Ok(teams);
     }
 
     [Authorize]
-    [HttpGet("/api/Users/{userId}/[controller]")]
-    public async Task<IActionResult> GetUserTeams(string userId)
+    [HttpGet("/api/Users/{userId}/[controller]", Name = "GetUserTeams")]
+    public async Task<IActionResult> GetUserTeams([FromQuery] SearchParameters searchParameters, string userId)
     {
         if (User.Identity == null)
         {
@@ -66,15 +97,42 @@ public class TeamsController : ControllerBase
             }
         }
         
-        var userTeamsResult = await _teamService.GetUserTeamsAsync(userId);
-        if (userTeamsResult.IsSuccess)
-        {
-            return Ok(userTeamsResult.Data);
-        }
-        else
+        var userTeamsResult = await _teamService.GetUserTeamsAsync(searchParameters, userId);
+        if (!userTeamsResult.IsSuccess)
         {
             return StatusCode(userTeamsResult.ErrorStatus, userTeamsResult.ErrorMessage);
         }
+        var userTeams = (PagedList<Team>)userTeamsResult.Data;
+        
+        var previousPageLink = userTeams.HasPrevious
+            ? Url.Link("GetUserTeams", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = userTeams.HasNext
+            ? Url.Link("GetUserTeams", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+        
+        var paginationMetadata = new
+        {
+            totalCount = userTeams.TotalCount,
+            pageSize = userTeams.PageSize,
+            currentPage = userTeams.CurrentPage,
+            totalPages = userTeams.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+        
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+        
+        return Ok(userTeams);
     }
     
     [AllowAnonymous]
@@ -87,10 +145,8 @@ public class TeamsController : ControllerBase
         {
             return Ok(teamResult.Data);
         }
-        else
-        {
-            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
-        }
+
+        return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
     }
 
     [Authorize]
@@ -115,10 +171,8 @@ public class TeamsController : ControllerBase
         {
             return CreatedAtAction(nameof(Post), createdTeamResult.Data.Id);
         }
-        else
-        {
-            return StatusCode(createdTeamResult.ErrorStatus, createdTeamResult.ErrorMessage);
-        }
+
+        return StatusCode(createdTeamResult.ErrorStatus, createdTeamResult.ErrorMessage);
     }
 
     [Authorize]

@@ -1,17 +1,18 @@
-import { GameScore } from "../utils/types";
+import { formatPaginationDataToQuery } from "../utils/helpers";
+import { Game, GameScore, GameSet, Log, PageData } from "../utils/types";
 import api from "./api";
 
-export const getGames = async (signal?: AbortSignal) => {
-  const res = await api.get("/Games", { signal: signal });
+export const getGames = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Game[], pagination: PageData }> => {
+  const res = await api.get(`/Games?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
   return res.data;
 };
 
-export const getUserGames = async (userId: string, signal?: AbortSignal) => {
-  const res = await api.get(`/Users/${userId}/Games`, { signal: signal });
+export const getUserGames = async (userId: string, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Game[], pagination: PageData }> => {
+  const res = await api.get(`/Users/${userId}/Games?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
   return res.data;
 };
 
-export const getGame = async (gameId: string, signal?: AbortSignal) => {
+export const getGame = async (gameId: string, signal?: AbortSignal): Promise<Game> => {
   const res = await api.get(`/Games/${gameId}`, { signal: signal });
   return res.data;
 };
@@ -100,7 +101,7 @@ export const startGame = async (gameId: string) => {
   return res.data;
 };
 
-export const getGameSets = async (gameId: string, signal?: AbortSignal) => {
+export const getGameSets = async (gameId: string, signal?: AbortSignal): Promise<GameSet[]> => {
   const res = await api.get(`/Games/${gameId}/Sets`, { signal: signal });
   return res.data;
 };
@@ -129,7 +130,7 @@ export const changeGameSetStats = async (gameId: string, setId: string, playerId
   return res.data;
 }
 
-export const getGameLogs = async (gameId: string, signal?: AbortSignal) => {
+export const getGameLogs = async (gameId: string, signal?: AbortSignal): Promise<Log[]> => {
   const res = await api.get(`/Games/${gameId}/Logs`, { signal: signal });
   return res.data;
 };

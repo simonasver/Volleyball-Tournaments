@@ -35,6 +35,12 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (res) => {
+    if(res.headers.pagination) {
+      const pagination = JSON.parse(res.headers.pagination);
+      if(pagination) {
+        res.data = { data: res.data, pagination };
+      }
+    }
     return res;
   },
   async (err) => {

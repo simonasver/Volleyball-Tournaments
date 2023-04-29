@@ -1,5 +1,7 @@
 ﻿using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
+using Backend.Data.Entities.Utils;
+using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +20,24 @@ public class TournamentRepository : ITournamentRepository
     public async Task<IEnumerable<Tournament>> GetAllAsync()
     {
         return await _dbContext.Tournaments.Include(x => x.AcceptedTeams).OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Tournament>> GetAllAsync(bool all, SearchParameters searchParameters)
+    {
+        var queryable = _dbContext.Tournaments.AsQueryable();
+        if (!all)
+        {
+            queryable = queryable.Where(x => !x.IsPrivate);
+        }
+
+        queryable = queryable.OrderByDescending(x => x.CreateDate);
+        return await PagedList<Tournament>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
+    }
+
+    public async Task<IEnumerable<Tournament>> GetAllUserAsync(SearchParameters searchParameters, string userId)
+    {
+        var queryable = _dbContext.Tournaments.AsQueryable().OrderByDescending(x => x.CreateDate).Where(x => x.OwnerId == userId);
+        return await PagedList<Tournament>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<Tournament?> GetAsync(Guid tournamentId)

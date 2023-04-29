@@ -1,4 +1,6 @@
 ﻿using Backend.Data.Entities.Team;
+using Backend.Data.Entities.Utils;
+using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +16,21 @@ public class TeamRepository : ITeamRepository
         _dbContext = dbContext;
     }
 
-    
     public async Task<IEnumerable<Team>> GetAllAsync()
     {
         return await _dbContext.Teams.ToListAsync();
+    }
+    public async Task<IEnumerable<Team>> GetAllAsync(SearchParameters searchParameters)
+    {
+        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate);
+        return await PagedList<Team>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
+    }
+
+    public async Task<IEnumerable<Team>> GetAllUserAsync(SearchParameters searchParameters, string userId)
+    {
+        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate)
+            .Where(x => x.OwnerId == userId);
+        return await PagedList<Team>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<Team?> GetAsync(Guid teamId)

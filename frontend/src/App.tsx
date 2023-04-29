@@ -39,19 +39,19 @@ function App() {
         <Route path="/editprofile" element={<EditProfilePage />} />
         <Route path="/admin" element={<AdminPanel />} />
 
-        <Route path="/myteams" element={<MyTeamsPage />} />
+        <Route path={`/myteams`} element={<MyTeamsPage />} />
         <Route path="/team/:teamId" element={<TeamPage />} />
         <Route path="/createteam" element={<CreateTeamPage />} />
         <Route path="/editteam/:teamId" element={<EditTeamPage />} />
 
-        <Route path="/games" element={<AllGamesPage />} />
-        <Route path="/mygames" element={<MyGamesPage />} />
+        <Route path={`/games/`} element={<AllGamesPage />} />
+        <Route path={`/mygames/`} element={<MyGamesPage />} />
         <Route path="/game/:gameId" element={<GamePage />} />
         <Route path="/creategame" element={<CreateGamePage />} />
         <Route path="/editgame/:gameId" element={<EditGamePage />} />
 
-        <Route path="/tournaments" element={<AllTournamentsPage />} />
-        <Route path="/mytournaments" element={<MyTournamentsPage />} />
+        <Route path={`/tournaments/`} element={<AllTournamentsPage />} />
+        <Route path={`/mytournaments/`} element={<MyTournamentsPage />} />
         <Route path="/tournament/:tournamentId" element={<TournamentPage />} />
         <Route path="/createtournament" element={<CreateTournamentPage />} />
         <Route
