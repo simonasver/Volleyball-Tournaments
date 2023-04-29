@@ -10,5 +10,6 @@ public class ApplicationUser : IdentityUser
     public string FullName { get; set; }
     public DateTime RegisterDate { get; set; }
     public DateTime LastLoginDate { get; set; }
+    public bool Banned { get; set; }
 }
 

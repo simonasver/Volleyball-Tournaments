@@ -22,7 +22,8 @@ import MyTournamentsPage from "./pages/Tournament/MyTournamentsPage";
 import TournamentPage from "./pages/Tournament/TournamentPage";
 import CreateTournamentPage from "./pages/Tournament/CreateTournamentPage";
 import EditTournamentPage from "./pages/Tournament/EditTournamentPage";
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanelPage from "./pages/Admin/AdminPanelPage";
+import UsersListPage from "./pages/Admin/UsersListPage";
 
 function App() {
   return (
@@ -37,7 +38,8 @@ function App() {
 
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/editprofile" element={<EditProfilePage />} />
-        <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/admin" element={<AdminPanelPage />} />
+        <Route path="/users" element={<UsersListPage />} />
 
         <Route path={`/myteams`} element={<MyTeamsPage />} />
         <Route path="/team/:teamId" element={<TeamPage />} />

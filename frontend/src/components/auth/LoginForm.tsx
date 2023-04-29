@@ -37,7 +37,7 @@ const LoginForm = () => {
             email: res.userEmail,
             fullName: res.fullName,
             profilePictureUrl: res.profilePictureUrl,
-            roles: res.userRoles,
+            roles: res.roles,
           })
         );
         dispatch(

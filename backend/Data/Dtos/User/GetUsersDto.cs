@@ -1,7 +1,8 @@
-﻿namespace Backend.Data.Dtos.User;
+namespace Backend.Data.Dtos.User;
 
-public class GetUserDto
+public class GetUsersUserDto
 {
+    public string Id { get; set; }
     public string ProfilePictureUrl { get; set; }
     public string UserName { get; set; }
     public string FullName { get; set; }
@@ -11,9 +12,10 @@ public class GetUserDto
     public IList<string> Roles { get; set; }
     public bool Banned { get; set; }
 
-    public GetUserDto(string profilePictureUrl, string userName, string fullName, string email, DateTime registerDate,
+    public GetUsersUserDto(string id, string profilePictureUrl, string userName, string fullName, string email, DateTime registerDate,
         DateTime lastLoginDate, IList<string> userRoles, bool banned)
     {
+        Id = id;
         ProfilePictureUrl = profilePictureUrl;
         UserName = userName;
         FullName = fullName;

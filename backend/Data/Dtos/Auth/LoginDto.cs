@@ -18,7 +18,7 @@ public class LoginDtoResponse
     public string UserName { get; set; }
     public string FullName { get; set; }
     public string UserEmail { get; set; }
-    public IList<string> UserRoles { get; set; }
+    public IList<string> Roles { get; set; }
 
     public LoginDtoResponse(string accessToken, string refreshToken, string userId, string profilePictureUrl, string userName, string fullName, string userEmail,
         IList<string> userRoles)
@@ -30,6 +30,6 @@ public class LoginDtoResponse
         UserName = userName;
         FullName = fullName;
         UserEmail = userEmail;
-        UserRoles = userRoles;
+        Roles = userRoles;
     }
 }

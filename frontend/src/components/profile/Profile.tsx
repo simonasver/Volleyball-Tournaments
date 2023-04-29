@@ -38,7 +38,7 @@ const Profile = () => {
               profilePictureUrl: res.profilePictureUrl,
               registerDate: new Date(res.registerDate).toLocaleString(),
               lastLoginDate: new Date(res.lastLoginDate).toLocaleString(),
-              roles: res.userRoles,
+              roles: res.roles,
             })
           );
           setIsLoading(false);

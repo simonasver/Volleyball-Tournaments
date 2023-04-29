@@ -12,12 +12,13 @@ interface TeamSmallCardProps {
   title: string;
   imageUrl?: string;
   description?: string;
+  players: number;
   createDate: string;
   onButtonPress: () => void;
 }
 
 const TeamSmallCard = (props: TeamSmallCardProps) => {
-  const { title, imageUrl, description, createDate, onButtonPress } = props;
+  const { title, imageUrl, description, players, createDate, onButtonPress } = props;
   return (
     <Card sx={{ width: { xs: "100%", md: "70%" } }}>
       <CardHeader title={title} />
@@ -31,6 +32,7 @@ const TeamSmallCard = (props: TeamSmallCardProps) => {
 
       <CardContent>
         <Typography variant="body1">{description}</Typography>
+        <Typography variant="body1">Players: {players}</Typography>
         <Typography variant="body2" color="text.secondary">
           Created at: {createDate}
         </Typography>

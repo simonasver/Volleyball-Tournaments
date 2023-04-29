@@ -30,6 +30,11 @@ public class TokensController : ControllerBase
             return BadRequest("User Name or password is invalid");
         }
 
+        if (user.Banned)
+        {
+            return Forbid();
+        }
+
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
         if (!isPasswordValid)
         {
@@ -75,6 +80,11 @@ public class TokensController : ControllerBase
         if(user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiration <= DateTime.Now)
         {
             return BadRequest("Bad user or token");
+        }
+        
+        if (user.Banned)
+        {
+            return Forbid();
         }
 
         var roles = await _userManager.GetRolesAsync(user);

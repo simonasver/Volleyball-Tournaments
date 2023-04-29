@@ -22,13 +22,13 @@ public class TeamRepository : ITeamRepository
     }
     public async Task<IEnumerable<Team>> GetAllAsync(SearchParameters searchParameters)
     {
-        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate);
+        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate).Include(x => x.Players);
         return await PagedList<Team>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<IEnumerable<Team>> GetAllUserAsync(SearchParameters searchParameters, string userId)
     {
-        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate)
+        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate).Include(x => x.Players)
             .Where(x => x.OwnerId == userId);
         return await PagedList<Team>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }

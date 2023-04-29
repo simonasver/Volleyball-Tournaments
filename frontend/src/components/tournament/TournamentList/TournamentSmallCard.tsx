@@ -1,5 +1,5 @@
 import { Button, Card, CardActions, CardContent, CardHeader, CardMedia, Chip, Typography } from "@mui/material";
-import { TournamentStatus } from "../../../utils/types";
+import { GameTeam, TournamentStatus } from "../../../utils/types";
 
 interface TournamentSmallCardProps {
     id: string;
@@ -10,18 +10,19 @@ interface TournamentSmallCardProps {
     status: TournamentStatus;
     teamCount: number;
     maxTeams: number;
+    winner: GameTeam;
     onButtonPress: () => void;
   }
 
 const TournamentSmallCard = (props: TournamentSmallCardProps) => {
 
-    const { title, pictureUrl, description, createDate, status, teamCount, maxTeams, onButtonPress } = props;
+    const { title, pictureUrl, description, createDate, status, teamCount, maxTeams, winner, onButtonPress } = props;
 
   return (
     <Card sx={{ width: { xs: "100%", md: "70%" } }}>
       <CardHeader
         title={title}
-        subheader={<Chip label={TournamentStatus[status]} size="small" />}
+        subheader={<><Chip label={TournamentStatus[status]} size="small" />{winner && <Chip color="primary" label={"Winner: " + winner.title} size="small" />}</>}
       />
       {pictureUrl && (
         <CardMedia

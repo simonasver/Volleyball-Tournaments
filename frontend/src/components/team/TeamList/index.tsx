@@ -3,7 +3,13 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { PageData, Team } from "../../../utils/types";
 import { useAppSelector } from "../../../utils/hooks";
 import { getTeams, getUserTeams } from "../../../services/team.service";
-import { errorMessageFromAxiosError, formatPaginationDataToQuery, getDefaultPageSize, getDefaultPaginationData, isAdmin } from "../../../utils/helpers";
+import {
+  errorMessageFromAxiosError,
+  formatPaginationDataToQuery,
+  getDefaultPageSize,
+  getDefaultPaginationData,
+  isAdmin,
+} from "../../../utils/helpers";
 import { Alert, Pagination, Typography } from "@mui/material";
 import Loader from "../../layout/Loader";
 import TeamSmallCard from "./TeamSmallCard";
@@ -18,7 +24,10 @@ const TeamList = (props: TeamListProps) => {
   const navigate = useNavigate();
 
   const [query, setQuery] = useSearchParams();
-  const [currentPage, setCurrentPage] = React.useState<{ pageNumber: number, pageSize: number }>({ pageNumber: 1, pageSize: getDefaultPageSize() });
+  const [currentPage, setCurrentPage] = React.useState<{
+    pageNumber: number;
+    pageSize: number;
+  }>({ pageNumber: 1, pageSize: getDefaultPageSize() });
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -35,10 +44,15 @@ const TeamList = (props: TeamListProps) => {
   };
 
   React.useEffect(() => {
-    const pageNumber: number = parseInt(query.get("pageNumber") ?? "") ?? getDefaultPageSize();
+    const pageNumber: number =
+      parseInt(query.get("pageNumber") ?? "") ?? getDefaultPageSize();
     const pageSize: number = parseInt(query.get("pageSize") ?? "") ?? 1;
-    if(!pageNumber && !pageSize) {
-      navigate(`/${all ? "teams" : "myteams"}?${formatPaginationDataToQuery(getDefaultPaginationData())}`);
+    if (!pageNumber && !pageSize) {
+      navigate(
+        `/${all ? "teams" : "myteams"}?${formatPaginationDataToQuery(
+          getDefaultPaginationData()
+        )}`
+      );
     } else {
       setSearchParams(pageNumber, pageSize);
     }
@@ -53,7 +67,11 @@ const TeamList = (props: TeamListProps) => {
         if (!isAdmin(user)) {
           return navigate("/", { replace: true });
         } else {
-          getTeams(currentPage?.pageNumber, currentPage?.pageSize, abortController.signal)
+          getTeams(
+            currentPage?.pageNumber,
+            currentPage?.pageSize,
+            abortController.signal
+          )
             .then((res) => {
               setError("");
               setTeams(res.data);
@@ -70,7 +88,12 @@ const TeamList = (props: TeamListProps) => {
             });
         }
       } else {
-        getUserTeams(user.id, currentPage?.pageNumber, currentPage?.pageSize, abortController.signal)
+        getUserTeams(
+          user.id,
+          currentPage?.pageNumber,
+          currentPage?.pageSize,
+          abortController.signal
+        )
           .then((res) => {
             setError("");
             setTeams(res.data);
@@ -108,6 +131,7 @@ const TeamList = (props: TeamListProps) => {
               title={item.title}
               imageUrl={item.pictureUrl}
               description={item.description}
+              players={item.players?.length ?? 0}
               onButtonPress={() => navigate(`/team/${item.id}`)}
               createDate={new Date(item.createDate).toLocaleString()}
             />
@@ -122,7 +146,16 @@ const TeamList = (props: TeamListProps) => {
           You have no teams yet. Create one!
         </Typography>
       )}
-      {pagination && <Pagination defaultPage={currentPage?.pageNumber} count={pagination.totalPages} onChange={(event: React.ChangeEvent<unknown>, page: number) => setSearchParams(page, currentPage.pageSize)} color="primary"/>}
+      {pagination && (
+        <Pagination
+          defaultPage={currentPage.pageNumber}
+          count={pagination.totalPages}
+          onChange={(event: React.ChangeEvent<unknown>, page: number) =>
+            setSearchParams(page, currentPage.pageSize)
+          }
+          color="primary"
+        />
+      )}
     </>
   );
 };

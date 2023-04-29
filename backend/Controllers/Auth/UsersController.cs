@@ -1,10 +1,15 @@
-﻿using Backend.Auth.Model;
+﻿using System.Text.Json;
+using Backend.Auth.Model;
+using Backend.Data.Dtos.Admin;
 using Backend.Data.Dtos.Auth;
 using Backend.Data.Dtos.User;
+using Backend.Data.Entities.Utils;
+using Backend.Helpers.Extensions;
 using Backend.Helpers.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers.Auth;
 
@@ -40,7 +45,8 @@ public class UsersController : ControllerBase
             UserName = userRegisterDto.UserName,
             FullName = userRegisterDto.FullName ?? userRegisterDto.UserName,
             RegisterDate = DateTime.Now,
-            LastLoginDate = DateTime.Now
+            LastLoginDate = DateTime.Now,
+            Banned = false
         };
         var createUserResult = await _userManager.CreateAsync(newUser, userRegisterDto.Password);
         if (!createUserResult.Succeeded)
@@ -58,6 +64,50 @@ public class UsersController : ControllerBase
         };
 
         return CreatedAtAction(nameof(Register), newUserDto);
+    }
+
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
+    [HttpGet("/api/[controller]", Name = "GetUsers")]
+    public async Task<IActionResult> GetAll([FromQuery] SearchParameters searchParameters)
+    {
+        var users = await PagedList<ApplicationUser>.CreateAsync(_userManager.Users, searchParameters.PageNumber, searchParameters.PageSize);
+        
+        var previousPageLink = users.HasPrevious
+            ? Url.Link("GetUsers", new
+            {
+                pageNumber = searchParameters.PageNumber - 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+
+        var nextPageLink = users.HasNext
+            ? Url.Link("GetUsers", new
+            {
+                pageNumber = searchParameters.PageNumber + 1,
+                pageSize = searchParameters.PageSize
+            })
+            : null;
+        
+        var paginationMetadata = new
+        {
+            totalCount = users.TotalCount,
+            pageSize = users.PageSize,
+            currentPage = users.CurrentPage,
+            totalPages = users.TotalPages,
+            previousPageLink,
+            nextPageLink
+        };
+        
+        Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
+
+        List<GetUsersUserDto> usersDto = new List<GetUsersUserDto>();
+        
+        foreach (var user in users)
+        {
+            usersDto.Add(new GetUsersUserDto(user.Id, user.ProfilePictureUrl ?? "", user.UserName, user.FullName, user.Email, user.RegisterDate, user.LastLoginDate, await _userManager.GetRolesAsync(user), user.Banned));
+        }
+
+        return Ok(usersDto);
     }
 
     [Authorize]
@@ -86,8 +136,7 @@ public class UsersController : ControllerBase
 
         var roles = await _userManager.GetRolesAsync(user);
 
-        return Ok(new GetUserDto(user.ProfilePictureUrl ?? "", user.UserName, user.FullName, user.Email, user.RegisterDate, user.LastLoginDate, roles));
-
+        return Ok(new GetUserDto(user.ProfilePictureUrl ?? "", user.UserName, user.FullName, user.Email, user.RegisterDate, user.LastLoginDate, roles, user.Banned));
     }
     
     [Authorize]
@@ -131,5 +180,22 @@ public class UsersController : ControllerBase
         await _userManager.UpdateAsync(userToEdit);
 
         return Ok();
+    }
+
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
+    [HttpPatch("/api/[controller]/{userId}/Banned")]
+    public async Task<IActionResult> Ban(string userId, [FromBody] BanDto banDto)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
+
+        user.Banned = banDto.Ban;
+
+        await _userManager.UpdateAsync(user);
+
+        return NoContent();
     }
 }
