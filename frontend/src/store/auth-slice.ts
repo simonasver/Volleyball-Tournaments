@@ -13,11 +13,11 @@ export interface User {
   profilePictureUrl?: string;
   registerDate?: string;
   lastLoginDate?: string;
-  roles: Roles[];
+  roles: UserRole[];
   banned?: boolean;
 }
 
-export enum Roles {
+export enum UserRole {
   User = "User",
   Admin = "Admin"
 }

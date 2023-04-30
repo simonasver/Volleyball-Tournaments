@@ -8,7 +8,7 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import { GameStatus, GameTeam } from "../../../utils/types";
+import { GameStatus, GameTeam, Team } from "../../../utils/types";
 
 interface GameSmallCardProps {
   id: string;
@@ -18,11 +18,13 @@ interface GameSmallCardProps {
   createDate: string;
   status: GameStatus;
   winner: GameTeam;
+  firstTeam: Team;
+  secondTeam: Team;
   onButtonPress: () => void;
 }
 
 const GameSmallCard = (props: GameSmallCardProps) => {
-  const { title, pictureUrl, description, createDate, status, winner, onButtonPress } = props;
+  const { title, pictureUrl, description, createDate, status, winner, firstTeam, secondTeam, onButtonPress } = props;
 
   let statusString = "";
   switch (status) {
@@ -55,6 +57,8 @@ const GameSmallCard = (props: GameSmallCardProps) => {
       )}
       <CardContent>
         <Typography variant="body1">{description}</Typography>
+        {firstTeam && <Typography variant="body1">First team: {firstTeam.title}</Typography>}
+        {secondTeam && <Typography variant="body1">Second team: {secondTeam.title}</Typography>}
         <Typography variant="body2" color="text.secondary">
           Created at: {createDate}
         </Typography>

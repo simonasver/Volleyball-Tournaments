@@ -15,12 +15,14 @@ public class TournamentService : ITournamentService
     private readonly ITournamentRepository _tournamentRepository;
     private readonly ITournamentMatchRepository _tournamentMatchRepository;
     private readonly IGameTeamRepository _gameTeamRepository;
+    private readonly ILogService _logService;
 
-    public TournamentService(ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, IGameTeamRepository gameTeamRepository)
+    public TournamentService(ITournamentRepository tournamentRepository, ITournamentMatchRepository tournamentMatchRepository, IGameTeamRepository gameTeamRepository, ILogService logService)
     {
         _tournamentRepository = tournamentRepository;
         _tournamentMatchRepository = tournamentMatchRepository;
         _gameTeamRepository = gameTeamRepository;
+        _logService = logService;
     }
     
     public async Task<ServiceResult<IEnumerable<Tournament>>> GetAllAsync(bool all, SearchParameters searchParameters)
@@ -174,7 +176,10 @@ public class TournamentService : ITournamentService
 
         if (editTournamentDto.SingleThirdPlace != null)
         {
-            tournament.SingleThirdPlace = editTournamentDto.SingleThirdPlace ?? false;
+            if (tournament.Status < TournamentStatus.Started)
+            {
+                tournament.SingleThirdPlace = editTournamentDto.SingleThirdPlace ?? false;
+            }
         }
         
         if (editTournamentDto.Basic != null)
@@ -262,6 +267,11 @@ public class TournamentService : ITournamentService
     {
         try
         {
+            var logsDeleteResult = await _logService.DeleteTournamentLogsAsync(tournament.Id);
+            if (!logsDeleteResult.IsSuccess)
+            {
+                return ServiceResult<bool>.Failure(logsDeleteResult.ErrorStatus, logsDeleteResult.ErrorMessage);
+            }
             await _tournamentRepository.DeleteAsync(tournament.Id);
             return ServiceResult<bool>.Success();
         }
@@ -402,6 +412,11 @@ public class TournamentService : ITournamentService
         tournament.LastEditDate = DateTime.Now;
 
         tournament.Matches = populatedMatches;
+
+        if (tournament.SingleThirdPlace)
+        {
+            tournament.Matches.Add(TournamentUtils.GenerateThirdPlaceMatch(tournament));
+        }
 
         try
         {

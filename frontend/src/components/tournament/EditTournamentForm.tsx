@@ -37,6 +37,7 @@ const EditTournamentForm = () => {
   const [title, setTitle] = React.useState("");
   const [pictureUrl, setPictureUrl] = React.useState("");
   const [isBasic, setIsBasic] = React.useState(true);
+  const [singleThirdPlace, setSingleThirdPlace] = React.useState(false);
   const [description, setDescription] = React.useState("");
   const [maxTeams, setMaxTeams] = React.useState(128);
   const [pointsToWin, setPointsToWin] = React.useState(25);
@@ -69,6 +70,7 @@ const EditTournamentForm = () => {
           setPictureUrl(res.pictureUrl);
           setDescription(res.description);
           setIsBasic(res.basic);
+          setSingleThirdPlace(res.singleThirdPlace);
           setMaxTeams(res.maxTeams);
           setPointsToWin(res.pointsToWin);
           setPointsToWinLastSet(res.pointsToWinLastSet);
@@ -104,6 +106,7 @@ const EditTournamentForm = () => {
       title,
       pictureUrl,
       description,
+      singleThirdPlace,
       isBasic,
       maxTeams,
       pointsToWin,
@@ -178,6 +181,20 @@ const EditTournamentForm = () => {
                 />
               }
               label="Private tournament"
+            />
+          </FormGroup>
+          <br />
+          <FormGroup>
+            <FormControlLabel
+              checked={singleThirdPlace}
+              control={
+                <Switch
+                  value={singleThirdPlace}
+                  onChange={() => setSingleThirdPlace((state) => !state)}
+                />
+              }
+              label="Match for third place"
+              disabled={status >= TournamentStatus.Started}
             />
           </FormGroup>
           <br />
@@ -340,7 +357,7 @@ const EditTournamentForm = () => {
             type="submit"
             sx={{ width: { xs: "100%", md: "inherit" } }}
           >
-            Edit
+            Save
           </Button>
         </Grid>
       </form>

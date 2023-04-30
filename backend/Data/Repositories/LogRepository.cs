@@ -56,4 +56,16 @@ public class LogRepository : ILogRepository
             await _dbContext.SaveChangesAsync();
         }
     }
+
+    public async Task DeleteAllGameAsync(Guid gameId)
+    {
+        _dbContext.Logs.RemoveRange(_dbContext.Logs.Where(x => x.Game.Id == gameId));
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAllTournamentAsync(Guid tournamentId)
+    {
+        _dbContext.Logs.RemoveRange(_dbContext.Logs.Where(x => x.Tournament.Id == tournamentId));
+        await _dbContext.SaveChangesAsync();
+    }
 }

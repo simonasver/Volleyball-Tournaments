@@ -198,4 +198,41 @@ public class UsersController : ControllerBase
 
         return NoContent();
     }
+
+    [Authorize(Roles = ApplicationUserRoles.Admin)]
+    [HttpPatch("/api/[controller]/{userId}/Roles")]
+    public async Task<IActionResult> AddRemoveRole(string userId, [FromBody] AddRemoveRoleDto addRemoveRoleDto)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
+
+        if (addRemoveRoleDto.Role.ToString() == ApplicationUserRoles.User)
+        {
+            return BadRequest("Cannot remove or add User role");
+        }
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+        if (addRemoveRoleDto.Add)
+        {
+            if (userRoles.Contains(addRemoveRoleDto.Role.ToString()))
+            {
+                return BadRequest("User already has the role " + addRemoveRoleDto.Role);
+            }
+            await _userManager.AddToRoleAsync(user, addRemoveRoleDto.Role.ToString());
+        }
+        else
+        {
+            if (!userRoles.Contains(addRemoveRoleDto.Role.ToString()))
+            {
+                return BadRequest("User is not in the role " + addRemoveRoleDto.Role);
+            }
+
+            await _userManager.RemoveFromRoleAsync(user, addRemoveRoleDto.Role.ToString());
+        }
+        
+        return NoContent();
+    }
 }

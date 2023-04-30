@@ -552,7 +552,7 @@ public class GamesController : ControllerBase
 
         if (!result.IsSuccess)
         {
-            return StatusCode(result.ErrorStatus, result.ErrorStatus);
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
 
         return NoContent();
@@ -623,7 +623,7 @@ public class GamesController : ControllerBase
             return BadRequest("Game does not exist");
         }
         
-        var logs = await _logService.GetGameLogs(gameId);
+        var logs = await _logService.GetGameLogsAsync(gameId);
 
         if (!logs.IsSuccess)
         {

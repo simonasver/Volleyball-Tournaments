@@ -48,6 +48,7 @@ public class TournamentMatchRepository : ITournamentMatchRepository
                 {
                     Id = x.Id,
                     Round = x.Round,
+                    ThirdPlace = x.ThirdPlace,
                     Game = x.Game,
                     FirstParentId = x.FirstParentId,
                     SecondParentId = x.SecondParentId,

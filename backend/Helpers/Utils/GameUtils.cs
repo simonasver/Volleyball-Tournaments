@@ -1,3 +1,4 @@
+using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 
@@ -112,5 +113,36 @@ public class GameUtils
         }
         game.Sets.Add(newSet);
         return game;
+    }
+    
+    public static GameTeam FindGameLoser(Game game) 
+    {
+        if (game.Winner == null)
+        {
+            throw new InvalidOperationException("Game does not have a winner");
+        }
+
+        if (game.FirstTeam == game.Winner)
+        {
+            return game.SecondTeam;
+        }
+        else
+        {
+            return game.FirstTeam;
+        }
+    }
+
+    public static GameTeam FindOtherTeam(Game game, GameTeam team)
+    {
+        if (game.FirstTeam == team && game.SecondTeam != null)
+        {
+            return game.SecondTeam;
+        }
+        if (game.SecondTeam == team && game.FirstTeam != null)
+        {
+            return game.FirstTeam;
+        }
+
+        throw new Exception("Not found");
     }
 }

@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { Bracket, BracketGame } from "react-tournament-bracket";
 import { TournamentMatch } from "../../../utils/types";
 import { Game } from "react-tournament-bracket/lib/components/model";
@@ -18,7 +18,10 @@ const MapGameDataToFrontEnd = (tournamentMatch: TournamentMatch) => {
     gameId: tournamentMatch.game?.id ?? "",
     name: tournamentMatch.game?.title ?? "",
     bracketLabel: "",
-    scheduled: Math.max(Number(new Date(tournamentMatch.game?.createDate ?? "")), Number(new Date(tournamentMatch.game?.startDate ?? -8640000000000000))),
+    scheduled: Math.max(
+      Number(new Date(tournamentMatch.game?.createDate ?? "")),
+      Number(new Date(tournamentMatch.game?.startDate ?? -8640000000000000))
+    ),
     sides: {
       home: {
         team: {
@@ -44,7 +47,7 @@ const MapGameDataToFrontEnd = (tournamentMatch: TournamentMatch) => {
 };
 
 const MapTournamentDataToFrontEnd = (tournamentGames: TournamentMatch[]) => {
-  if(!tournamentGames || tournamentGames.length === 0) {
+  if (!tournamentGames || tournamentGames.length === 0) {
     return undefined;
   }
 
@@ -69,7 +72,9 @@ const MapGameToParentGames = (
     return mappedGame;
   }
 
-  const firstParent = tournamentGames.find(x => x.id === tournamentGame.firstParentId);
+  const firstParent = tournamentGames.find(
+    (x) => x.id === tournamentGame.firstParentId
+  );
   if (firstParent) {
     mappedGame.sides.home.seed = {
       displayName: "",
@@ -81,7 +86,9 @@ const MapGameToParentGames = (
       sourcePool: {},
     };
   }
-  const secondParent = tournamentGames.find(x => x.id === tournamentGame.secondParentId);
+  const secondParent = tournamentGames.find(
+    (x) => x.id === tournamentGame.secondParentId
+  );
   if (secondParent) {
     mappedGame.sides.visitor.seed = {
       displayName: "",
@@ -101,8 +108,12 @@ const TournamentBracket = (props: TournamentBracketProps) => {
 
   const formattedGames = MapTournamentDataToFrontEnd(tournamentGames);
 
+  const thirdPlaceGame = tournamentGames.find((x) => x.thirdPlace);
+  const formattedThirdPlaceGame =
+    thirdPlaceGame && MapGameDataToFrontEnd(thirdPlaceGame);
+
   return (
-    <Box sx={{ width: "100%", overflow: "auto" }}>
+    <Box display={"flex"} sx={{ width: "100%", overflow: "auto" }}>
       <Box sx={{ width: "fit-content", margin: "0 auto" }}>
         {formattedGames && (
           <Bracket
@@ -110,7 +121,11 @@ const TournamentBracket = (props: TournamentBracketProps) => {
             GameComponent={TournamentBracketGameComponent}
           />
         )}
-        {/* <BracketGame game={MapGameDataToFrontEnd(tournamentGames[0])} /> */}
+      </Box>
+      <Box sx={{ width: "fit-content", marginRight: "auto" }}>
+        {formattedThirdPlaceGame && (
+          <TournamentBracketGameComponent game={formattedThirdPlaceGame} />
+        )}
       </Box>
     </Box>
   );
@@ -119,7 +134,12 @@ const TournamentBracket = (props: TournamentBracketProps) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TournamentBracketGameComponent = (props: any) => {
   const navigate = useNavigate();
-  return <BracketGame {...props} onClick={() => navigate(`/game/${props.game.gameId}`)} />;
+  return (
+    <BracketGame
+      {...props}
+      onClick={() => navigate(`/game/${props.game.gameId}`)}
+    />
+  );
 };
 
 export default TournamentBracket;

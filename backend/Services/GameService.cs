@@ -234,6 +234,11 @@ public class GameService : IGameService
         
         try
         {
+            var logsDeleteResult = await _logService.DeleteGameLogsAsync(game.Id);
+            if (!logsDeleteResult.IsSuccess)
+            {
+                return ServiceResult<bool>.Failure(logsDeleteResult.ErrorStatus, logsDeleteResult.ErrorMessage);
+            }
             await _gameRepository.DeleteAsync(game.Id);
             return ServiceResult<bool>.Success();
         }
@@ -501,7 +506,7 @@ public class GameService : IGameService
 
         if (changeSetPlayerScoreDto.Change)
         {
-            await _logService.CreateLog("Player " + player.Name + " score was increased by 1", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+            await _logService.CreateLogAsync("Player " + player.Name + " score was increased by 1", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
             player.Score++;
             if (!player.Team)
             {
@@ -510,20 +515,28 @@ public class GameService : IGameService
                                                         (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin) || set.Number != game.MaxSets && (set.FirstTeamScore >= game.PointsToWin &&
                         (set.FirstTeamScore - set.SecondTeamScore) >= game.PointDifferenceToWin))
                 {
-                    await _logService.CreateLog("First team won the " + set.Number + "set", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+                    await _logService.CreateLogAsync("First team won the " + set.Number + "set", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
                     set.Winner = set.FirstTeam;
                     set.Status = GameStatus.Finished;
                     game.FirstTeamScore++;
                     var nextSet = game.Sets.FirstOrDefault(x => x.Number == set.Number + 1);
                     if (game.FirstTeamScore >= (game.MaxSets + 1) / 2)
                     {
-                        await _logService.CreateLog("First team won the game", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+                        await _logService.CreateLogAsync("First team won the game", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
                         game.Winner = game.FirstTeam;
                         game.Status = GameStatus.Finished;
                         if (tournament != null)
                         {
-                            (tournament, tournamentMatchesToUpdate) =
-                                TournamentUtils.MatchesToUpdateInTournamentAfterWonMatch(tournament, tournamentMatch);
+                            try
+                            {
+                                (tournament, tournamentMatchesToUpdate) =
+                                    TournamentUtils.MatchesToUpdateInTournamentAfterWonMatch(tournament,
+                                        tournamentMatch);
+                            }
+                            catch (Exception ex)
+                            {
+                                return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+                            }
                         }
                     }
                     else
@@ -558,20 +571,28 @@ public class GameService : IGameService
                     (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin) || set.Number != game.MaxSets && ((set.SecondTeamScore >= game.PointsToWin &&
                         (set.SecondTeamScore - set.FirstTeamScore) >= game.PointDifferenceToWin)))
                 {
-                    await _logService.CreateLog("Second team won the " + set.Number + "set", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+                    await _logService.CreateLogAsync("Second team won the " + set.Number + "set", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
                     set.Winner = set.SecondTeam;
                     set.Status = GameStatus.Finished;
                     game.SecondTeamScore++;
                     var nextSet = game.Sets.FirstOrDefault(x => x.Number == set.Number + 1);
                     if (game.SecondTeamScore >= (game.MaxSets + 1) / 2)
                     {
-                        await _logService.CreateLog("Second team won the game", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+                        await _logService.CreateLogAsync("Second team won the game", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
                         game.Winner = game.SecondTeam;
                         game.Status = GameStatus.Finished;
                         if (tournament != null)
                         {
-                            (tournament, tournamentMatchesToUpdate) =
-                                TournamentUtils.MatchesToUpdateInTournamentAfterWonMatch(tournament, tournamentMatch);
+                            try
+                            {
+                                (tournament, tournamentMatchesToUpdate) =
+                                    TournamentUtils.MatchesToUpdateInTournamentAfterWonMatch(tournament,
+                                        tournamentMatch);
+                            }
+                            catch (Exception ex)
+                            {
+                                ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+                            }
                         }
                     }
                     else
@@ -603,7 +624,7 @@ public class GameService : IGameService
         {
             if (player.Score > 0)
             {
-                await _logService.CreateLog("Player " + player.Name + " score was decreased by 1", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+                await _logService.CreateLogAsync("Player " + player.Name + " score was decreased by 1", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
                 player.Score--;
                 if (!player.Team)
                 {
@@ -696,7 +717,7 @@ public class GameService : IGameService
 
         async Task CreateStatChangeLog(string stat)
         {
-            await _logService.CreateLog("Player " + player.Name + " " + stat + " were " + (changeSetPlayerStatsDto.Change ? "increased" : "decreased") + " by one", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
+            await _logService.CreateLogAsync("Player " + player.Name + " " + stat + " were " + (changeSetPlayerStatsDto.Change ? "increased" : "decreased") + " by one", false, userId, game: game, tournament: game.TournamentMatch?.Tournament);
         }
 
         string lessThanZeroMessage = "Cannot reduce to more than zero!";

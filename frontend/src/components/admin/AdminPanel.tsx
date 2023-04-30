@@ -1,11 +1,11 @@
 import React from "react";
 import { Button, Stack, Typography } from "@mui/material";
-import { generateTournament } from "../../services/admin.service";
 import { alertActions } from "../../store/alert-slice";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
 import { useAppDispatch } from "../../utils/hooks";
 import GenerateTournamentModal from "./GenerateTournamentsModal";
 import { useNavigate } from "react-router-dom";
+import { generateTournament } from "../../services/tournament.service";
 
 enum Modal {
   None = 0,
@@ -18,6 +18,10 @@ const AdminPanel = () => {
   const dispatch = useAppDispatch();
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
+
+  const closeModals = () => {
+    setModalStatus(Modal.None);
+  };
 
   const onGenerateSubmitHandler = (teamNumber: number) => {
     generateTournament(teamNumber)
@@ -77,7 +81,7 @@ const AdminPanel = () => {
       {modalStatus === Modal.Generate && (
         <GenerateTournamentModal
           onSubmit={onGenerateSubmitHandler}
-          onClose={() => setModalStatus(Modal.None)}
+          onClose={closeModals}
         />
       )}
     </>

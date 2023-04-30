@@ -11,4 +11,6 @@ public interface ILogRepository
     public Task<Log> CreateAsync(Log log);
     public Task<Log> UpdateAsync(Log log);
     public Task DeleteAsync(Guid logId);
+    public Task DeleteAllGameAsync(Guid gameId);
+    public Task DeleteAllTournamentAsync(Guid tournamentId);
 }

@@ -1,9 +1,11 @@
+import React from "react";
 import { IconButton, TableCell, TableRow } from "@mui/material";
 import { GameStatus } from "../../../utils/types";
 
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import React from "react";
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 
 interface SetPlayerComponentProps {
   playerId: string;
@@ -26,7 +28,7 @@ interface SetPlayerComponentProps {
   isOwner: boolean;
   status: GameStatus;
   basic: boolean;
-  onChangeScore: (setId: string, playerId: string, change: boolean) => void;
+  onChangeScore: (setId: string, playerId: string, change: boolean, fast?: boolean) => void;
 }
 
 const SetPlayerComponent = React.memo(function SetPlayer(
@@ -60,6 +62,32 @@ const SetPlayerComponent = React.memo(function SetPlayer(
     <TableRow key={playerId}>
       <TableCell sx={{ left: 0, position: "sticky", backgroundColor: "#ebeced", boxShadow: 1, minWidth: { md: "200px", xs: "100px" } }}>
         {name}
+        {isOwner &&
+          status >= GameStatus.Started &&
+          status < GameStatus.Finished && (
+            <IconButton
+              color="success"
+              component="label"
+              size="small"
+              sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
+              onClick={() => onChangeScore(setId, playerId, true, true)}
+            >
+              <KeyboardDoubleArrowUpIcon />
+            </IconButton>
+          )}
+        {isOwner &&
+          status >= GameStatus.Started &&
+          status < GameStatus.Finished && (
+            <IconButton
+              color="error"
+              component="label"
+              size="small"
+              sx={{ opacity: 0.5, "&:hover": { opacity: 1 } }}
+              onClick={() => onChangeScore(setId, playerId, false, true)}
+            >
+              <KeyboardDoubleArrowDownIcon />
+            </IconButton>
+          )}
         {isOwner &&
           status >= GameStatus.Started &&
           status < GameStatus.Finished && (

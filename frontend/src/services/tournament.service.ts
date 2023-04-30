@@ -51,6 +51,7 @@ export const editTournament = async (
   title: string,
   pictureUrl: string,
   description: string,
+  singleThirdPlace: boolean,
   basic: boolean,
   maxTeams: number,
   pointsToWin: number,
@@ -64,6 +65,7 @@ export const editTournament = async (
     Title: title,
     PictureUrl: pictureUrl,
     Description: description,
+    SingleThirdPlace: singleThirdPlace,
     Basic: basic,
     MaxTeams: maxTeams,
     PointsToWin: pointsToWin,
@@ -113,4 +115,9 @@ export const joinTournament = async (tournamentId: string, teamId: string) => {
   export const moveTeamDown = async (tournamentId: string, matchId: string) => {
     const res = await api.patch(`/Tournaments/${tournamentId}/Matches/${matchId}/Brackets`);
     return res.data;
-  }
+  };
+
+  export const generateTournament = async (teamNumber: number) => {
+    const res = await api.post(`/Tournaments/generate?teamAmount=${teamNumber}`);
+    return res.data;
+  };

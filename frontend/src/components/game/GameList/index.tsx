@@ -128,6 +128,8 @@ const GameList = (props: GameListProps) => {
               createDate={new Date(item.createDate).toLocaleString()}
               status={item.status}
               winner={item.winner}
+              firstTeam={item.firstTeam}
+              secondTeam={item.secondTeam}
               onButtonPress={() => navigate("/game/" + item.id)}
             />
             <br />

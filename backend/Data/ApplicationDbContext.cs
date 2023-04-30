@@ -57,7 +57,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<TournamentMatch>().HasOne(x => x.FirstParent).WithOne().HasForeignKey<TournamentMatch>("FirstParentId").IsRequired(false);
         builder.Entity<TournamentMatch>().HasOne(x => x.SecondParent).WithOne().HasForeignKey<TournamentMatch>("SecondParentId").IsRequired(false);
 
-        builder.Entity<Log>().HasOne(l => l.Tournament).WithMany().IsRequired(false);
-        builder.Entity<Log>().HasOne(l => l.Game).WithMany().IsRequired(false);
+        builder.Entity<Log>().HasOne(l => l.Tournament).WithMany().IsRequired(false).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<Log>().HasOne(l => l.Game).WithMany().IsRequired(false).OnDelete(DeleteBehavior.Restrict);
     }
 }

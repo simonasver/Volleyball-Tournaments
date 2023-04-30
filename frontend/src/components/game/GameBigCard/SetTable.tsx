@@ -7,7 +7,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  makeStyles,
 } from "@mui/material";
 import SetPlayerComponent from "./SetPlayerComponent";
 import { GameStatus, SetPlayer } from "../../../utils/types";
@@ -22,7 +21,7 @@ interface SetTableProps {
   players: SetPlayer[];
   team: boolean;
   basic: boolean;
-  onChangeScore: (setId: string, playerId: string, change: boolean) => void;
+  onChangeScore: (setId: string, playerId: string, change: boolean, fast?: boolean) => void;
 }
 
 const SetTable = (props: SetTableProps) => {

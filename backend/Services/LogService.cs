@@ -16,7 +16,7 @@ public class LogService : ILogService
         _logRepository = logRepository;
     }
 
-    public async Task<ServiceResult<bool>> CreateLog(string message, bool isPrivate, string userId, Tournament? tournament = null, Game? game = null)
+    public async Task<ServiceResult<bool>> CreateLogAsync(string message, bool isPrivate, string userId, Tournament? tournament = null, Game? game = null)
     {
         if (string.IsNullOrEmpty(message))
         {
@@ -36,18 +36,57 @@ public class LogService : ILogService
         return ServiceResult<bool>.Success();
     }
 
-    public async Task<ServiceResult<IEnumerable<Log>>> GetAllLogs()
+    public async Task<ServiceResult<IEnumerable<Log>>> GetAllLogsAsync()
     {
         return ServiceResult<IEnumerable<Log>>.Success(await _logRepository.GetAllAsync());
     }
 
-    public async Task<ServiceResult<IEnumerable<Log>>> GetTournamentLogs(Guid tournamentId)
+    public async Task<ServiceResult<IEnumerable<Log>>> GetTournamentLogsAsync(Guid tournamentId)
     {
         return ServiceResult<IEnumerable<Log>>.Success(await _logRepository.GetAllTournament(tournamentId));
     }
 
-    public async Task<ServiceResult<IEnumerable<Log>>> GetGameLogs(Guid gameId)
+    public async Task<ServiceResult<IEnumerable<Log>>> GetGameLogsAsync(Guid gameId)
     {
         return ServiceResult<IEnumerable<Log>>.Success(await _logRepository.GetAllGame(gameId));
+    }
+
+    public async Task<ServiceResult<bool>> DeleteAsync(Log log)
+    {
+        try
+        {
+            await _logRepository.DeleteAsync(log.Id);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> DeleteGameLogsAsync(Guid gameId)
+    {
+        try
+        {
+            await _logRepository.DeleteAllGameAsync(gameId);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> DeleteTournamentLogsAsync(Guid tournamentId)
+    {
+        try
+        {
+            await _logRepository.DeleteAllTournamentAsync(tournamentId);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
     }
 }

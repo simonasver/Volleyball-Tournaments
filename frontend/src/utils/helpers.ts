@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Roles, User } from "../store/auth-slice";
+import { UserRole, User } from "../store/auth-slice";
 import { Game } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,7 +28,7 @@ export function errorMessageFromAxiosError(e: any): string {
 
 export function isAdmin(user: User | undefined): boolean {
   if (user === undefined) return false;
-  return user.roles?.includes(Roles.Admin) ?? false;
+  return user.roles?.includes(UserRole.Admin) ?? false;
 }
 
 export function isGameFull(game: Game): boolean {

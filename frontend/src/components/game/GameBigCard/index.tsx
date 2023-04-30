@@ -62,6 +62,7 @@ import { moveTeamDown } from "../../../services/tournament.service";
 import ChangeScoreModal from "./ChangeScoreModal";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import GameSettings from "./GameSettings";
 
 interface GameBigCardProps {
   id: string;
@@ -111,42 +112,6 @@ const GameBigCard = (props: GameBigCardProps) => {
   const [changeScoreError, setChangeScoreError] = React.useState("");
 
   const [currentTab, setCurrentTab] = React.useState<number>(0);
-
-  const tableSettings = React.useMemo(() => {
-    return [
-      {
-        name: "Is scoreboard complex",
-        value: !game?.basic ? "Yes" : "No",
-      },
-      {
-        name: "Points to win",
-        value: game?.pointsToWin,
-      },
-      {
-        name: "Points to win last set",
-        value: game?.pointsToWinLastSet,
-      },
-      {
-        name: "Point difference to win",
-        value: game?.pointDifferenceToWin,
-      },
-      {
-        name: "Best of x",
-        value: game?.maxSets,
-      },
-      {
-        name: "Players per team",
-        value:
-          game?.playersPerTeam === 0 ? "Unrestricted" : game?.playersPerTeam,
-      },
-    ];
-  }, [
-    game?.basic,
-    game?.pointsToWin,
-    game?.pointDifferenceToWin,
-    game?.maxSets,
-    game?.playersPerTeam,
-  ]);
 
   const onTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -352,28 +317,41 @@ const GameBigCard = (props: GameBigCardProps) => {
       });
   };
 
-  const onChangeScore = (type: GameScore, change: boolean) => {
+  const onChangeScore = (
+    type: GameScore,
+    change: boolean,
+    fast?: boolean,
+    setId?: string,
+    playerId?: string
+  ) => {
     if (type !== GameScore.Score) {
-      return onChangePlayerStats(type, change);
+      return onChangePlayerStats(type, change, fast, setId, playerId);
     }
-    changeGameSetScore(id, changeScoreSet, changeScorePlayer, change)
+    changeGameSetScore(
+      id,
+      setId ?? changeScoreSet,
+      playerId ?? changeScorePlayer,
+      change
+    )
       .then(() => {
         const successMessage = `Player ${
           game?.sets
-            .find((x) => x.id === changeScoreSet)
-            ?.players.find((x) => x.id === changeScorePlayer)?.name
+            .find((x) => x.id === setId ?? changeScoreSet)
+            ?.players.find((x) => x.id === playerId ?? changeScorePlayer)?.name
         } score was ${change ? "increased" : "decreased"}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        closeModal();
+        if (!fast) {
+          closeModal();
+        }
 
         getGame(id)
           .then((res) => {
             setError("");
             setGame(res);
             const changedIndex = res.sets.findIndex(
-              (set: GameSet) => set.id === changeScoreSet
+              (set: GameSet) => set.id === setId ?? changeScoreSet
             );
             if (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
@@ -399,15 +377,15 @@ const GameBigCard = (props: GameBigCardProps) => {
             }
           });
 
-          getGameLogs(id)
-            .then((res) => {
-              setLogs(res);
-            })
-            .catch((e) => {
-              console.log(e);
-              const errorMessage = errorMessageFromAxiosError(e);
-              setError(errorMessage);
-            });
+        getGameLogs(id)
+          .then((res) => {
+            setLogs(res);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -418,25 +396,40 @@ const GameBigCard = (props: GameBigCardProps) => {
       });
   };
 
-  const onChangePlayerStats = (type: GameScore, change: boolean) => {
-    changeGameSetStats(id, changeScoreSet, changeScorePlayer, type, change)
+  const onChangePlayerStats = (
+    type: GameScore,
+    change: boolean,
+    fast?: boolean,
+    setId?: string,
+    playerId?: string
+  ) => {
+    changeGameSetStats(
+      id,
+      setId ?? changeScoreSet,
+      playerId ?? changeScorePlayer,
+      type,
+      change
+    )
       .then(() => {
         const successMessage = `Player ${
           game?.sets
-            .find((x) => x.id === changeScoreSet)
-            ?.players.find((x) => x.id === changeScorePlayer)?.name
+            .find((x) => x.id === setId ?? changeScoreSet)
+            ?.players.find((x) => x.id === playerId ?? changeScorePlayer)?.name
         } stat ${type} was ${change ? "increased" : "decreased"}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        closeModal();
+        if (!fast) {
+          closeModal();
+        }
 
         getGame(id)
           .then((res) => {
+            console.log(res);
             setError("");
             setGame(res);
             const changedIndex = res.sets.findIndex(
-              (set: GameSet) => set.id === changeScoreSet
+              (set: GameSet) => set.id === setId ?? changeScoreSet
             );
             if (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
@@ -486,22 +479,28 @@ const GameBigCard = (props: GameBigCardProps) => {
    * @param setId
    * @param playerId
    * @param change false - decrease, true - increase
+   * @param fast true - don't show modal
    */
   const onChangeScoreOpen = (
     setId: string,
     playerId: string,
-    change: boolean
+    change: boolean,
+    fast?: boolean
   ) => {
     setChangeScoreSet(setId);
     setChangeScorePlayer(playerId);
-    const set = game?.sets.find((x) => x.id === setId);
     setChangeScorePositive(change);
-    setChangeScoreHeader(
-      `${change ? "Increase" : "Decrease"} ${game?.title} game ${
-        set?.players.find((x) => x.id === playerId)?.name
-      } player score in set ${set?.number}`
-    );
-    setModalStatus(Modal.ChangeScore);
+    if (fast) {
+      onChangeScore(changeScoreInput, change, fast, setId, playerId);
+    } else {
+      const set = game?.sets.find((x) => x.id === setId);
+      setChangeScoreHeader(
+        `${change ? "Increase" : "Decrease"} ${game?.title} game ${
+          set?.players.find((x) => x.id === playerId)?.name
+        } player score in set ${set?.number}`
+      );
+      setModalStatus(Modal.ChangeScore);
+    }
   };
 
   let statusString = "";
@@ -527,6 +526,7 @@ const GameBigCard = (props: GameBigCardProps) => {
     return (
       <>
         <Chip color="primary" variant="outlined" label={<b>Game</b>} />
+        {game?.isPrivate && <Chip label="Private" />}
         <Chip label={statusString} />
         {game?.tournamentMatch && (
           <Chip
@@ -617,8 +617,8 @@ const GameBigCard = (props: GameBigCardProps) => {
                           color={
                             game.winner
                               ? game.winner.id === game.firstTeam.id
-                                ? "green"
-                                : "red"
+                                ? "primary"
+                                : "default"
                               : "default"
                           }
                         >
@@ -642,6 +642,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                           )}
                         {user?.id === game.ownerId &&
                           game.tournamentMatch &&
+                          !game.tournamentMatch.thirdPlace &&
                           game.status != GameStatus.Started &&
                           !isGameFull(game) && (
                             <IconButton
@@ -671,6 +672,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                       <Grid item>
                         {user?.id === game.ownerId &&
                           game.tournamentMatch &&
+                          !game.tournamentMatch.thirdPlace &&
                           game.status != GameStatus.Started &&
                           !isGameFull(game) && (
                             <IconButton
@@ -706,8 +708,8 @@ const GameBigCard = (props: GameBigCardProps) => {
                           color={
                             game.winner
                               ? game.winner.id === game.secondTeam.id
-                                ? "green"
-                                : "red"
+                                ? "primary"
+                                : "default"
                               : "default"
                           }
                         >
@@ -735,8 +737,8 @@ const GameBigCard = (props: GameBigCardProps) => {
                       color={
                         game.winner
                           ? game.winner.id === game.firstTeam.id
-                            ? "green"
-                            : "red"
+                            ? "primary"
+                            : "default"
                           : "default"
                       }
                     >
@@ -754,8 +756,8 @@ const GameBigCard = (props: GameBigCardProps) => {
                       color={
                         game.winner
                           ? game.winner.id === game.secondTeam.id
-                            ? "green"
-                            : "red"
+                            ? "primary"
+                            : "default"
                           : "default"
                       }
                     >
@@ -766,6 +768,7 @@ const GameBigCard = (props: GameBigCardProps) => {
               </Grid>
               <br />
               <Typography variant="body1">{game.description}</Typography>
+              {game.firstTeam && <Typography variant="body1">First team: {game.firstTeam.title}</Typography>}
               <Typography variant="body2" color="text.secondary">
                 Created at: {new Date(game.createDate).toLocaleString()}
               </Typography>
@@ -783,26 +786,14 @@ const GameBigCard = (props: GameBigCardProps) => {
               />
             </div>
             <div hidden={currentTab !== 1}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>
-                      <b>Setting</b>
-                    </TableCell>
-                    <TableCell>
-                      <b>Value</b>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {tableSettings.map((setting) => (
-                    <TableRow key={setting.name}>
-                      <TableCell>{setting.name}</TableCell>
-                      <TableCell>{setting.value}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <GameSettings
+                basic={game.basic}
+                pointsToWin={game.pointsToWin}
+                pointsToWinLastSet={game.pointsToWinLastSet}
+                pointDifferenceToWin={game.pointDifferenceToWin}
+                maxSets={game.maxSets}
+                playersPerTeam={game.playersPerTeam}
+              />
             </div>
             <Accordion
               expanded={logsExpanded}

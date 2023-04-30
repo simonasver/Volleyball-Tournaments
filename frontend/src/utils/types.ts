@@ -3,6 +3,7 @@ export interface Tournament {
   title: string;
   pictureUrl: string;
   description: string;
+  singleThirdPlace: boolean;
   basic: boolean;
   type: TournamentType;
   pointsToWin: number;
@@ -25,6 +26,7 @@ export interface Tournament {
 export interface TournamentMatch {
   id: string;
   round: number;
+  thirdPlace: boolean;
   game?: Game;
   firstParentId: string;
   firstParent?: TournamentMatch;

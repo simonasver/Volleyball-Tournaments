@@ -7,7 +7,7 @@ interface GameSetsProps {
   isOwner: boolean;
   sets: GameSet[];
   basic: boolean;
-  onChangeScore: (setId: string, playerId: string, change: boolean) => void;
+  onChangeScore: (setId: string, playerId: string, change: boolean, fast?: boolean) => void;
 }
 
 const GameSets = (props: GameSetsProps) => {

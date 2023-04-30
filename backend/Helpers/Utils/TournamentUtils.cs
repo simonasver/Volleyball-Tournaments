@@ -1,6 +1,7 @@
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
+using Backend.Data.Entities.Utils;
 
 namespace Backend.Helpers.Utils;
 
@@ -46,6 +47,7 @@ public class TournamentUtils
             {
                 Tournament = tournament,
                 Round = roundCount,
+                ThirdPlace = false,
                 Game = new Game()
                 {
                     Title = tournament.Title + " game " + roundCount,
@@ -65,6 +67,33 @@ public class TournamentUtils
                 },
             }, roundCount);
         return games;
+    }
+
+    public static TournamentMatch GenerateThirdPlaceMatch(Tournament tournament)
+    {
+        return new TournamentMatch()
+        {
+            Tournament = tournament,
+            Round = 0,
+            ThirdPlace = true,
+            Game = new Game()
+            {
+                Title = tournament.Title + " game " + "third place",
+                Basic = tournament.Basic,
+                PointsToWin = tournament.PointsToWin,
+                PointsToWinLastSet = tournament.PointsToWinLastSet,
+                PointDifferenceToWin = tournament.PointDifferenceToWin,
+                MaxSets = tournament.MaxSets,
+                PlayersPerTeam = tournament.PlayersPerTeam,
+                FirstTeamScore = 0,
+                SecondTeamScore = 0,
+                IsPrivate = tournament.IsPrivate,
+                CreateDate = DateTime.Now,
+                LastEditDate = DateTime.Now,
+                Status = GameStatus.New,
+                OwnerId = tournament.OwnerId
+            },
+        };
     }
 
     private static TournamentMatch GenerateParentGames(Tournament tournament, TournamentMatch childMatch, int currentRound)
@@ -252,6 +281,35 @@ public class TournamentUtils
                 childMatch.Item1.Game = CheckIfGameIsReady(childMatch.Item1);
                 matchesToUpdate.Add(childMatch.Item1);
             }
+            if (tournamentMatch.Round == lastRound - 1 && tournament.SingleThirdPlace && tournament.AcceptedTeams.Count >= 4)
+            {
+                var thirdPlaceMatch = tournament.Matches.FirstOrDefault(x => x.ThirdPlace);
+                var thirdPlaceGame = thirdPlaceMatch.Game;
+                if (thirdPlaceGame.FirstTeam == null)
+                {
+                    try
+                    {
+                        thirdPlaceGame.FirstTeam = GameUtils.FindOtherTeam(tournamentMatch.Game, tournamentMatch.Game.Winner).Copy();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                else if (thirdPlaceGame.SecondTeam == null)
+                {
+                    try
+                    {
+                        thirdPlaceGame.SecondTeam = GameUtils.FindOtherTeam(tournamentMatch.Game, tournamentMatch.Game.Winner).Copy();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                thirdPlaceMatch.Game = CheckIfGameIsReady(thirdPlaceMatch);
+                matchesToUpdate.Add(thirdPlaceMatch);
+            }
         }
 
         return (tournament, matchesToUpdate);
@@ -288,7 +346,7 @@ public class TournamentUtils
         }
 
         tournamentMatch.Game.Status = GameStatus.Ready;
-        tournamentMatch.Game.Title = tournamentMatch.Game.FirstTeam.Title + " vs " + tournamentMatch.Game.SecondTeam.Title;
+        tournamentMatch.Game.Title = tournamentMatch.ThirdPlace ? "Third place match" : tournamentMatch.Game.FirstTeam.Title + " vs " + tournamentMatch.Game.SecondTeam.Title;
         tournamentMatch.Game.Description = "Tournament " + tournamentMatch.Tournament.Title + " match in round " + tournamentMatch.Round +
                                            " between " + tournamentMatch.Game.FirstTeam.Title + " vs " + tournamentMatch.Game.SecondTeam.Title;
         return tournamentMatch.Game;
