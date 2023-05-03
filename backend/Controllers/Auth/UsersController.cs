@@ -51,7 +51,7 @@ public class UsersController : ControllerBase
         var createUserResult = await _userManager.CreateAsync(newUser, userRegisterDto.Password);
         if (!createUserResult.Succeeded)
         {
-            return BadRequest("Could not create a user");
+            return BadRequest(createUserResult.Errors.FirstOrDefault()?.Description ?? "Could not create a user");
         }
 
         await _userManager.AddToRoleAsync(newUser, ApplicationUserRoles.User);
