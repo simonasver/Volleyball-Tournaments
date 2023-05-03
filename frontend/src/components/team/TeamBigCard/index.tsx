@@ -26,7 +26,7 @@ import {
   removePlayerFromTeam,
 } from "../../../services/team.service";
 import { Team } from "../../../utils/types";
-import { errorMessageFromAxiosError } from "../../../utils/helpers";
+import { errorMessageFromAxiosError, isOwner } from "../../../utils/helpers";
 import Loader from "../../layout/Loader";
 import { alertActions } from "../../../store/alert-slice";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
@@ -184,7 +184,7 @@ const TeamBigCard = (props: TeamBigCardProps) => {
             <Typography variant="body2" color="text.secondary">
               Created at: {new Date(team.createDate).toLocaleString()}
             </Typography>
-            {user?.id === team.ownerId && (
+            {isOwner(user, team.ownerId) && (
               <Typography variant="body2" color="text.secondary">
                 Last edited at: {new Date(team.lastEditDate).toLocaleString()}
               </Typography>

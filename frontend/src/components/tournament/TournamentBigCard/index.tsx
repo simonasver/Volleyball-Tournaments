@@ -36,7 +36,7 @@ import GroupRemoveIcon from "@mui/icons-material/GroupRemove";
 import RequestJoinTournamentModal from "./RequestJoinTournamentModal";
 import AcceptTeamModal from "./AcceptTournamentTeamModal";
 import DeleteTournamentModal from "./DeleteTournamentModal";
-import { errorMessageFromAxiosError } from "../../../utils/helpers";
+import { errorMessageFromAxiosError, isOwner } from "../../../utils/helpers";
 import {
   addTeamToTournament,
   getTournament,
@@ -355,7 +355,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
               <Typography variant="body2" color="text.secondary">
                 Created at: {new Date(tournament.createDate).toLocaleString()}
               </Typography>
-              {user?.id === tournament.ownerId && (
+              {isOwner(user, tournament.ownerId) && (
                 <Typography variant="body2" color="text.secondary">
                   Last edited at:{" "}
                   {new Date(tournament.lastEditDate).toLocaleString()}
@@ -418,7 +418,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
-              {user?.id === tournament.ownerId &&
+              {isOwner(user, tournament.ownerId) &&
                 tournament.status < TournamentStatus.Started &&
                 tournament.acceptedTeams?.length >= 2 && (
                   <IconButton
@@ -444,7 +444,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </IconButton>
                 )}
             </Box>
-            {user?.id === tournament.ownerId &&
+            {isOwner(user, tournament.ownerId) &&
               tournament.status < TournamentStatus.Started && (
                 <IconButton
                   centerRipple={false}
@@ -456,7 +456,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {user?.id === tournament.ownerId &&
+            {isOwner(user, tournament.ownerId) &&
               tournament.status < TournamentStatus.Started && (
                 <IconButton
                   centerRipple={false}
@@ -468,7 +468,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {user?.id === tournament.ownerId &&
+            {isOwner(user, tournament.ownerId) &&
               tournament.status < TournamentStatus.Finished && (
                 <IconButton
                   centerRipple={false}
@@ -479,7 +479,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {user?.id === tournament.ownerId && (
+            {isOwner(user, tournament.ownerId) && (
               <IconButton
                 centerRipple={false}
                 color="error"

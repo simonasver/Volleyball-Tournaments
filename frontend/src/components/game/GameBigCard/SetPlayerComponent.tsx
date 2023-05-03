@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, IconButton, Stack, TableCell, TableRow } from "@mui/material";
+import { Grid, IconButton, TableCell, TableRow } from "@mui/material";
 import { GameStatus } from "../../../utils/types";
 
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
@@ -75,7 +75,7 @@ const SetPlayerComponent = React.memo(function SetPlayer(
         }}
       >
         <Grid
-        display={"flex"}
+          display={"flex"}
           direction={"row"}
           justifyContent={"space-between"}
           alignItems={"center"}

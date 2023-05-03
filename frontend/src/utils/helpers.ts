@@ -31,6 +31,11 @@ export function isAdmin(user: User | undefined): boolean {
   return user.roles?.includes(UserRole.Admin) ?? false;
 }
 
+export function isOwner(user: User | undefined, resourceOwnerId: string): boolean {
+  if (user === undefined) return false;
+  return user.roles?.includes(UserRole.Admin) || user.id === resourceOwnerId;
+}
+
 export function isGameFull(game: Game): boolean {
   return !!game.firstTeam && !!game.secondTeam;
 }

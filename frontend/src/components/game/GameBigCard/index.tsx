@@ -45,7 +45,7 @@ import {
   removeTeamFromGame,
   startGame,
 } from "../../../services/game.service";
-import { errorMessageFromAxiosError, isGameFull } from "../../../utils/helpers";
+import { errorMessageFromAxiosError, isGameFull, isOwner } from "../../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RequestJoinGameModal from "./RequestJoinGameModal";
@@ -625,7 +625,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                         </Typography>
                       </Grid>
                       <Grid item>
-                        {user?.id === game.ownerId &&
+                        {isOwner(user, game.ownerId) &&
                           !game.tournamentMatch &&
                           game.status < GameStatus.Started && (
                             <IconButton
@@ -639,7 +639,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                               </Tooltip>
                             </IconButton>
                           )}
-                        {user?.id === game.ownerId &&
+                        {isOwner(user, game.ownerId) &&
                           game.tournamentMatch &&
                           !game.tournamentMatch.thirdPlace &&
                           game.status != GameStatus.Started &&
@@ -669,7 +669,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                       justifyContent="space-between"
                     >
                       <Grid item>
-                        {user?.id === game.ownerId &&
+                        {isOwner(user, game.ownerId) &&
                           game.tournamentMatch &&
                           !game.tournamentMatch.thirdPlace &&
                           game.status != GameStatus.Started &&
@@ -685,7 +685,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                               </Tooltip>
                             </IconButton>
                           )}
-                        {user?.id === game.ownerId &&
+                        {isOwner(user, game.ownerId) &&
                           !game.tournamentMatch &&
                           game.status < GameStatus.Started && (
                             <IconButton
@@ -770,14 +770,14 @@ const GameBigCard = (props: GameBigCardProps) => {
               <Typography variant="body2" color="text.secondary">
                 Created at: {new Date(game.createDate).toLocaleString()}
               </Typography>
-              {user?.id === game.ownerId && (
+              {isOwner(user, game.ownerId) && (
                 <Typography variant="body2" color="text.secondary">
                   Last edited at: {new Date(game.lastEditDate).toLocaleString()}
                 </Typography>
               )}
               <Divider />
               <GameSets
-                isOwner={user?.id === game.ownerId}
+                isOwner={isOwner(user, game.ownerId)}
                 sets={sets ?? []}
                 basic={game.basic}
                 onChangeScore={onChangeScoreOpen}
@@ -833,7 +833,7 @@ const GameBigCard = (props: GameBigCardProps) => {
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
-              {user?.id === game.ownerId &&
+              {isOwner(user, game.ownerId) &&
                 game.status === GameStatus.Ready && (
                   <IconButton
                     centerRipple={false}
@@ -859,7 +859,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                   </IconButton>
                 )}
             </Box>
-            {user?.id === game.ownerId &&
+            {isOwner(user, game.ownerId) &&
               !game.tournamentMatch &&
               game.status < GameStatus.Started && (
                 <IconButton
@@ -872,7 +872,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {user?.id === game.ownerId && game.status < GameStatus.Finished && (
+            {isOwner(user, game.ownerId) && game.status < GameStatus.Finished && (
               <IconButton
                 centerRipple={false}
                 onClick={() => navigate(`/editgame/${id}`)}
@@ -882,7 +882,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                 </Tooltip>
               </IconButton>
             )}
-            {user?.id === game.ownerId && !game.tournamentMatch && (
+            {isOwner(user, game.ownerId) && !game.tournamentMatch && (
               <IconButton
                 centerRipple={false}
                 color="error"
