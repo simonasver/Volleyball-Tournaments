@@ -312,7 +312,14 @@ public class GameService : IGameService
             }
         }
 
-        game = GameUtils.AddTeamToGame(game, team);
+        try
+        {
+            game = GameUtils.AddTeamToGame(game, team);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<Game>.Failure(StatusCodes.Status400BadRequest, ex.Message);
+        }
         
         game.LastEditDate = DateTime.Now;
 

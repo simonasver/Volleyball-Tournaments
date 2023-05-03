@@ -336,8 +336,8 @@ const GameBigCard = (props: GameBigCardProps) => {
       .then(() => {
         const successMessage = `Player ${
           game?.sets
-            .find((x) => x.id === setId ?? changeScoreSet)
-            ?.players.find((x) => x.id === playerId ?? changeScorePlayer)?.name
+            .find((x) => x.id === setId || changeScoreSet)
+            ?.players.find((x) => x.id === playerId || changeScorePlayer)?.name
         } score was ${change ? "increased" : "decreased"}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
@@ -351,7 +351,7 @@ const GameBigCard = (props: GameBigCardProps) => {
             setError("");
             setGame(res);
             const changedIndex = res.sets.findIndex(
-              (set: GameSet) => set.id === setId ?? changeScoreSet
+              (set: GameSet) => set.id === setId || changeScoreSet
             );
             if (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
@@ -413,8 +413,8 @@ const GameBigCard = (props: GameBigCardProps) => {
       .then(() => {
         const successMessage = `Player ${
           game?.sets
-            .find((x) => x.id === setId ?? changeScoreSet)
-            ?.players.find((x) => x.id === playerId ?? changeScorePlayer)?.name
+            .find((x) => x.id === setId || changeScoreSet)
+            ?.players.find((x) => x.id === playerId || changeScorePlayer)?.name
         } stat ${type} was ${change ? "increased" : "decreased"}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
@@ -425,11 +425,10 @@ const GameBigCard = (props: GameBigCardProps) => {
 
         getGame(id)
           .then((res) => {
-            console.log(res);
             setError("");
             setGame(res);
             const changedIndex = res.sets.findIndex(
-              (set: GameSet) => set.id === setId ?? changeScoreSet
+              (set: GameSet) => set.id === setId || changeScoreSet
             );
             if (
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
@@ -768,7 +767,6 @@ const GameBigCard = (props: GameBigCardProps) => {
               </Grid>
               <br />
               <Typography variant="body1">{game.description}</Typography>
-              {game.firstTeam && <Typography variant="body1">First team: {game.firstTeam.title}</Typography>}
               <Typography variant="body2" color="text.secondary">
                 Created at: {new Date(game.createDate).toLocaleString()}
               </Typography>

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230418191621_added additional values")]
-    partial class addedadditionalvalues
+    [Migration("20230501095948_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,6 +29,9 @@ namespace Backend.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Banned")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -367,6 +370,43 @@ namespace Backend.Migrations
                     b.ToTable("SetPlayers");
                 });
 
+            modelBuilder.Entity("Backend.Data.Entities.Log", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("GameId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("TournamentId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("TournamentId");
+
+                    b.ToTable("Logs");
+                });
+
             modelBuilder.Entity("Backend.Data.Entities.Team.Team", b =>
                 {
                     b.Property<Guid>("Id")
@@ -510,6 +550,9 @@ namespace Backend.Migrations
 
                     b.Property<Guid?>("SecondParentId")
                         .HasColumnType("char(36)");
+
+                    b.Property<bool>("ThirdPlace")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid>("TournamentId")
                         .HasColumnType("char(36)");
@@ -753,6 +796,31 @@ namespace Backend.Migrations
                         .WithMany("Players")
                         .HasForeignKey("SetId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Backend.Data.Entities.Log", b =>
+                {
+                    b.HasOne("Backend.Data.Entities.Game.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
+                        .WithMany()
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Game");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("Backend.Data.Entities.Team.Team", b =>

@@ -352,7 +352,7 @@ public class TournamentService : ITournamentService
     {
         if (tournament.Status >= TournamentStatus.Started)
         {
-            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Game is already started");
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Tournament is already started");
         }
 
         var team = tournament.AcceptedTeams.FirstOrDefault(x => x.Id == teamId);

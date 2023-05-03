@@ -16,11 +16,6 @@ public class GameRepository : IGameRepository
         _dbContext = dbContext;
     }
     
-    
-    public async Task<IEnumerable<Game>> GetAllAsync()
-    {
-        return await _dbContext.Games.Include(x => x.TournamentMatch).Include(x => x.Winner).OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).ToListAsync();
-    }
 
     public async Task<IEnumerable<Game>> GetAllAsync(bool all, SearchParameters searchParameters)
     {

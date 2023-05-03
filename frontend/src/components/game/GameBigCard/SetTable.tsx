@@ -67,7 +67,7 @@ const SetTable = (props: SetTableProps) => {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ left: 0, position: "sticky", backgroundColor: "#ebeced", minWidth: { md: "200px", xs: "100px" } }}>Player</TableCell>
+              <TableCell sx={{ left: 0, position: "sticky", backgroundColor: "#ebeced", minWidth: { md: "300px", xs: "100px" } }}>Player</TableCell>
               <TableCell>Score</TableCell>
               {!basic && (<>
                 <TableCell>Kills</TableCell>
@@ -77,6 +77,8 @@ const SetTable = (props: SetTableProps) => {
                 <TableCell>Blocks</TableCell>
                 <TableCell>Touches</TableCell>
                 <TableCell>Blocking errors</TableCell>
+                <TableCell>Aces</TableCell>
+                <TableCell>Serving errors</TableCell>
                 <TableCell>Total serves</TableCell>
                 <TableCell>Successful digs</TableCell>
                 <TableCell>Ball touches</TableCell>

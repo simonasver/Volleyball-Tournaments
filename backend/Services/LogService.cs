@@ -23,44 +23,36 @@ public class LogService : ILogService
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Message cannot be null");
         }
 
-        await _logRepository.CreateAsync(new Log()
-        {
-            IsPrivate = isPrivate,
-            OwnerId = userId,
-            Message = message,
-            Tournament = tournament,
-            Game = game,
-            Time = DateTime.Now
-        });
-
-        return ServiceResult<bool>.Success();
-    }
-
-    public async Task<ServiceResult<IEnumerable<Log>>> GetAllLogsAsync()
-    {
-        return ServiceResult<IEnumerable<Log>>.Success(await _logRepository.GetAllAsync());
-    }
-
-    public async Task<ServiceResult<IEnumerable<Log>>> GetTournamentLogsAsync(Guid tournamentId)
-    {
-        return ServiceResult<IEnumerable<Log>>.Success(await _logRepository.GetAllTournament(tournamentId));
-    }
-
-    public async Task<ServiceResult<IEnumerable<Log>>> GetGameLogsAsync(Guid gameId)
-    {
-        return ServiceResult<IEnumerable<Log>>.Success(await _logRepository.GetAllGame(gameId));
-    }
-
-    public async Task<ServiceResult<bool>> DeleteAsync(Log log)
-    {
         try
         {
-            await _logRepository.DeleteAsync(log.Id);
+            await _logRepository.CreateAsync(new Log()
+            {
+                IsPrivate = isPrivate,
+                OwnerId = userId,
+                Message = message,
+                Tournament = tournament,
+                Game = game,
+                Time = DateTime.Now
+            });
             return ServiceResult<bool>.Success();
         }
         catch (Exception ex)
         {
             return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+
+    }
+
+    public async Task<ServiceResult<IEnumerable<Log>>> GetGameLogsAsync(Guid gameId)
+    {
+        try
+        {
+            var logs = await _logRepository.GetAllGame(gameId);
+            return ServiceResult<IEnumerable<Log>>.Success(logs);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<IEnumerable<Log>>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 

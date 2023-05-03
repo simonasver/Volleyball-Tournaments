@@ -799,7 +799,8 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Data.Entities.Game.Game", "Game")
                         .WithMany()
-                        .HasForeignKey("GameId");
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
                         .WithMany()
@@ -809,7 +810,8 @@ namespace Backend.Migrations
 
                     b.HasOne("Backend.Data.Entities.Tournament.Tournament", "Tournament")
                         .WithMany()
-                        .HasForeignKey("TournamentId");
+                        .HasForeignKey("TournamentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Game");
 

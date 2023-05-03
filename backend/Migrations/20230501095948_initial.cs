@@ -49,6 +49,7 @@ namespace Backend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RegisterDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastLoginDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Banned = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -216,14 +217,16 @@ namespace Backend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    SingleThirdPlace = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     MaxTeams = table.Column<int>(type: "int", nullable: false),
                     IsPrivate = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     LastEditDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     FinalRound = table.Column<int>(type: "int", nullable: false),
+                    Basic = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     PointsToWin = table.Column<int>(type: "int", nullable: false),
+                    PointsToWinLastSet = table.Column<int>(type: "int", nullable: false),
                     PointDifferenceToWin = table.Column<int>(type: "int", nullable: false),
                     MaxSets = table.Column<int>(type: "int", nullable: false),
                     PlayersPerTeam = table.Column<int>(type: "int", nullable: false),
@@ -248,6 +251,7 @@ namespace Backend.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Round = table.Column<int>(type: "int", nullable: false),
+                    ThirdPlace = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     FirstParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     SecondParentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     TournamentId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
@@ -285,7 +289,9 @@ namespace Backend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Basic = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     PointsToWin = table.Column<int>(type: "int", nullable: false),
+                    PointsToWinLastSet = table.Column<int>(type: "int", nullable: false),
                     PointDifferenceToWin = table.Column<int>(type: "int", nullable: false),
                     MaxSets = table.Column<int>(type: "int", nullable: false),
                     PlayersPerTeam = table.Column<int>(type: "int", nullable: false),
@@ -370,6 +376,44 @@ namespace Backend.Migrations
                         principalTable: "Tournaments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Logs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    IsPrivate = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TournamentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    GameId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    Time = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Message = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    OwnerId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Logs_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Logs_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Logs_Tournaments_TournamentId",
+                        column: x => x.TournamentId,
+                        principalTable: "Tournaments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -507,7 +551,20 @@ namespace Backend.Migrations
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Score = table.Column<int>(type: "int", nullable: false),
+                    Score = table.Column<uint>(type: "int unsigned", nullable: false),
+                    Kills = table.Column<uint>(type: "int unsigned", nullable: true),
+                    Errors = table.Column<uint>(type: "int unsigned", nullable: true),
+                    Attempts = table.Column<uint>(type: "int unsigned", nullable: true),
+                    SuccessfulBlocks = table.Column<uint>(type: "int unsigned", nullable: true),
+                    Blocks = table.Column<uint>(type: "int unsigned", nullable: true),
+                    Touches = table.Column<uint>(type: "int unsigned", nullable: true),
+                    BlockingErrors = table.Column<uint>(type: "int unsigned", nullable: true),
+                    Aces = table.Column<uint>(type: "int unsigned", nullable: true),
+                    ServingErrors = table.Column<uint>(type: "int unsigned", nullable: true),
+                    TotalServes = table.Column<uint>(type: "int unsigned", nullable: true),
+                    SuccessfulDigs = table.Column<uint>(type: "int unsigned", nullable: true),
+                    BallTouches = table.Column<uint>(type: "int unsigned", nullable: true),
+                    BallMisses = table.Column<uint>(type: "int unsigned", nullable: true),
                     Team = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     SetId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
                 },
@@ -606,6 +663,21 @@ namespace Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Logs_GameId",
+                table: "Logs",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Logs_OwnerId",
+                table: "Logs",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Logs_TournamentId",
+                table: "Logs",
+                column: "TournamentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SetPlayers_SetId",
                 table: "SetPlayers",
                 column: "SetId");
@@ -693,6 +765,9 @@ namespace Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "GameTeamPlayers");
+
+            migrationBuilder.DropTable(
+                name: "Logs");
 
             migrationBuilder.DropTable(
                 name: "SetPlayers");

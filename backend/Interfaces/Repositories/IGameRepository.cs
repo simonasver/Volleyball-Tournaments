@@ -6,7 +6,6 @@ namespace Backend.Interfaces.Repositories;
 
 public interface IGameRepository
 {
-    public Task<IEnumerable<Game>> GetAllAsync();
     public Task<IEnumerable<Game>> GetAllAsync(bool all, SearchParameters searchParameters);
     public Task<IEnumerable<Game>> GetAllUserAsync(SearchParameters searchParameters, string userId);
     public Task<Game?> GetAsync(Guid gameId);

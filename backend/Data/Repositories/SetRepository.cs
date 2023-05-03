@@ -19,32 +19,10 @@ public class SetRepository : ISetRepository
         return await _dbContext.Sets.Include(x => x.Players).Include(x => x.Game).OrderBy(x => x.Number).ToListAsync();
     }
 
-    public async Task<Set?> GetAsync(Guid setId)
-    {
-        return await _dbContext.Sets.FirstOrDefaultAsync(x => x.Id == setId);
-    }
-
-    public async Task<Set> CreateAsync(Set set)
-    {
-        _dbContext.Sets.Add(set);
-        await _dbContext.SaveChangesAsync();
-        return set;
-    }
-
     public async Task<Set> UpdateAsync(Set set)
     {
         _dbContext.Sets.Update(set);
         await _dbContext.SaveChangesAsync();
         return set;
-    }
-
-    public async Task DeleteAsync(Guid setId)
-    {
-        var setToDelete = await _dbContext.Sets.FirstOrDefaultAsync(x => x.Id == setId);
-        if (setToDelete != null)
-        {
-            _dbContext.Sets.Remove(setToDelete);
-            await _dbContext.SaveChangesAsync();
-        }
     }
 }

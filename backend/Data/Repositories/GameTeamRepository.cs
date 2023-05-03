@@ -13,24 +13,6 @@ public class GameTeamRepository : IGameTeamRepository
     {
         _dbContext = dbContext;
     }
-    
-    
-    public async Task<IEnumerable<GameTeam>> GetAllAsync()
-    {
-        return await _dbContext.GameTeams.ToListAsync();
-    }
-
-    public async Task<GameTeam?> GetAsync(Guid gameTeamId)
-    {
-        return await _dbContext.GameTeams.FirstOrDefaultAsync(x => x.Id == gameTeamId);
-    }
-
-    public async Task<GameTeam> CreateAsync(GameTeam gameTeam)
-    {
-        _dbContext.GameTeams.Add(gameTeam);
-        await _dbContext.SaveChangesAsync();
-        return gameTeam;
-    }
 
     public async Task<GameTeam> UpdateAsync(GameTeam gameTeam)
     {
