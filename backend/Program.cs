@@ -1,8 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using Backend.Auth;
 using Backend.Auth.Model;
 using Backend.Data;
 using Backend.Data.Repositories;

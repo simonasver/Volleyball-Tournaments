@@ -31,7 +31,7 @@ public class AuthDbSeeder
         }
     }
 
-    private async Task AddAdminUser()
+    private async Task<string> AddAdminUser()
     {
         var newAdminUser = new ApplicationUser()
         {
@@ -49,6 +49,10 @@ public class AuthDbSeeder
             {
                 await _userManager.AddToRolesAsync(newAdminUser, ApplicationUserRoles.All);
             }
+
+            return "";
         }
+
+        return existingAdminUser.Id;
     }
 }
