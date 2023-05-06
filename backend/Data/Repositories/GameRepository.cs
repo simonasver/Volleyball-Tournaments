@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Backend.Data.Entities.Game;
+﻿using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
@@ -49,14 +48,14 @@ public class GameRepository : IGameRepository
             Include(x => x.RequestedTeams)
                 .ThenInclude(x => x.Players)
             .Include(x => x.FirstTeam)
-                .ThenInclude(x => x.Players)
+                .ThenInclude(x => x!.Players)
             .Include(x => x.SecondTeam)
-                .ThenInclude(x => x.Players)
+                .ThenInclude(x => x!.Players)
             .Include(x => x.Sets)
                 .ThenInclude(x => x.Players)
             .Include(x => x.Winner)
             .Include(x => x.TournamentMatch)
-                .ThenInclude(x => x.Tournament)
+                .ThenInclude(x => x!.Tournament)
             .FirstOrDefaultAsync(x => x.Id == gameId);
     }
 

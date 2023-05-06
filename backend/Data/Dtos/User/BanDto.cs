@@ -1,4 +1,4 @@
-namespace Backend.Data.Dtos.Admin;
+namespace Backend.Data.Dtos.User;
 
 public class BanDto
 {

@@ -1,5 +1,4 @@
 ﻿using Backend.Data.Dtos.Game;
-using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
@@ -55,7 +54,7 @@ public class GameService : IGameService
 
     public async Task<ServiceResult<Game>> GetAsync(Guid gameId)
     {
-        Game game;
+        Game? game;
         try
         {
             game = await _gameRepository.GetAsync(gameId);
@@ -237,7 +236,7 @@ public class GameService : IGameService
             var logsDeleteResult = await _logService.DeleteGameLogsAsync(game.Id);
             if (!logsDeleteResult.IsSuccess)
             {
-                return ServiceResult<bool>.Failure(logsDeleteResult.ErrorStatus, logsDeleteResult.ErrorMessage);
+                return ServiceResult<bool>.Failure(logsDeleteResult.ErrorStatus, logsDeleteResult.ErrorMessage!);
             }
             await _gameRepository.DeleteAsync(game.Id);
             return ServiceResult<bool>.Success();
@@ -291,13 +290,13 @@ public class GameService : IGameService
             return ServiceResult<Game>.Failure(StatusCodes.Status400BadRequest, "Cannot join tournament game");
         }
 
-        if (!game.RequestedTeams.Any(x => x.Id == addTeamToGameDto.TeamId))
+        if (game.RequestedTeams.All(x => x.Id != addTeamToGameDto.TeamId))
         {
             return ServiceResult<Game>.Failure(StatusCodes.Status400BadRequest, "Team has not requested to join the game");
         }
 
-        var team = game.RequestedTeams.FirstOrDefault(x => x.Id == addTeamToGameDto.TeamId);
-        
+        var team = game.RequestedTeams.FirstOrDefault(x => x.Id == addTeamToGameDto.TeamId)!;
+
         if ((team.Players.Count != game.PlayersPerTeam && game.PlayersPerTeam != 0) || team.Players.Count == 0)
         {
             game.RequestedTeams.Remove(team);
@@ -308,7 +307,7 @@ public class GameService : IGameService
             }
             catch (Exception ex)
             {
-                return ServiceResult<Game>.Failure(StatusCodes.Status500InternalServerError);
+                return ServiceResult<Game>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
@@ -330,7 +329,7 @@ public class GameService : IGameService
         }
         catch (Exception ex)
         {
-            return ServiceResult<Game>.Failure(StatusCodes.Status500InternalServerError);
+            return ServiceResult<Game>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
 
@@ -381,7 +380,7 @@ public class GameService : IGameService
             game.SecondTeam = null;
         }
         
-        if ((game.FirstTeam != null && game.SecondTeam == null) || (game.FirstTeam == null && game.SecondTeam != null))
+        if (game is { FirstTeam: not null, SecondTeam: null } || (game.FirstTeam == null && game.SecondTeam != null))
         {
             game.Status = GameStatus.SingleTeam;
         }
@@ -480,7 +479,7 @@ public class GameService : IGameService
             var tournamentResult = await _tournamentService.GetAsync(game.TournamentMatch.Tournament.Id);
             if (!tournamentResult.IsSuccess)
             {
-                return ServiceResult<bool>.Failure(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+                return ServiceResult<bool>.Failure(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage!);
             }
 
             tournament = tournamentResult.Data!;
@@ -488,7 +487,7 @@ public class GameService : IGameService
             var tournamentMatchesResult = await _tournamentService.GetTournamentMatchesAsync(tournament.Id, true);
             if (!tournamentMatchesResult.IsSuccess)
             {
-                return ServiceResult<bool>.Failure(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+                return ServiceResult<bool>.Failure(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage!);
             }
             tournamentMatch = tournamentMatchesResult.Data.FirstOrDefault(x => x.Id == game.TournamentMatch.Id);
         }
@@ -659,14 +658,14 @@ public class GameService : IGameService
             var result = await _tournamentService.UpdateAsync(tournament);
             if (!result.IsSuccess)
             {
-                return ServiceResult<bool>.Failure(result.ErrorStatus, result.ErrorMessage);
+                return ServiceResult<bool>.Failure(result.ErrorStatus, result.ErrorMessage!);
             }
             foreach (var matchToUpdate in tournamentMatchesToUpdate)
             {
                 result = await _tournamentService.UpdateMatchAsync(matchToUpdate);
                 if (!result.IsSuccess)
                 {
-                    return ServiceResult<bool>.Failure(result.ErrorStatus, result.ErrorMessage);
+                    return ServiceResult<bool>.Failure(result.ErrorStatus, result.ErrorMessage!);
                 }
                 foreach (var gameTeam in new [] {matchToUpdate.Game.FirstTeam, matchToUpdate.Game.SecondTeam})
                 {

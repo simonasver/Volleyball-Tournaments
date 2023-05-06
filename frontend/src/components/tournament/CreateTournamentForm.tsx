@@ -86,6 +86,7 @@ const CreateTournamentForm = () => {
       pictureUrl,
       description,
       isBasic,
+      singleThirdPlace,
       maxTeams,
       pointsToWin,
       pointsToWinLastSet,

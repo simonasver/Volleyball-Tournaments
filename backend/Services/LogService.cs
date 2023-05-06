@@ -1,5 +1,5 @@
-using Backend.Data.Entities;
 using Backend.Data.Entities.Game;
+using Backend.Data.Entities.Log;
 using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
 using Backend.Interfaces.Repositories;

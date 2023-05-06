@@ -1,15 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Backend.Auth.Model;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 
 namespace Backend.Data.Entities.Tournament;
-
-public enum TournamentType
-{
-    SingleElimination,
-    DoubleElimination,
-    RoundRobin
-}
 
 public enum TournamentStatus
 {

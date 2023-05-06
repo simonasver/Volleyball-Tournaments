@@ -1,5 +1,3 @@
-using Backend.Auth.Model;
-
 namespace Backend.Data.Dtos.User;
 
 public class AddRemoveRoleDto

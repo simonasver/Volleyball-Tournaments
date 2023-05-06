@@ -1,15 +1,9 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using System.Xml;
-using Backend.Auth.Model;
+﻿using System.Text.Json;
 using Backend.Data.Dtos.Tournament;
-using Backend.Data.Entities.Game;
-using Backend.Data.Entities.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
-using Backend.Helpers.Utils;
-using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -52,7 +46,7 @@ public class TournamentsController : ControllerBase
             return StatusCode(tournamentsResult.ErrorStatus, tournamentsResult.ErrorMessage);
         }
 
-        var tournaments = (PagedList<Tournament>)tournamentsResult.Data;
+        var tournaments = (PagedList<Tournament>)tournamentsResult.Data!;
         
         var previousPageLink = tournaments.HasPrevious
             ? Url.Link("GetTournaments", new
@@ -116,7 +110,7 @@ public class TournamentsController : ControllerBase
             return StatusCode(userTournamentsResult.ErrorStatus, userTournamentsResult.ErrorMessage);
         }
 
-        var userTournaments = (PagedList<Tournament>)userTournamentsResult.Data;
+        var userTournaments = (PagedList<Tournament>)userTournamentsResult.Data!;
         
         var previousPageLink = userTournaments.HasPrevious
             ? Url.Link("GetUserTournaments", new
@@ -207,7 +201,7 @@ public class TournamentsController : ControllerBase
             return StatusCode(createdTournamentResult.ErrorStatus, createdTournamentResult.ErrorMessage);
         }
         
-        return CreatedAtAction(nameof(Post), createdTournamentResult.Data.Id);
+        return CreatedAtAction(nameof(Post), createdTournamentResult.Data!.Id);
     }
 
     [Authorize]
@@ -544,7 +538,7 @@ public class TournamentsController : ControllerBase
     [HttpPost("/api/[controller]/generate")]
     public async Task<IActionResult> Generate([FromQuery] int teamAmount)
     {
-        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
         
         if (user == null)
         {

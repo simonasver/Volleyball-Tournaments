@@ -1,4 +1,4 @@
-using Backend.Data.Entities;
+using Backend.Data.Entities.Log;
 
 namespace Backend.Interfaces.Repositories;
 

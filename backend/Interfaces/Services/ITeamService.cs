@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;

@@ -12,13 +12,13 @@ public class ServiceResult<T>
         IsSuccess = true;
     }
 
-    public ServiceResult(T data)
+    private ServiceResult(T data)
     {
         IsSuccess = true;
         Data = data;
     }
 
-    public ServiceResult(int errorStatus, string errorMessage)
+    private ServiceResult(int errorStatus, string errorMessage)
     {
         IsSuccess = false;
         ErrorStatus = errorStatus;

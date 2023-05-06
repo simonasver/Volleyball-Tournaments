@@ -1,10 +1,9 @@
-using Backend.Data.Dtos.Game;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 
 namespace Backend.Helpers.Utils;
 
-public class GameUtils
+public static class GameUtils
 {
     /// <summary>
     /// Determines, whether the set could be last for the game
@@ -45,11 +44,11 @@ public class GameUtils
         }
         else throw new InvalidOperationException("Game already has two teams");
 
-        if ((game.FirstTeam != null && game.SecondTeam == null) || (game.FirstTeam == null && game.SecondTeam != null))
+        if (game is { FirstTeam: not null, SecondTeam: null } || (game.FirstTeam == null && game.SecondTeam != null))
         {
             game.Status = GameStatus.SingleTeam;
         }
-        else if (game.FirstTeam != null && game.SecondTeam != null)
+        else if (game is { FirstTeam: not null, SecondTeam: not null })
         {
             game.Status = GameStatus.Ready;
         }
@@ -58,6 +57,11 @@ public class GameUtils
     }
     public static Game AddSetToGame(Game game, int number = 0)
     {
+        if (game.FirstTeam == null || game.SecondTeam == null)
+        {
+            throw new InvalidOperationException("Game must have two teams");
+        }
+        
         var newSet = new Set()
         {
             Number = number + 1,
@@ -113,23 +117,6 @@ public class GameUtils
         }
         game.Sets.Add(newSet);
         return game;
-    }
-    
-    public static GameTeam FindGameLoser(Game game) 
-    {
-        if (game.Winner == null)
-        {
-            throw new InvalidOperationException("Game does not have a winner");
-        }
-
-        if (game.FirstTeam == game.Winner)
-        {
-            return game.SecondTeam;
-        }
-        else
-        {
-            return game.FirstTeam;
-        }
     }
 
     public static GameTeam FindOtherTeam(Game game, GameTeam team)

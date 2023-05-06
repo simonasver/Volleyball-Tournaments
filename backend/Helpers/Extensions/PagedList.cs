@@ -13,7 +13,7 @@ public class PagedList<T> : List<T>
 
     public bool HasNext => (CurrentPage < TotalPages);
 
-    public PagedList(List<T> items, int count, int pageNumber, int pageSize)
+    private PagedList(List<T> items, int count, int pageNumber, int pageSize)
     {
         TotalCount = count;
         PageSize = pageSize;

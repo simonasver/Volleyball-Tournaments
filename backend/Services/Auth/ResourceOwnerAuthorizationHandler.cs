@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
-using Backend.Auth.Model;
+using Backend.Data.Entities.Auth;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace Backend.Services;
+namespace Backend.Services.Auth;
 
 public class ResourceOwnerAuthorizationHandler : AuthorizationHandler<ResourceOwnerRequirement, IUserOwnedResource>
 {

@@ -1,5 +1,4 @@
-﻿using Backend.Data.Entities.Game;
-using Backend.Data.Entities.Tournament;
+﻿using Backend.Data.Entities.Tournament;
 using Backend.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,10 +24,10 @@ public class TournamentMatchRepository : ITournamentMatchRepository
             .Include(x => x.SecondParent)
             .Include(x => x.Game)
                 .ThenInclude(x => x.FirstTeam)
-                    .ThenInclude(x => x.Players)
+                    .ThenInclude(x => x!.Players)
             .Include(x => x.Game)
                 .ThenInclude(x => x.SecondTeam)
-                    .ThenInclude(x => x.Players)
+                    .ThenInclude(x => x!.Players)
             .Where(x => x.Tournament.Id == tournamentId)
             .ToListAsync();
         }

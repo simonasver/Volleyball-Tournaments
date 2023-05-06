@@ -1,6 +1,7 @@
-using Backend.Auth.Model;
+using Backend.Data.Entities.Auth;
 using Backend.Interfaces.Services;
 using Backend.Services;
+using Backend.Services.Auth;
 using Microsoft.Extensions.Configuration;
 
 namespace TestProject.Services;

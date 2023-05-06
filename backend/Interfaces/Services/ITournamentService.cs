@@ -21,5 +21,5 @@ public interface ITournamentService
     public Task<ServiceResult<bool>> RemoveTeamAsync(Tournament tournament, Guid teamId);
     public Task<ServiceResult<bool>> StartAsync(Tournament tournament);
     public Task<ServiceResult<bool>> MoveBracketAsync(Tournament tournament, Guid matchId);
-    public Task<ServiceResult<bool>> GenerateAsync(int teamAmount, string userId);
+    public Task<ServiceResult<bool>> GenerateAsync(int? teamAmount, string userId);
 }

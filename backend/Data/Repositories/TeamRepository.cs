@@ -2,7 +2,6 @@
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Data.Repositories;

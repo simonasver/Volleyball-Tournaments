@@ -1,4 +1,4 @@
-using Backend.Data.Entities;
+using Backend.Data.Entities.Log;
 using Backend.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,14 +13,9 @@ public class LogRepository : ILogRepository
         _dbContext = dbContext;
     }
 
-    public async Task<IEnumerable<Log>> GetAllTournament(Guid tournamentId)
-    {
-        return await _dbContext.Logs.Where(x => x.Tournament != null && x.Tournament.Id == tournamentId).OrderByDescending(x => x.Time).ToListAsync();
-    }
-
     public async Task<IEnumerable<Log>> GetAllGame(Guid gameId)
     {
-        return await _dbContext.Logs.Where(x => x.Game != null && x.Game.Id == gameId).OrderByDescending(x => x.Time).ToListAsync();;
+        return await _dbContext.Logs.Where(x => x.Game != null && x.Game.Id == gameId).OrderByDescending(x => x.Time).ToListAsync();
     }
 
     public async Task<Log> CreateAsync(Log log)
@@ -32,13 +27,13 @@ public class LogRepository : ILogRepository
 
     public async Task DeleteAllGameAsync(Guid gameId)
     {
-        _dbContext.Logs.RemoveRange(_dbContext.Logs.Where(x => x.Game.Id == gameId));
+        _dbContext.Logs.RemoveRange(_dbContext.Logs.Where(x => x.Game != null && x.Game.Id == gameId));
         await _dbContext.SaveChangesAsync();
     }
 
     public async Task DeleteAllTournamentAsync(Guid tournamentId)
     {
-        _dbContext.Logs.RemoveRange(_dbContext.Logs.Where(x => x.Tournament.Id == tournamentId));
+        _dbContext.Logs.RemoveRange(_dbContext.Logs.Where(x => x.Tournament != null && x.Tournament.Id == tournamentId));
         await _dbContext.SaveChangesAsync();
     }
 }

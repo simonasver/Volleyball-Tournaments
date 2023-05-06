@@ -1,15 +1,13 @@
 ﻿using System.Text.Json;
-using Backend.Auth.Model;
-using Backend.Data.Dtos.Admin;
 using Backend.Data.Dtos.Auth;
 using Backend.Data.Dtos.User;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
 using Backend.Helpers.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers.Auth;
 
@@ -209,7 +207,7 @@ public class UsersController : ControllerBase
             return NotFound("User not found");
         }
 
-        if (addRemoveRoleDto.Role.ToString() == ApplicationUserRoles.User)
+        if (addRemoveRoleDto.Role == ApplicationUserRoles.User)
         {
             return BadRequest("Cannot remove or add User role");
         }
@@ -217,20 +215,20 @@ public class UsersController : ControllerBase
         var userRoles = await _userManager.GetRolesAsync(user);
         if (addRemoveRoleDto.Add)
         {
-            if (userRoles.Contains(addRemoveRoleDto.Role.ToString()))
+            if (userRoles.Contains(addRemoveRoleDto.Role))
             {
                 return BadRequest("User already has the role " + addRemoveRoleDto.Role);
             }
-            await _userManager.AddToRoleAsync(user, addRemoveRoleDto.Role.ToString());
+            await _userManager.AddToRoleAsync(user, addRemoveRoleDto.Role);
         }
         else
         {
-            if (!userRoles.Contains(addRemoveRoleDto.Role.ToString()))
+            if (!userRoles.Contains(addRemoveRoleDto.Role))
             {
                 return BadRequest("User is not in the role " + addRemoveRoleDto.Role);
             }
 
-            await _userManager.RemoveFromRoleAsync(user, addRemoveRoleDto.Role.ToString());
+            await _userManager.RemoveFromRoleAsync(user, addRemoveRoleDto.Role);
         }
         
         return NoContent();

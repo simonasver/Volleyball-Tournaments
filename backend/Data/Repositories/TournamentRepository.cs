@@ -1,5 +1,4 @@
-﻿using Backend.Data.Entities.Team;
-using Backend.Data.Entities.Tournament;
+﻿using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
 using Backend.Interfaces.Repositories;

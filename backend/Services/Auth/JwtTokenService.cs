@@ -7,7 +7,7 @@ using Backend.Interfaces.Services;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Backend.Services;
+namespace Backend.Services.Auth;
 
 public class JwtTokenService : IJwtTokenService
 {

@@ -9,7 +9,8 @@ const LogoutForm = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   React.useEffect(() => {
-    logout(dispatch)
+    const abortController = new AbortController();
+    logout(dispatch, abortController.signal)
       .then()
       .catch((e) => {
         console.log(e);
@@ -20,6 +21,7 @@ const LogoutForm = () => {
         );
         return navigate("/", { replace: true });
       });
+    return () => abortController.abort();
   }, []);
   return <Loader isOpen={true}/>;
 };

@@ -1,11 +1,10 @@
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
-using Backend.Data.Entities.Utils;
 
 namespace Backend.Helpers.Utils;
 
-public class TournamentUtils
+public static class TournamentUtils
 {
     public static Tournament AddTeamToTournament(Tournament tournament, Team team)
     {
@@ -40,8 +39,7 @@ public class TournamentUtils
 
     public static TournamentMatch GenerateEmptyBracket(Tournament tournament, int roundCount)
     {
-        var games = new TournamentMatch();
-        games = GenerateParentGames(
+        var games = GenerateParentGames(
             tournament,
             new TournamentMatch()
             {
@@ -179,7 +177,7 @@ public class TournamentUtils
 
     public static IEnumerable<TournamentMatch> MoveMatchTeamDown(ICollection<TournamentMatch> tournamentMatches, TournamentMatch tournamentMatch)
     {
-        if (tournamentMatch.Game.FirstTeam != null && tournamentMatch.Game.SecondTeam != null)
+        if (tournamentMatch.Game is { FirstTeam: not null, SecondTeam: not null })
         {
             throw new InvalidOperationException("Cannot move down a team if it has an opponent");
         }
@@ -244,7 +242,7 @@ public class TournamentUtils
     {
         if (tournamentMatch.FirstParent == null && tournamentMatch.SecondParent == null)
         {
-            return (tournamentMatch.Game.FirstTeam != null && tournamentMatch.Game.SecondTeam != null);
+            return tournamentMatch.Game is { FirstTeam: not null, SecondTeam: not null };
         }
         
         return (HasDirectAncestor(tournamentMatch.FirstParent) || HasDirectAncestor(tournamentMatch.SecondParent));
@@ -266,7 +264,7 @@ public class TournamentUtils
             tournament.Winner = tournamentMatch.Game.Winner;
             tournament.Status = TournamentStatus.Finished;
         }
-        else
+        else if (!tournamentMatch.ThirdPlace)
         {
             var childMatch = FindChildMatchOf(tournament.Matches, tournamentMatch);
             if (!childMatch.Item2)
@@ -281,31 +279,17 @@ public class TournamentUtils
                 childMatch.Item1.Game = CheckIfGameIsReady(childMatch.Item1);
                 matchesToUpdate.Add(childMatch.Item1);
             }
-            if (tournamentMatch.Round == lastRound - 1 && tournament.SingleThirdPlace && tournament.AcceptedTeams.Count >= 4)
+            if (tournamentMatch.Round == lastRound - 1 && tournament is { SingleThirdPlace: true, AcceptedTeams.Count: >= 4 })
             {
-                var thirdPlaceMatch = tournament.Matches.FirstOrDefault(x => x.ThirdPlace);
+                var thirdPlaceMatch = tournament.Matches.FirstOrDefault(x => x.ThirdPlace)!;
                 var thirdPlaceGame = thirdPlaceMatch.Game;
                 if (thirdPlaceGame.FirstTeam == null)
                 {
-                    try
-                    {
-                        thirdPlaceGame.FirstTeam = GameUtils.FindOtherTeam(tournamentMatch.Game, tournamentMatch.Game.Winner).Copy();
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
+                    thirdPlaceGame.FirstTeam = GameUtils.FindOtherTeam(tournamentMatch.Game, tournamentMatch.Game.Winner).Copy();
                 }
                 else if (thirdPlaceGame.SecondTeam == null)
                 {
-                    try
-                    {
-                        thirdPlaceGame.SecondTeam = GameUtils.FindOtherTeam(tournamentMatch.Game, tournamentMatch.Game.Winner).Copy();
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
+                    thirdPlaceGame.SecondTeam = GameUtils.FindOtherTeam(tournamentMatch.Game, tournamentMatch.Game.Winner).Copy();
                 }
                 thirdPlaceMatch.Game = CheckIfGameIsReady(thirdPlaceMatch);
                 matchesToUpdate.Add(thirdPlaceMatch);

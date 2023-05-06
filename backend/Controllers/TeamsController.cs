@@ -1,11 +1,9 @@
 ﻿using System.Text.Json;
-using Backend.Auth.Model;
 using Backend.Data.Dtos.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
-using Backend.Helpers.Utils;
-using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -39,7 +37,7 @@ public class TeamsController : ControllerBase
             return StatusCode(teamsResult.ErrorStatus, teamsResult.ErrorMessage);
         }
 
-        var teams = (PagedList<Team>)teamsResult.Data;
+        var teams = (PagedList<Team>)teamsResult.Data!;
 
         var previousPageLink = teams.HasPrevious
             ? Url.Link("GetTeams", new
@@ -102,7 +100,7 @@ public class TeamsController : ControllerBase
         {
             return StatusCode(userTeamsResult.ErrorStatus, userTeamsResult.ErrorMessage);
         }
-        var userTeams = (PagedList<Team>)userTeamsResult.Data;
+        var userTeams = (PagedList<Team>)userTeamsResult.Data!;
         
         var previousPageLink = userTeams.HasPrevious
             ? Url.Link("GetUserTeams", new
@@ -169,7 +167,7 @@ public class TeamsController : ControllerBase
 
         if (createdTeamResult.IsSuccess)
         {
-            return CreatedAtAction(nameof(Post), createdTeamResult.Data.Id);
+            return CreatedAtAction(nameof(Post), createdTeamResult.Data!.Id);
         }
 
         return StatusCode(createdTeamResult.ErrorStatus, createdTeamResult.ErrorMessage);
@@ -259,7 +257,7 @@ public class TeamsController : ControllerBase
             return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
         }
 
-        var team = teamResult.Data;
+        var team = teamResult.Data!;
         
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
@@ -293,7 +291,7 @@ public class TeamsController : ControllerBase
             return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
         }
 
-        var team = teamResult.Data;
+        var team = teamResult.Data!;
         
         // Only if it's user owned resource or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))

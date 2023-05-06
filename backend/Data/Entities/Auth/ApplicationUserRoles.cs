@@ -1,4 +1,4 @@
-﻿namespace Backend.Auth.Model;
+﻿namespace Backend.Data.Entities.Auth;
 
 public class ApplicationUserRoles
 {

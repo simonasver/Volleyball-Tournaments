@@ -53,7 +53,7 @@ public class TournamentService : ITournamentService
 
     public async Task<ServiceResult<Tournament>> GetAsync(Guid tournamentId)
     {
-        Tournament tournament;
+        Tournament? tournament;
         try
         {
             tournament = await _tournamentRepository.GetAsync(tournamentId);
@@ -63,12 +63,7 @@ public class TournamentService : ITournamentService
             return ServiceResult<Tournament>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
         }
 
-        if (tournament == null)
-        {
-            return ServiceResult<Tournament>.Failure(StatusCodes.Status404NotFound);
-        }
-        
-        return ServiceResult<Tournament>.Success(tournament);
+        return tournament == null ? ServiceResult<Tournament>.Failure(StatusCodes.Status404NotFound) : ServiceResult<Tournament>.Success(tournament);
     }
 
     public async Task<ServiceResult<IEnumerable<TournamentMatch>>> GetTournamentMatchesAsync(Guid tournamentId, bool allData)
@@ -270,7 +265,7 @@ public class TournamentService : ITournamentService
             var logsDeleteResult = await _logService.DeleteTournamentLogsAsync(tournament.Id);
             if (!logsDeleteResult.IsSuccess)
             {
-                return ServiceResult<bool>.Failure(logsDeleteResult.ErrorStatus, logsDeleteResult.ErrorMessage);
+                return ServiceResult<bool>.Failure(logsDeleteResult.ErrorStatus, logsDeleteResult.ErrorMessage!);
             }
             await _tournamentRepository.DeleteAsync(tournament.Id);
             return ServiceResult<bool>.Success();
@@ -319,7 +314,7 @@ public class TournamentService : ITournamentService
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Tournament is already full");
         }
 
-        if (!tournament.RequestedTeams.Any(x => x.Id == addTeamToTournamentDto.TeamId))
+        if (tournament.RequestedTeams.All(x => x.Id != addTeamToTournamentDto.TeamId))
         {
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Team has not requested to join the game");
         }
@@ -435,7 +430,7 @@ public class TournamentService : ITournamentService
 
         if (!tournamentMatchesResult.IsSuccess)
         {
-            return ServiceResult<bool>.Failure(tournamentMatchesResult.ErrorStatus, tournamentMatchesResult.ErrorMessage);
+            return ServiceResult<bool>.Failure(tournamentMatchesResult.ErrorStatus, tournamentMatchesResult.ErrorMessage!);
         }
 
         var tournamentMatches = tournamentMatchesResult.Data;
@@ -475,7 +470,7 @@ public class TournamentService : ITournamentService
         return ServiceResult<bool>.Success();
     }
 
-    public async Task<ServiceResult<bool>> GenerateAsync(int teamAmount, string userId)
+    public async Task<ServiceResult<bool>> GenerateAsync(int? teamAmount, string userId)
     {
         if (teamAmount == null || teamAmount < 0 || teamAmount > 128)
         {

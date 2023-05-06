@@ -1,4 +1,4 @@
-﻿using Backend.Auth.Model;
+﻿using Backend.Data.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 
 namespace Backend.Data;
@@ -31,7 +31,7 @@ public class AuthDbSeeder
         }
     }
 
-    private async Task<string> AddAdminUser()
+    private async Task AddAdminUser()
     {
         var newAdminUser = new ApplicationUser()
         {
@@ -49,10 +49,6 @@ public class AuthDbSeeder
             {
                 await _userManager.AddToRolesAsync(newAdminUser, ApplicationUserRoles.All);
             }
-
-            return "";
         }
-
-        return existingAdminUser.Id;
     }
 }

@@ -1,4 +1,3 @@
-using Backend.Auth.Model;
 using Backend.Data;
 using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;

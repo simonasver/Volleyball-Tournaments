@@ -1,5 +1,4 @@
 ﻿using Backend.Data.Entities.Game;
-using Backend.Data.Entities.Tournament;
 using Backend.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 

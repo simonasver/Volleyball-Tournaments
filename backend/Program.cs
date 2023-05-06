@@ -1,12 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
-using Backend.Auth.Model;
 using Backend.Data;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Repositories;
 using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Backend.Services;
+using Backend.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

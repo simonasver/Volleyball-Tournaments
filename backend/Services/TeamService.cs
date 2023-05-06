@@ -1,4 +1,3 @@
-using System.Security.Policy;
 using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
@@ -37,7 +36,7 @@ public class TeamService : ITeamService
         {
             teams = await _teamRepository.GetAllUserAsync(searchParameters, userId);
         }
-        catch (Exception ex)
+        catch
         {
             return ServiceResult<IEnumerable<Team>>.Failure(StatusCodes.Status500InternalServerError, "Not found");
         }
@@ -47,7 +46,7 @@ public class TeamService : ITeamService
 
     public async Task<ServiceResult<Team>> GetAsync(Guid teamId)
     {
-        Team team;
+        Team? team;
         try
         {
             team = await _teamRepository.GetAsync(teamId);

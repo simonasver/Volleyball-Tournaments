@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Backend.Data.Entities.Game;
+﻿using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Utils;
 
 namespace Backend.Interfaces.Repositories;

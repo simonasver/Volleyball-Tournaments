@@ -1,4 +1,4 @@
-﻿using Backend.Auth.Model;
+﻿using Backend.Data.Entities.Auth;
 
 namespace Backend.Data.Entities.Team
 {

@@ -1,5 +1,6 @@
 using Backend.Data.Entities;
 using Backend.Data.Entities.Game;
+using Backend.Data.Entities.Log;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
 

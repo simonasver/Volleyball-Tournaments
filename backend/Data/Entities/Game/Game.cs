@@ -1,4 +1,4 @@
-﻿using Backend.Auth.Model;
+﻿using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Tournament;
 
 namespace Backend.Data.Entities.Game;

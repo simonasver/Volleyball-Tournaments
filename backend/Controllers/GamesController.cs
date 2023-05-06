@@ -1,20 +1,13 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Backend.Auth.Model;
+﻿using System.Text.Json;
 using Backend.Data.Dtos.Game;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
-using Backend.Data.Entities.Team;
-using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Extensions;
-using Backend.Helpers.Utils;
-using Backend.Interfaces.Repositories;
 using Backend.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers;
 
@@ -56,7 +49,7 @@ public class GamesController : ControllerBase
             return StatusCode(gamesResult.ErrorStatus, gamesResult.ErrorMessage);
         }
         
-        var games = (PagedList<Game>)gamesResult.Data;
+        var games = (PagedList<Game>)gamesResult.Data!;
 
         var previousPageLink = games.HasPrevious
             ? Url.Link("GetGames", new
@@ -121,7 +114,7 @@ public class GamesController : ControllerBase
             return StatusCode(userGamesResult.ErrorStatus, userGamesResult.ErrorMessage);
         }
 
-        var userGames = (PagedList<Game>)userGamesResult.Data;
+        var userGames = (PagedList<Game>)userGamesResult.Data!;
         
         var previousPageLink = userGames.HasPrevious
             ? Url.Link("GetUserGames", new
@@ -212,7 +205,7 @@ public class GamesController : ControllerBase
             return StatusCode(createdGameResult.ErrorStatus, createdGameResult.ErrorMessage);
         }
 
-        return CreatedAtAction(nameof(Post), createdGameResult.Data.Id);
+        return CreatedAtAction(nameof(Post), createdGameResult.Data!.Id);
     }
 
     [Authorize]
@@ -442,7 +435,7 @@ public class GamesController : ControllerBase
             return NotFound();
         }
         
-        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
         
         if (user == null)
         {
@@ -530,7 +523,7 @@ public class GamesController : ControllerBase
             return BadRequest("Game does not exist");
         }
         
-        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
         
         if (user == null)
         {
@@ -577,7 +570,7 @@ public class GamesController : ControllerBase
             return BadRequest("Game does not exist");
         }
         
-        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        var user = await _userManager.FindByNameAsync(User.Identity?.Name);
         
         if (user == null)
         {
@@ -637,7 +630,7 @@ public class GamesController : ControllerBase
                 await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
             if (!authorization.Succeeded)
             {
-                return Ok(logs.Data.Where(x => !x.IsPrivate));
+                return Ok(logs.Data!.Where(x => !x.IsPrivate));
             }
 
             return Ok(logs.Data);
