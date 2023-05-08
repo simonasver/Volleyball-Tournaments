@@ -38,6 +38,12 @@ const CreateTeamForm = () => {
       .catch((e) => {
         console.log(e);
         setError(errorMessageFromAxiosError(e));
+        dispatch(
+          alertActions.changeAlert({
+            type: "error",
+            message: errorMessageFromAxiosError(e),
+          })
+        );
       });
   };
 

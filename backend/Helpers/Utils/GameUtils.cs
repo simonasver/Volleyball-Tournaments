@@ -6,14 +6,13 @@ namespace Backend.Helpers.Utils;
 public static class GameUtils
 {
     /// <summary>
-    /// Determines, whether the set could be last for the game
+    /// Determines, whether the set is the last for the game
     /// </summary>
     /// <param name="game"></param>
     /// <param name="set"></param>
     public static bool IsFinalSet(Game game, Set set)
     {
-        return (game.FirstTeamScore == (((game.MaxSets + 1) / 2) - 1) ||
-               game.SecondTeamScore == (((game.MaxSets + 1) / 2) - 1));
+        return game.MaxSets == set.Number;
     }
     public static Game AddTeamToGame(Game game, Team team)
     {

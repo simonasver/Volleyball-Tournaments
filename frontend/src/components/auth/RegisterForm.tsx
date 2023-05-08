@@ -6,9 +6,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { register } from "../../services/auth.service";
 import { errorMessageFromAxiosError } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/hooks";
+import { alertActions } from "../../store/alert-slice";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
 
   const [alertType, setAlertType] = React.useState<
     "success" | "info" | "warning" | "error"
@@ -36,12 +40,24 @@ const RegisterForm = () => {
           </>
         );
         setAlert(successfulElement);
+        dispatch(
+          alertActions.changeAlert({
+            type: "success",
+            message: "Successfully registered",
+          })
+        );
       })
       .catch((e) => {
         const errorMessage = errorMessageFromAxiosError(e);
         setAlertType("error");
         const errorElement = <Typography>{errorMessage}</Typography>;
         setAlert(errorElement);
+        dispatch(
+          alertActions.changeAlert({
+            type: "error",
+            message: errorMessageFromAxiosError(e),
+          })
+        );
       });
   };
 

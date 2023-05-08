@@ -44,9 +44,15 @@ const SetTable = (props: SetTableProps) => {
         color={
           status === GameStatus.Finished
             ? team === winner
-              ? "green"
-              : "red"
+              ? "primary"
+              : "default"
             : "default"
+        }
+        fontWeight={status === GameStatus.Finished
+          ? team === winner
+            ? "bold"
+            : "default"
+          : "default"
         }
       >
         {teamName}
@@ -56,9 +62,15 @@ const SetTable = (props: SetTableProps) => {
         color={
           status === GameStatus.Finished
             ? team === winner
-              ? "green"
-              : "red"
+              ? "primary"
+              : "default"
             : "default"
+        }
+        fontWeight={status === GameStatus.Finished
+          ? team === winner
+            ? "bold"
+            : "default"
+          : "default"
         }
       >
         {teamScore}

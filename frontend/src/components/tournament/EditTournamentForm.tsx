@@ -87,6 +87,12 @@ const EditTournamentForm = () => {
         .catch((e) => {
           console.log(e);
           const errorMessage = errorMessageFromAxiosError(e);
+          dispatch(
+            alertActions.changeAlert({
+              type: "error",
+              message: errorMessageFromAxiosError(e),
+            })
+          );
           setError(errorMessage);
           if (errorMessage) {
             setIsLoading(false);

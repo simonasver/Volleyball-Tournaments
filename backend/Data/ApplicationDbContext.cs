@@ -37,6 +37,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Team>().HasMany(t => t.Players).WithOne(tp => tp.Team).OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<Game>().HasMany(g => g.RequestedTeams).WithMany(t => t.GamesRequestedTo).UsingEntity(join => join.ToTable("GameRequestedTeams"));
         builder.Entity<Game>().HasMany(g => g.Sets).WithOne(s => s.Game).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.FirstTeam).WithOne().HasForeignKey<GameTeam>("GameWhereFirstId").OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.SecondTeam).WithOne().HasForeignKey<GameTeam>("GameWhereSecondId").OnDelete(DeleteBehavior.Cascade);
@@ -46,7 +47,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Set>().HasMany(s => s.Players).WithOne().HasForeignKey("SetId").OnDelete(DeleteBehavior.Cascade);
         
-        builder.Entity<Tournament>().HasMany(t => t.RequestedTeams);
+        builder.Entity<Tournament>().HasMany(t => t.RequestedTeams).WithMany(t => t.TournamentsRequestedTo).UsingEntity(join => join.ToTable("TournamentRequestedTeams"));;
         builder.Entity<Tournament>().HasMany(t => t.AcceptedTeams).WithOne(at => at.Tournament)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Tournament>().HasMany(t => t.Matches).WithOne(m => m.Tournament)

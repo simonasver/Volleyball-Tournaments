@@ -43,7 +43,7 @@ const LoginForm = () => {
         dispatch(
           alertActions.changeAlert({
             type: "success",
-            message: "Successfully logged in!",
+            message: "Successfully logged in",
           })
         );
         navigate("/", { replace: true });
@@ -51,6 +51,12 @@ const LoginForm = () => {
       .catch((e) => {
         console.log(e);
         setError(errorMessageFromAxiosError(e));
+        dispatch(
+          alertActions.changeAlert({
+            type: "error",
+            message: errorMessageFromAxiosError(e),
+          })
+        );
       });
   };
 

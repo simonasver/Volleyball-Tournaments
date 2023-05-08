@@ -11,6 +11,8 @@ namespace Backend.Data.Entities.Team
         public DateTime CreateDate { get; set; }
         public DateTime LastEditDate { get; set; }
         public ICollection<TeamPlayer> Players { get; set; }
+        public ICollection<Game.Game> GamesRequestedTo { get; set; }
+        public ICollection<Tournament.Tournament> TournamentsRequestedTo { get; set; }
 
         public string OwnerId { get; set; }
         public ApplicationUser Owner { get; set; }

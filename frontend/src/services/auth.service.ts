@@ -33,7 +33,12 @@ export const refresh = async (token: string) => {
 };
 
 export const logout = async (dispatch: AppDispatch, signal?: AbortSignal) => {
+  try {
     const res = await api.delete("/Tokens", { signal: signal });
-    dispatch(authActions.clearUser());
     return res.data;
+  } catch (e) {
+    return Promise.reject(e);
+  } finally {
+    dispatch(authActions.clearUser());
+  }
 };
