@@ -196,7 +196,7 @@ const EditGameForm = () => {
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
             setPictureUrl(e.target.value)
           }
-          type="text"
+          type="url"
           label="Game picture (url)"
           variant="outlined"
           fullWidth

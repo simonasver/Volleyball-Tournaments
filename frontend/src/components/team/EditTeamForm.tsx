@@ -118,7 +118,7 @@ const EditTeamForm = () => {
           onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTeamPicture(e.target.value)
           }
-          type="text"
+          type="url"
           label="Team picture (url)"
           variant="outlined"
           fullWidth

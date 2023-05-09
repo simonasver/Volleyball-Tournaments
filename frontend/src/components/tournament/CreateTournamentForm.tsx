@@ -197,7 +197,7 @@ const CreateTournamentForm = () => {
             onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
               setPictureUrl(e.target.value)
             }
-            type="text"
+            type="url"
             label="Tournament picture (url)"
             variant="outlined"
             fullWidth
