@@ -143,10 +143,10 @@ const GameList = (props: GameListProps) => {
           There are no games yet. Create one!
         </Typography>
       )}
-      {pagination && (
+      {(games?.length ?? 0 > 0) && (
         <Pagination
           defaultPage={currentPage.pageNumber}
-          count={pagination.totalPages}
+          count={pagination?.totalPages}
           onChange={(event: React.ChangeEvent<unknown>, page: number) =>
             setSearchParams(page, currentPage.pageSize)
           }

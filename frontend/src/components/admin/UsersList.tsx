@@ -306,10 +306,10 @@ const UsersList = () => {
           justifyContent="center"
         >
           <Grid item>
-            {pagination && (
+            {(users?.length ?? 0) > 0 && (
               <Pagination
                 defaultPage={currentPage.pageNumber}
-                count={pagination.totalPages}
+                count={pagination?.totalPages}
                 onChange={(event: React.ChangeEvent<unknown>, page: number) =>
                   setSearchParams(page, currentPage.pageSize)
                 }
