@@ -143,7 +143,7 @@ const GameList = (props: GameListProps) => {
           There are no games yet. Create one!
         </Typography>
       )}
-      {(games?.length ?? 0 > 0) && (
+      {(games?.length ?? 0) > 0 && (
         <Pagination
           defaultPage={currentPage.pageNumber}
           count={pagination?.totalPages}
