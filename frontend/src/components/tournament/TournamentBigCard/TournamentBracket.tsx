@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import { Bracket, BracketGame } from "react-tournament-bracket";
 import { TournamentMatch } from "../../../utils/types";
 import { Game } from "react-tournament-bracket/lib/components/model";
