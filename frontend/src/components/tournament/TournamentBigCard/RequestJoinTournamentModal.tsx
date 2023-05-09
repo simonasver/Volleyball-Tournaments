@@ -59,7 +59,7 @@ const RequestJoinTournamentModal = (props: RequestJoinTournamentModalProps) => {
           >
             {teams.map((item) => (
               <MenuItem key={item.id} value={item.id}>
-                {item.title}
+                {item.title}, {item.players.length} players
               </MenuItem>
             ))}
           </Select>
