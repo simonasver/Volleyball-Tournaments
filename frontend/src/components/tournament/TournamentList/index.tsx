@@ -53,7 +53,8 @@ const TournamentList = (props: GameListProps) => {
       navigate(
         `/${
           all ? "tournaments" : "mytournaments"
-        }?${formatPaginationDataToQuery(getDefaultPaginationData())}`
+        }?${formatPaginationDataToQuery(getDefaultPaginationData())}`,
+        { replace: true }
       );
     } else {
       setSearchParams(pageNumber, pageSize);

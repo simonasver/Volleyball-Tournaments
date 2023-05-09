@@ -51,7 +51,8 @@ const TeamList = (props: TeamListProps) => {
       navigate(
         `/${all ? "teams" : "myteams"}?${formatPaginationDataToQuery(
           getDefaultPaginationData()
-        )}`
+        )}`,
+        { replace: true }
       );
     } else {
       setSearchParams(pageNumber, pageSize);

@@ -50,7 +50,8 @@ const GameList = (props: GameListProps) => {
       navigate(
         `/${all ? "games" : "mygames"}?${formatPaginationDataToQuery(
           getDefaultPaginationData()
-        )}`
+        )}`,
+        { replace: true }
       );
     } else {
       setSearchParams(pageNumber, pageSize);

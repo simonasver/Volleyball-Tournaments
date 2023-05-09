@@ -69,7 +69,8 @@ const UsersList = () => {
     const pageSize: number = parseInt(query.get("pageSize") ?? "") ?? 1;
     if (!pageNumber && !pageSize) {
       navigate(
-        `/users?${formatPaginationDataToQuery(getDefaultPaginationData())}`
+        `/users?${formatPaginationDataToQuery(getDefaultPaginationData())}`,
+        { replace: true }
       );
     } else {
       setSearchParams(pageNumber, pageSize);
