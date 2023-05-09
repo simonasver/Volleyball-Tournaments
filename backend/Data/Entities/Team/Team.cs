@@ -1,8 +1,9 @@
 ﻿using Backend.Data.Entities.Auth;
+using Backend.Interfaces.Services;
 
 namespace Backend.Data.Entities.Team
 {
-    public class Team
+    public class Team : IUserOwnedResource
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

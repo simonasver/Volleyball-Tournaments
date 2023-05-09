@@ -1,8 +1,9 @@
 using Backend.Data.Entities.Auth;
+using Backend.Interfaces.Services;
 
 namespace Backend.Data.Entities.Log;
 
-public class Log
+public class Log : IUserOwnedResource
 {
     public Guid Id { get; set; }
     public bool IsPrivate { get; set; }

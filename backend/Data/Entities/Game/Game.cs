@@ -1,5 +1,6 @@
 ﻿using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Tournament;
+using Backend.Interfaces.Services;
 
 namespace Backend.Data.Entities.Game;
 
@@ -12,7 +13,7 @@ public enum GameStatus
     Finished
 }
 
-public class Game
+public class Game : IUserOwnedResource
 {
     public Guid Id { get; set; }
     public string Title { get; set; }

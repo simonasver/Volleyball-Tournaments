@@ -198,6 +198,7 @@ public class TeamsController : ControllerBase
                 await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
             if (!authorization.Succeeded)
             {
+                Console.WriteLine("No authorization");
                 return Forbid();
             }
         }

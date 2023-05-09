@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
+using Backend.Interfaces.Services;
 
 namespace Backend.Data.Entities.Tournament;
 
@@ -12,7 +13,7 @@ public enum TournamentStatus
     Finished
 }
 
-public class Tournament
+public class Tournament : IUserOwnedResource
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
