@@ -106,7 +106,7 @@ public class TeamService : ITeamService
     {
         var teams = await _teamRepository.GetAllAsync();
 
-        if (teams.Any(x => x.Title == editTeamDto.Title))
+        if (teams.Any(x => x.Title == editTeamDto.Title && x.Id != team.Id))
         {
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Team title must be unique");
         }
