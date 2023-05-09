@@ -37,13 +37,13 @@ const EditProfile = () => {
             console.log(e);
             const errorMessage = errorMessageFromAxiosError(e);
             setError(errorMessage);
-            dispatch(
-              alertActions.changeAlert({
-                type: "error",
-                message: errorMessage,
-              })
-            );
             if(errorMessage){
+              dispatch(
+                alertActions.changeAlert({
+                  type: "error",
+                  message: errorMessageFromAxiosError(e),
+                })
+              );
               setIsLoading(false);
             }
         })
