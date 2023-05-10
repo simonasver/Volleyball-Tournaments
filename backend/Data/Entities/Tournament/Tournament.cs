@@ -13,7 +13,7 @@ public enum TournamentStatus
     Finished
 }
 
-public class Tournament : IUserOwnedResource
+public class Tournament : IUserManagedResource
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
@@ -43,4 +43,5 @@ public class Tournament : IUserOwnedResource
     
     public string OwnerId { get; set; }
     public ApplicationUser Owner { get; set; }
+    public ICollection<ApplicationUser> Managers { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using Backend.Data.Dtos.Tournament;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
@@ -522,6 +523,56 @@ public class TournamentService : ITournamentService
         try
         {
             await _tournamentRepository.CreateAsync(tournament);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+    
+    public async Task<ServiceResult<bool>> AddManager(Tournament tournament, ApplicationUser user)
+    {
+        if (tournament.OwnerId == user.Id)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Owner cannot be manager");
+        }
+        
+        var manager = tournament.Managers.FirstOrDefault(x => x.Id == user.Id);
+        if (manager != null)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is already a manager of this resource");
+        }
+        
+        tournament.Managers.Add(user);
+
+        try
+        {
+            await _tournamentRepository.UpdateAsync(tournament);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> RemoveManager(Tournament tournament, ApplicationUser user)
+    {
+        if (tournament.OwnerId == user.Id)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Cannot remove managing permission from the owner");
+        }
+        
+        var manager = tournament.Managers.FirstOrDefault(x => x.Id == user.Id);
+        if (manager == null)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is not a manager of this resource");
+        }
+        
+        try
+        {
+            await _tournamentRepository.UpdateAsync(tournament);
             return ServiceResult<bool>.Success();
         }
         catch (Exception ex)

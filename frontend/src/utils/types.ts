@@ -1,3 +1,5 @@
+import { User } from "../store/auth-slice";
+
 export interface Tournament {
   id: string;
   title: string;
@@ -21,6 +23,7 @@ export interface Tournament {
   winner: GameTeam;
   matches: TournamentMatch[];
   ownerId: string;
+  managers: User[];
 }
 
 export interface TournamentMatch {
@@ -76,6 +79,7 @@ export interface Game {
   blockedTeams: Team[];
   tournamentMatch: TournamentMatch;
   ownerId: string;
+  managers: User[];
 }
 
 export enum GameScore {
@@ -160,6 +164,7 @@ export interface Team {
   lastEditDate: string;
   players: TeamPlayer[];
   ownerId: string;
+  managers: User[];
 }
 
 export interface TeamPlayer {

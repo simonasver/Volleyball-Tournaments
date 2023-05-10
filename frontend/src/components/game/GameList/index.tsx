@@ -14,11 +14,12 @@ import GameSmallCard from "./GameSmallCard";
 import { Game, PageData } from "../../../utils/types";
 
 interface GameListProps {
+  searchInput?: string;
   all?: boolean;
 }
 
 const GameList = (props: GameListProps) => {
-  const { all } = props;
+  const { all, searchInput } = props;
 
   const navigate = useNavigate();
 
@@ -68,12 +69,14 @@ const GameList = (props: GameListProps) => {
           user.id,
           currentPage?.pageNumber,
           currentPage?.pageSize,
+          searchInput ?? "",
           abortController.signal
         )
           .then((res) => {
             setGames(res.data);
             setPagination(res.pagination);
             setIsLoading(false);
+            setError("");
           })
           .catch((e) => {
             console.error(e);
@@ -88,12 +91,14 @@ const GameList = (props: GameListProps) => {
       getGames(
         currentPage?.pageNumber,
         currentPage?.pageSize,
+        searchInput ?? "",
         abortController.signal
       )
         .then((res) => {
           setGames(res.data);
           setPagination(res.pagination);
           setIsLoading(false);
+          setError("");
         })
         .catch((e) => {
           console.error(e);
@@ -105,7 +110,7 @@ const GameList = (props: GameListProps) => {
         });
     }
     return () => abortController.abort();
-  }, [currentPage]);
+  }, [currentPage, searchInput]);
 
   return (
     <>

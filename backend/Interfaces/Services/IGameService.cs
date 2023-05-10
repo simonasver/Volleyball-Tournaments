@@ -1,4 +1,6 @@
 ﻿using Backend.Data.Dtos.Game;
+using Backend.Data.Dtos.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
@@ -22,4 +24,7 @@ public interface IGameService
 
     public Task<ServiceResult<bool>> ChangePlayerSetStatsAsync(ChangeSetPlayerStatsDto changeSetPlayerStatsDto, Game game,
         Guid setId, Guid playerId, string userId);
+
+    public Task<ServiceResult<bool>> AddManager(Game game, ApplicationUser user);
+    public Task<ServiceResult<bool>> RemoveManager(Game game, ApplicationUser user);
 }

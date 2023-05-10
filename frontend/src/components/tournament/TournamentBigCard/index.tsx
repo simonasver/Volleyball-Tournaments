@@ -20,6 +20,7 @@ import {
 import React, { SyntheticEvent } from "react";
 import Loader from "../../layout/Loader";
 import {
+  GameTeam,
   Team,
   Tournament,
   TournamentMatch,
@@ -36,13 +37,19 @@ import GroupRemoveIcon from "@mui/icons-material/GroupRemove";
 import RequestJoinTournamentModal from "./RequestJoinTournamentModal";
 import AcceptTeamModal from "./AcceptTournamentTeamModal";
 import DeleteTournamentModal from "./DeleteTournamentModal";
-import { errorMessageFromAxiosError, isOwner } from "../../../utils/helpers";
+import {
+  errorMessageFromAxiosError,
+  isManager,
+  isOwner,
+} from "../../../utils/helpers";
 import {
   addTeamToTournament,
+  addTournamentManager,
   getTournament,
   getTournamentMatches,
   joinTournament,
   removeTeamFromTournament,
+  removeTournamentManager,
   startTournament,
 } from "../../../services/tournament.service";
 import { getUserTeams } from "../../../services/team.service";
@@ -52,6 +59,13 @@ import TournamentBracket from "./TournamentBracket";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import TournamentSettings from "./TournamentSettings";
+import { User } from "../../../store/auth-slice";
+
+import AddManagerModal from "../../shared/ManagerModals/AddManagerModal";
+import RemoveManagerModal from "../../shared/ManagerModals/RemoveManagerModal";
+import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
+import PersonRemoveAlt1OutlinedIcon from "@mui/icons-material/PersonRemoveAlt1Outlined";
+import { getUsers } from "../../../services/user.service";
 
 interface TournamentBigCardProps {
   id: string;
@@ -63,6 +77,8 @@ enum Modal {
   Accept = 2,
   Remove = 3,
   Delete = 4,
+  AddManager = 5,
+  RemoveManager = 6,
 }
 
 const TournamentBigCard = (props: TournamentBigCardProps) => {
@@ -70,6 +86,8 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const [users, setUsers] = React.useState<User[]>();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -86,14 +104,20 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   const user = useAppSelector((state) => state.auth.user);
   const [userTeams, setUserTeams] = React.useState<Team[]>([]);
 
-  const [requestJoinInput, setRequestJoinInput] = React.useState("");
-  const [acceptTeamInput, setAcceptTeamInput] = React.useState("");
-  const [removeTeamInput, setRemoveTeamInput] = React.useState("");
+  const [requestJoinInput, setRequestJoinInput] = React.useState<Team>();
+  const [acceptTeamInput, setAcceptTeamInput] = React.useState<Team>();
+  const [removeTeamInput, setRemoveTeamInput] = React.useState<GameTeam>();
 
   const [requestJoinError, setRequestJoinError] = React.useState("");
   const [acceptTeamError, setAcceptTeamError] = React.useState("");
   const [removeTeamError, setRemoveTeamError] = React.useState("");
   const [startError, setStartError] = React.useState("");
+
+  const [managerSearchInput, setManagerSearchInput] = React.useState("");
+  const [addManagerInput, setAddManagerInput] = React.useState<User>();
+  const [removeManagerInput, setRemoveManagerInput] = React.useState<User>();
+  const [addManagerError, setAddManagerError] = React.useState("");
+  const [removeManagerError, setRemoveManagerError] = React.useState("");
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
 
@@ -139,30 +163,48 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   React.useEffect(() => {
     const abortController = new AbortController();
     if (user) {
-      getUserTeams(user?.id, 1, 99999, abortController.signal).then((res) => {
-        setUserTeams(res.data);
-      });
+      getUserTeams(user?.id, 1, 99999, "", abortController.signal).then(
+        (res) => {
+          setUserTeams(res.data);
+        }
+      );
     }
     return () => abortController.abort();
   }, []);
 
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    getUsers(1, 20, managerSearchInput, abortController.signal)
+      .then((res) => {
+        setError("");
+        setUsers(res.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    return () => abortController.abort();
+  }, [managerSearchInput]);
+
   const closeModal = () => {
     setRequestJoinError("");
-    setRequestJoinInput("");
+    setRequestJoinInput(undefined);
     setAcceptTeamError("");
-    setAcceptTeamInput("");
+    setAcceptTeamInput(undefined);
     setRemoveTeamError("");
-    setRemoveTeamInput("");
+    setRemoveTeamInput(undefined);
+    setAddManagerInput(undefined);
+    setAddManagerError("");
+    setRemoveManagerInput(undefined);
+    setRemoveManagerError("");
+    setManagerSearchInput("");
     setModalStatus(Modal.None);
   };
 
   const onRequestJoinTournamentSubmit = () => {
-    joinTournament(id, requestJoinInput)
+    joinTournament(id, requestJoinInput?.id ?? "")
       .then(() => {
         closeModal();
-        const successMessage = `Requested to join tournament ${
-          tournament?.title
-        } with team ${userTeams.find((x) => x.id === requestJoinInput)?.title}`;
+        const successMessage = `Requested to join tournament ${tournament?.title} with team ${requestJoinInput?.title}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
@@ -189,12 +231,13 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   };
 
   const onAcceptTeamSubmit = () => {
-    addTeamToTournament(id, acceptTeamInput)
+    addTeamToTournament(id, acceptTeamInput?.id ?? "")
       .then(() => {
         closeModal();
         const successMessage = `Team ${
-          tournament?.requestedTeams?.find((x) => x.id === acceptTeamInput)
-            ?.title ?? ""
+          tournament?.requestedTeams?.find(
+            (x) => x.id === acceptTeamInput?.id ?? ""
+          )?.title ?? ""
         } was added to tournament ${tournament?.title}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
@@ -223,11 +266,12 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
   };
 
   const onRemoveTeamFromTournamentSubmit = () => {
-    removeTeamFromTournament(id, removeTeamInput).then(() => {
+    removeTeamFromTournament(id, removeTeamInput?.id ?? "").then(() => {
       closeModal();
       const successMessage = `Team ${
-        tournament?.acceptedTeams?.find((x) => x.id === removeTeamInput)
-          ?.title ?? ""
+        tournament?.acceptedTeams?.find(
+          (x) => x.id === removeTeamInput?.id ?? ""
+        )?.title ?? ""
       } was removed from the tournament`;
       dispatch(
         alertActions.changeAlert({ type: "success", message: successMessage })
@@ -293,6 +337,42 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
       .catch((e) => {
         console.log(e);
         setStartError(errorMessageFromAxiosError(e));
+      });
+  };
+
+  const onAddManagerSubmit = () => {
+    if (!addManagerInput) {
+      return setAddManagerError("Select cannot be empty");
+    }
+    addTournamentManager(id, addManagerInput.id)
+      .then(() => {
+        closeModal();
+        const successMessage = `Player ${addManagerInput.userName} was successfully added to ${tournament?.title} tournament managers`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        setAddManagerError(errorMessageFromAxiosError(e));
+      });
+  };
+
+  const onRemoveManagerSubmit = () => {
+    if (!removeManagerInput) {
+      return setRemoveManagerError("Select cannot be empty");
+    }
+    removeTournamentManager(id, removeManagerInput.id)
+      .then(() => {
+        closeModal();
+        const successMessage = `Player ${removeManagerInput.userName} was successfully removed from ${tournament?.title} tournament managers`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        setRemoveManagerError(errorMessageFromAxiosError(e));
       });
   };
 
@@ -418,7 +498,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
-              {isOwner(user, tournament.ownerId) &&
+              {isManager(user, tournament.ownerId, tournament.managers) &&
                 tournament.status < TournamentStatus.Started &&
                 tournament.acceptedTeams?.length >= 2 && (
                   <IconButton
@@ -444,7 +524,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </IconButton>
                 )}
             </Box>
-            {isOwner(user, tournament.ownerId) &&
+            {isManager(user, tournament.ownerId, tournament.managers) &&
               tournament.status < TournamentStatus.Started && (
                 <IconButton
                   centerRipple={false}
@@ -456,7 +536,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {isOwner(user, tournament.ownerId) &&
+            {isManager(user, tournament.ownerId, tournament.managers) &&
               tournament.status < TournamentStatus.Started && (
                 <IconButton
                   centerRipple={false}
@@ -468,7 +548,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {isOwner(user, tournament.ownerId) &&
+            {isManager(user, tournament.ownerId, tournament.managers) &&
               tournament.status < TournamentStatus.Finished && (
                 <IconButton
                   centerRipple={false}
@@ -479,6 +559,28 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
+            {isOwner(user, tournament.ownerId) && (
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.AddManager)}
+                color="warning"
+              >
+                <Tooltip title="Add manager">
+                  <PersonAddAltOutlinedIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+            {isOwner(user, tournament.ownerId) && (
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.RemoveManager)}
+                color="warning"
+              >
+                <Tooltip title="Remove manager">
+                  <PersonRemoveAlt1OutlinedIcon />
+                </Tooltip>
+              </IconButton>
+            )}
             {isOwner(user, tournament.ownerId) && (
               <IconButton
                 centerRipple={false}
@@ -501,11 +603,11 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
               ? userTeams.filter(
                   (x) =>
                     !tournament?.requestedTeams.some((y) => y.id === x.id) &&
-                    !tournament?.acceptedTeams.some((y) => y.id === x.id)
+                    !tournament?.acceptedTeams.some((y) => y.title === x.title)
                 )
               : userTeams
           }
-          joinTeamInput={requestJoinInput}
+          joinTeamInput={requestJoinInput ?? undefined}
           onJoinTournamentInputChange={setRequestJoinInput}
           onSubmit={onRequestJoinTournamentSubmit}
           onClose={closeModal}
@@ -515,7 +617,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         <AcceptTeamModal
           errorMessage={acceptTeamError}
           teams={tournament?.requestedTeams ?? []}
-          acceptTeamInput={acceptTeamInput}
+          acceptTeamInput={acceptTeamInput ?? undefined}
           onAcceptTeamInputChange={setAcceptTeamInput}
           onSubmit={onAcceptTeamSubmit}
           onClose={closeModal}
@@ -525,7 +627,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         <RemoveTournamentTeamModal
           errorMessage={removeTeamError}
           teams={tournament?.acceptedTeams ?? []}
-          removeTeamInput={removeTeamInput}
+          removeTeamInput={removeTeamInput ?? undefined}
           onRemoveTeamInputChange={setRemoveTeamInput}
           onSubmit={onRemoveTeamFromTournamentSubmit}
           onClose={closeModal}
@@ -535,6 +637,30 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         <DeleteTournamentModal
           tournamentId={id}
           tournamentTitle={tournament?.title ?? ""}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.AddManager && (
+        <AddManagerModal
+          errorMessage={addManagerError}
+          users={users?.filter((x) => x.id !== user?.id && x.id !== tournament?.ownerId) ?? []}
+          addManagerInput={addManagerInput}
+          onAddManagerInputChange={setAddManagerInput}
+          searchInput={managerSearchInput}
+          onSearchInputChange={setManagerSearchInput}
+          onSubmit={onAddManagerSubmit}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.RemoveManager && (
+        <RemoveManagerModal
+          errorMessage={removeManagerError}
+          users={tournament?.managers ?? []}
+          removeManagerInput={removeManagerInput}
+          onRemoveManagerInputChange={setRemoveManagerInput}
+          searchInput={managerSearchInput}
+          onSearchInputChange={setManagerSearchInput}
+          onSubmit={onRemoveManagerSubmit}
           onClose={closeModal}
         />
       )}

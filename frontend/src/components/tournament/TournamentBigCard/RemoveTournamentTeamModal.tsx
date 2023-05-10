@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Alert,
   Button,
@@ -8,18 +7,15 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
 import { GameTeam } from "../../../utils/types";
+import GameTeamAutocompleteSelect from "../../shared/AutocompleteSearch/GameTeamAutocompleteSelect";
 
 interface RemoveTeamModalProps {
   errorMessage: string;
   teams: GameTeam[];
-  removeTeamInput: string;
-  onRemoveTeamInputChange: (value: string) => void;
+  removeTeamInput: GameTeam | undefined;
+  onRemoveTeamInputChange: (value: GameTeam | undefined) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -49,25 +45,22 @@ const RemoveTeamModal = (props: RemoveTeamModalProps) => {
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to remove</InputLabel>
-          <Select
-            value={removeTeamInput}
-            label="Team to remove"
-            onChange={(e: SelectChangeEvent<string>) =>
-              onRemoveTeamInputChange(e.target.value)
-            }
-          >
-            {teams.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.title}
-              </MenuItem>
-            ))}
-          </Select>
+          <GameTeamAutocompleteSelect
+            label={"Team to remove"}
+            data={teams}
+            selectedTeam={removeTeamInput}
+            onSelectedTeamChange={onRemoveTeamInputChange}
+          />
         </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
-        <Button color="error" variant="contained" onClick={onSubmit}>
+        <Button
+          color="error"
+          variant="contained"
+          onClick={onSubmit}
+          disabled={!removeTeamInput}
+        >
           Remove
         </Button>
       </DialogActions>

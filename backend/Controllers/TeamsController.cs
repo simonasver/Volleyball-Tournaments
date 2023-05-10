@@ -86,7 +86,7 @@ public class TeamsController : ControllerBase
             return Forbid();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             if (user.Id != userId)
@@ -191,14 +191,13 @@ public class TeamsController : ControllerBase
             return NotFound();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager, or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
-                Console.WriteLine("No authorization");
                 return Forbid();
             }
         }
@@ -260,11 +259,11 @@ public class TeamsController : ControllerBase
 
         var team = teamResult.Data!;
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -294,11 +293,11 @@ public class TeamsController : ControllerBase
 
         var team = teamResult.Data!;
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -312,6 +311,78 @@ public class TeamsController : ControllerBase
             return StatusCode(result.ErrorStatus, result.ErrorMessage);
         }
 
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpPatch("/api/[controller]/{teamId}/Managers")]
+    public async Task<IActionResult> AddManager(Guid teamId, [FromBody] AddManagerDto addManagerDto)
+    {
+        var teamResult = await _teamService.GetAsync(teamId);
+
+        if (!teamResult.IsSuccess)
+        {
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
+        }
+
+        var team = teamResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        var userForManager = await _userManager.FindByIdAsync(addManagerDto.ManagerId);
+
+        var result = await _teamService.AddManager(team, userForManager);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("/api/[controller]/{teamId}/Managers/{managerId}")]
+    public async Task<IActionResult> RemoveManager(Guid teamId, string managerId)
+    {
+        var teamResult = await _teamService.GetAsync(teamId);
+
+        if (!teamResult.IsSuccess)
+        {
+            return StatusCode(teamResult.ErrorStatus, teamResult.ErrorMessage);
+        }
+
+        var team = teamResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        var userForManager = await _userManager.FindByIdAsync(managerId);
+
+        var result = await _teamService.RemoveManager(team, userForManager);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
         return NoContent();
     }
 }

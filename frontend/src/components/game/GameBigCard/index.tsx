@@ -36,16 +36,23 @@ import {
 } from "../../../utils/types";
 import DeleteGameModal from "./DeleteGameModal";
 import {
+  addGameManager,
   addTeamToGame,
   changeGameSetScore,
   changeGameSetStats,
   getGame,
   getGameLogs,
   joinGame,
+  removeGameManager,
   removeTeamFromGame,
   startGame,
 } from "../../../services/game.service";
-import { errorMessageFromAxiosError, isGameFull, isOwner } from "../../../utils/helpers";
+import {
+  errorMessageFromAxiosError,
+  isGameFull,
+  isManager,
+  isOwner,
+} from "../../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import RequestJoinGameModal from "./RequestJoinGameModal";
@@ -63,6 +70,13 @@ import ChangeScoreModal from "./ChangeScoreModal";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import GameSettings from "./GameSettings";
+import { User } from "../../../store/auth-slice";
+
+import AddManagerModal from "../../shared/ManagerModals/AddManagerModal";
+import RemoveManagerModal from "../../shared/ManagerModals/RemoveManagerModal";
+import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
+import PersonRemoveAlt1OutlinedIcon from "@mui/icons-material/PersonRemoveAlt1Outlined";
+import { getUsers } from "../../../services/user.service";
 
 interface GameBigCardProps {
   id: string;
@@ -74,6 +88,8 @@ enum Modal {
   Accept = 2,
   Delete = 3,
   ChangeScore = 4,
+  AddManager = 5,
+  RemoveManager = 6,
 }
 
 const GameBigCard = (props: GameBigCardProps) => {
@@ -81,6 +97,8 @@ const GameBigCard = (props: GameBigCardProps) => {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const [users, setUsers] = React.useState<User[]>();
 
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
@@ -95,8 +113,8 @@ const GameBigCard = (props: GameBigCardProps) => {
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
 
-  const [requestJoinInput, setRequestJoinInput] = React.useState("");
-  const [acceptTeamInput, setAcceptTeamInput] = React.useState("");
+  const [requestJoinInput, setRequestJoinInput] = React.useState<Team>();
+  const [acceptTeamInput, setAcceptTeamInput] = React.useState<Team>();
   const [changeScoreInput, setChangeScoreInput] = React.useState<GameScore>(
     GameScore.Score
   );
@@ -112,6 +130,12 @@ const GameBigCard = (props: GameBigCardProps) => {
   const [changeScoreError, setChangeScoreError] = React.useState("");
 
   const [currentTab, setCurrentTab] = React.useState<number>(0);
+
+  const [managerSearchInput, setManagerSearchInput] = React.useState("");
+  const [addManagerInput, setAddManagerInput] = React.useState<User>();
+  const [removeManagerInput, setRemoveManagerInput] = React.useState<User>();
+  const [addManagerError, setAddManagerError] = React.useState("");
+  const [removeManagerError, setRemoveManagerError] = React.useState("");
 
   const onTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -153,33 +177,55 @@ const GameBigCard = (props: GameBigCardProps) => {
   React.useEffect(() => {
     const abortController = new AbortController();
     if (user) {
-      getUserTeams(user?.id, 1, 99999, abortController.signal).then((res) => {
-        setUserTeams(res.data);
-      });
+      getUserTeams(user?.id, 1, 99999, "", abortController.signal).then(
+        (res) => {
+          setUserTeams(res.data);
+        }
+      );
     }
     return () => abortController.abort();
   }, []);
 
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    getUsers(1, 20, managerSearchInput, abortController.signal)
+      .then((res) => {
+        setError("");
+        setUsers(res.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    return () => abortController.abort();
+  }, [managerSearchInput]);
+
   const closeModal = () => {
     setRequestJoinError("");
-    setRequestJoinInput("");
+    setRequestJoinInput(undefined);
     setAcceptTeamError("");
-    setAcceptTeamInput("");
+    setAcceptTeamInput(undefined);
     setChangeScoreError("");
     setChangeScorePlayer("");
     setChangeScoreSet("");
     setChangeScorePositive(false);
     setChangeScoreHeader("");
+    setAddManagerInput(undefined);
+    setAddManagerError("");
+    setRemoveManagerInput(undefined);
+    setRemoveManagerError("");
+    setManagerSearchInput("");
     setModalStatus(Modal.None);
   };
 
   const onRequestJoinGameSubmit = () => {
-    joinGame(id, requestJoinInput)
+    joinGame(id, requestJoinInput?.id ?? "")
       .then(() => {
         closeModal();
         const successMessage = `Requested to join game ${
           game?.title
-        } with team ${userTeams.find((x) => x.id === requestJoinInput)?.title}`;
+        } with team ${
+          userTeams.find((x) => x.id === requestJoinInput?.id ?? "")?.title
+        }`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
@@ -236,12 +282,12 @@ const GameBigCard = (props: GameBigCardProps) => {
   };
 
   const onAcceptTeamSubmit = () => {
-    addTeamToGame(id, acceptTeamInput)
+    addTeamToGame(id, acceptTeamInput?.id ?? "")
       .then(() => {
         closeModal();
         const successMessage = `Team ${
-          game?.requestedTeams?.find((x) => x.id === acceptTeamInput)?.title ??
-          ""
+          game?.requestedTeams?.find((x) => x.id === acceptTeamInput?.id ?? "")
+            ?.title ?? ""
         } was added to game ${game?.title}`;
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
@@ -540,6 +586,42 @@ const GameBigCard = (props: GameBigCardProps) => {
     );
   };
 
+  const onAddManagerSubmit = () => {
+    if (!addManagerInput) {
+      return setAddManagerError("Select cannot be empty");
+    }
+    addGameManager(id, addManagerInput.id)
+      .then(() => {
+        closeModal();
+        const successMessage = `Player ${addManagerInput.userName} was successfully added to ${game?.title} game managers`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        setAddManagerError(errorMessageFromAxiosError(e));
+      });
+  };
+
+  const onRemoveManagerSubmit = () => {
+    if (!removeManagerInput) {
+      return setRemoveManagerError("Select cannot be empty");
+    }
+    removeGameManager(id, removeManagerInput.id)
+      .then(() => {
+        closeModal();
+        const successMessage = `Player ${removeManagerInput.userName} was successfully removed from ${game?.title} game managers`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        setRemoveManagerError(errorMessageFromAxiosError(e));
+      });
+  };
+
   return (
     <>
       <Grid
@@ -625,7 +707,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                         </Typography>
                       </Grid>
                       <Grid item>
-                        {isOwner(user, game.ownerId) &&
+                        {isManager(user, game.ownerId, game.managers) &&
                           !game.tournamentMatch &&
                           game.status < GameStatus.Started && (
                             <IconButton
@@ -639,7 +721,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                               </Tooltip>
                             </IconButton>
                           )}
-                        {isOwner(user, game.ownerId) &&
+                        {isManager(user, game.ownerId, game.managers) &&
                           game.tournamentMatch &&
                           !game.tournamentMatch.thirdPlace &&
                           game.status != GameStatus.Started &&
@@ -669,7 +751,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                       justifyContent="space-between"
                     >
                       <Grid item>
-                        {isOwner(user, game.ownerId) &&
+                        {isManager(user, game.ownerId, game.managers) &&
                           game.tournamentMatch &&
                           !game.tournamentMatch.thirdPlace &&
                           game.status != GameStatus.Started &&
@@ -685,7 +767,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                               </Tooltip>
                             </IconButton>
                           )}
-                        {isOwner(user, game.ownerId) &&
+                        {isManager(user, game.ownerId, game.managers) &&
                           !game.tournamentMatch &&
                           game.status < GameStatus.Started && (
                             <IconButton
@@ -833,7 +915,7 @@ const GameBigCard = (props: GameBigCardProps) => {
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
-              {isOwner(user, game.ownerId) &&
+              {isManager(user, game.ownerId, game.managers) &&
                 game.status === GameStatus.Ready && (
                   <IconButton
                     centerRipple={false}
@@ -859,7 +941,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                   </IconButton>
                 )}
             </Box>
-            {isOwner(user, game.ownerId) &&
+            {isManager(user, game.ownerId, game.managers) &&
               !game.tournamentMatch &&
               game.status < GameStatus.Started && (
                 <IconButton
@@ -872,13 +954,36 @@ const GameBigCard = (props: GameBigCardProps) => {
                   </Tooltip>
                 </IconButton>
               )}
-            {isOwner(user, game.ownerId) && game.status < GameStatus.Finished && (
+            {isManager(user, game.ownerId, game.managers) &&
+              game.status < GameStatus.Finished && (
+                <IconButton
+                  centerRipple={false}
+                  onClick={() => navigate(`/editgame/${id}`)}
+                >
+                  <Tooltip title="Edit game">
+                    <EditIcon />
+                  </Tooltip>
+                </IconButton>
+              )}
+            {isOwner(user, game.ownerId) && (
               <IconButton
                 centerRipple={false}
-                onClick={() => navigate(`/editgame/${id}`)}
+                onClick={() => setModalStatus(Modal.AddManager)}
+                color="warning"
               >
-                <Tooltip title="Edit game">
-                  <EditIcon />
+                <Tooltip title="Add manager">
+                  <PersonAddAltOutlinedIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+            {isOwner(user, game.ownerId) && (
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.RemoveManager)}
+                color="warning"
+              >
+                <Tooltip title="Remove manager">
+                  <PersonRemoveAlt1OutlinedIcon />
                 </Tooltip>
               </IconButton>
             )}
@@ -904,8 +1009,8 @@ const GameBigCard = (props: GameBigCardProps) => {
               ? userTeams.filter(
                   (x) =>
                     !game?.requestedTeams.some((y) => y.id === x.id) &&
-                    x.id !== game?.firstTeam?.id &&
-                    x.id !== game?.secondTeam?.id
+                    x.title !== game?.firstTeam?.title &&
+                    x.title !== game?.secondTeam?.title
                 )
               : userTeams
           }
@@ -941,6 +1046,30 @@ const GameBigCard = (props: GameBigCardProps) => {
           changeScoreInput={changeScoreInput}
           changeScoreInputChange={setChangeScoreInput}
           onSubmit={onChangeScore}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.AddManager && (
+        <AddManagerModal
+          errorMessage={addManagerError}
+          users={users?.filter((x) => x.id !== user?.id && x.id !== game?.ownerId) ?? []}
+          addManagerInput={addManagerInput}
+          onAddManagerInputChange={setAddManagerInput}
+          searchInput={managerSearchInput}
+          onSearchInputChange={setManagerSearchInput}
+          onSubmit={onAddManagerSubmit}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.RemoveManager && (
+        <RemoveManagerModal
+          errorMessage={removeManagerError}
+          users={game?.managers ?? []}
+          removeManagerInput={removeManagerInput}
+          onRemoveManagerInputChange={setRemoveManagerInput}
+          searchInput={managerSearchInput}
+          onSearchInputChange={setManagerSearchInput}
+          onSubmit={onRemoveManagerSubmit}
           onClose={closeModal}
         />
       )}

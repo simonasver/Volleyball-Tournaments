@@ -17,11 +17,12 @@ import Loader from "../../layout/Loader";
 import TournamentSmallCard from "./TournamentSmallCard";
 
 interface GameListProps {
+  searchInput?: string;
   all?: boolean;
 }
 
 const TournamentList = (props: GameListProps) => {
-  const { all } = props;
+  const { all, searchInput } = props;
 
   const navigate = useNavigate();
 
@@ -71,12 +72,14 @@ const TournamentList = (props: GameListProps) => {
           user.id,
           currentPage.pageNumber,
           currentPage.pageSize,
+          searchInput ?? "",
           abortController.signal
         )
           .then((res) => {
             setTournaments(res.data);
             setPagination(res.pagination);
             setIsLoading(false);
+            setError("");
           })
           .catch((e) => {
             console.error(e);
@@ -91,12 +94,14 @@ const TournamentList = (props: GameListProps) => {
       getTournaments(
         currentPage.pageNumber,
         currentPage.pageSize,
+        searchInput ?? "",
         abortController.signal
       )
         .then((res) => {
           setTournaments(res.data);
           setPagination(res.pagination);
           setIsLoading(false);
+          setError("");
         })
         .catch((e) => {
           console.error(e);
@@ -108,7 +113,7 @@ const TournamentList = (props: GameListProps) => {
         });
     }
     return () => abortController.abort();
-  }, [currentPage]);
+  }, [currentPage, searchInput]);
 
   return (
     <>
@@ -147,7 +152,7 @@ const TournamentList = (props: GameListProps) => {
             <br />
             <br />
             <br />
-            There are no tournaments yet. Create one!
+            {!searchInput ? "There are no tournaments yet. Create one!" : "No tournaments found. Try changing your search input."}
           </Typography>
         )}
       {(tournaments?.length ?? 0) > 0 && (

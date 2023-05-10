@@ -1,11 +1,15 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/layout/Layout";
 import { Button, Grid, Typography } from "@mui/material";
 import BackButton from "../../components/layout/BackButton";
 import TournamentList from "../../components/tournament/TournamentList";
+import SearchFilterInput from "../../components/layout/SearchFilterInput";
 
 const AllTournamentsPage = () => {
   const navigate = useNavigate();
+
+  const [searchInput, setSearchInput] = React.useState("");
 
   return (
     <Layout>
@@ -31,6 +35,13 @@ const AllTournamentsPage = () => {
               <BackButton address="/" />
             </Grid>
             <Grid item>
+              <SearchFilterInput
+                label="Search by title"
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+              />
+            </Grid>
+            <Grid item>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -43,7 +54,7 @@ const AllTournamentsPage = () => {
           </Grid>
         </Grid>
         <br />
-        <TournamentList all />
+        <TournamentList searchInput={searchInput} all />
       </Grid>
     </Layout>
   );

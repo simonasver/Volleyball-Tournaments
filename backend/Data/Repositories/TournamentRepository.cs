@@ -24,13 +24,13 @@ public class TournamentRepository : ITournamentRepository
             queryable = queryable.Where(x => !x.IsPrivate);
         }
 
-        queryable = queryable.OrderByDescending(x => x.CreateDate).Include(x => x.AcceptedTeams).Include(x => x.Winner);
+        queryable = queryable.Where(x => x.Title.Contains(searchParameters.SearchInput)).OrderByDescending(x => x.CreateDate).Include(x => x.AcceptedTeams).Include(x => x.Winner);
         return await PagedList<Tournament>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<IEnumerable<Tournament>> GetAllUserAsync(SearchParameters searchParameters, string userId)
     {
-        var queryable = _dbContext.Tournaments.AsQueryable().OrderByDescending(x => x.CreateDate).Where(x => x.OwnerId == userId).Include(x => x.AcceptedTeams).Include(x => x.Winner);
+        var queryable = _dbContext.Tournaments.Where(x => x.Title.Contains(searchParameters.SearchInput)).AsQueryable().OrderByDescending(x => x.CreateDate).Where(x => x.OwnerId == userId).Include(x => x.AcceptedTeams).Include(x => x.Winner);
         return await PagedList<Tournament>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
@@ -42,6 +42,7 @@ public class TournamentRepository : ITournamentRepository
             .Include(x => x.AcceptedTeams)
                 .ThenInclude(x => x.Players)
             .Include(x => x.Winner)
+            .Include(x => x.Managers)
             .FirstOrDefaultAsync(x => x.Id == tournamentId);
     }
 

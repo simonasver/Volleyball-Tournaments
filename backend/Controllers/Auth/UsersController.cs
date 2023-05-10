@@ -64,11 +64,11 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(Register), newUserDto);
     }
 
-    [Authorize(Roles = ApplicationUserRoles.Admin)]
+    [Authorize]
     [HttpGet("/api/[controller]", Name = "GetUsers")]
     public async Task<IActionResult> GetAll([FromQuery] SearchParameters searchParameters)
     {
-        var users = await PagedList<ApplicationUser>.CreateAsync(_userManager.Users, searchParameters.PageNumber, searchParameters.PageSize);
+        var users = await PagedList<ApplicationUser>.CreateAsync(_userManager.Users.Where(x => x.UserName.Contains(searchParameters.SearchInput)), searchParameters.PageNumber, searchParameters.PageSize);
         
         var previousPageLink = users.HasPrevious
             ? Url.Link("GetUsers", new

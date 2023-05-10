@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Alert,
   Button,
@@ -8,18 +7,15 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
 import { Team } from "../../../utils/types";
+import TeamAutocompleteSelect from "../../shared/AutocompleteSearch/TeamAutocompleteSelect";
 
 interface RequestJoinGameModalProps {
   errorMessage: string;
   teams: Team[];
-  joinTeamInput: string;
-  onJoinGameInputChange: (value: string) => void;
+  joinTeamInput: Team | undefined;
+  onJoinGameInputChange: (value: Team | undefined) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -49,20 +45,7 @@ const RequestJoinGameModal = (props: RequestJoinGameModalProps) => {
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to join</InputLabel>
-          <Select
-            value={joinTeamInput}
-            label="Team to join"
-            onChange={(e: SelectChangeEvent<string>) =>
-              onJoinGameInputChange(e.target.value)
-            }
-          >
-            {teams.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.title}, {item.players.length} players
-              </MenuItem>
-            ))}
-          </Select>
+          <TeamAutocompleteSelect label={"Team to join with"} data={teams} selectedTeam={joinTeamInput} onSelectedTeamChange={onJoinGameInputChange} />
         </FormControl>
       </DialogContent>
       <DialogActions>

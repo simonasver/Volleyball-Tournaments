@@ -1,14 +1,14 @@
-import { formatPaginationDataToQuery } from "../utils/helpers";
+import { formatPaginationDataToQuery, formatSearchInputDataToQuery } from "../utils/helpers";
 import { PageData, Tournament, TournamentMatch } from "../utils/types";
 import api from "./api";
 
-export const getTournaments = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
-  const res = await api.get(`/Tournaments?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getTournaments = async (pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
+  const res = await api.get(`/Tournaments?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
   return res.data;
 };
 
-export const getUserTournaments = async (userId: string, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
-    const res = await api.get(`/Users/${userId}/Tournaments?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getUserTournaments = async (userId: string, pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
+    const res = await api.get(`/Users/${userId}/Tournaments?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
     return res.data;
 };
 
@@ -121,5 +121,17 @@ export const joinTournament = async (tournamentId: string, teamId: string) => {
 
   export const generateTournament = async (teamNumber: number) => {
     const res = await api.post(`/Tournaments/generate?teamAmount=${teamNumber}`);
+    return res.data;
+  };
+
+  export const addTournamentManager = async (teamId: string, playerId: string) => {
+    const res = await api.patch(`/Tournaments/${teamId}/Managers`, {
+      ManagerId: playerId
+    });
+    return res.data;
+  };
+  
+  export const removeTournamentManager = async (teamId: string, playerId: string) => {
+    const res = await api.delete(`/Tournaments/${teamId}/Managers/${playerId}`);
     return res.data;
   };

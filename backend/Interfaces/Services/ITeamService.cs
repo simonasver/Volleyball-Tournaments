@@ -1,4 +1,5 @@
 using Backend.Data.Dtos.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
 
@@ -14,4 +15,6 @@ public interface ITeamService
     public Task<ServiceResult<bool>> DeleteAsync(Guid teamId);
     public Task<ServiceResult<bool>> AddPlayerAsync(AddTeamPlayerDto addTeamPlayerDto, Team team);
     public Task<ServiceResult<bool>> RemovePlayerAsync(Guid playerId, Team team);
+    public Task<ServiceResult<bool>> AddManager(Team team, ApplicationUser user);
+    public Task<ServiceResult<bool>> RemoveManager(Team team, ApplicationUser user);
 }

@@ -1,13 +1,20 @@
 import React from "react";
-import { Button, Grid, Typography } from "@mui/material";
+import {
+  Button,
+  Grid,
+  Typography,
+} from "@mui/material";
 import Layout from "../../components/layout/Layout";
 import TeamList from "../../components/team/TeamList";
 import BackButton from "../../components/layout/BackButton";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
+import SearchFilterInput from "../../components/layout/SearchFilterInput";
 
 const MyTeamsPage = () => {
   const navigate = useNavigate();
+
+  const [searchInput, setSearchInput] = React.useState("");
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -41,6 +48,13 @@ const MyTeamsPage = () => {
               <BackButton address="/" />
             </Grid>
             <Grid item>
+              <SearchFilterInput
+                label="Search by title"
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+              />
+            </Grid>
+            <Grid item>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -53,7 +67,7 @@ const MyTeamsPage = () => {
           </Grid>
         </Grid>
         <br />
-        <TeamList />
+        <TeamList searchInput={searchInput} />
       </Grid>
     </Layout>
   );

@@ -1,4 +1,5 @@
 using Backend.Data.Dtos.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
 using Backend.Helpers.Utils;
@@ -204,5 +205,55 @@ public class TeamService : ITeamService
         }
 
         return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Player doesn't exist");
+    }
+    
+    public async Task<ServiceResult<bool>> AddManager(Team team, ApplicationUser user)
+    {
+        if (team.OwnerId == user.Id)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Owner cannot be manager");
+        }
+        
+        var manager = team.Managers.FirstOrDefault(x => x.Id == user.Id);
+        if (manager != null)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is already a manager of this resource");
+        }
+        
+        team.Managers.Add(user);
+
+        try
+        {
+            await _teamRepository.UpdateAsync(team);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> RemoveManager(Team team, ApplicationUser user)
+    {
+        if (team.OwnerId == user.Id)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Cannot remove managing permission from the owner");
+        }
+        
+        var manager = team.Managers.FirstOrDefault(x => x.Id == user.Id);
+        if (manager == null)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is not a manager of this resource");
+        }
+        
+        try
+        {
+            await _teamRepository.UpdateAsync(team);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
     }
 }

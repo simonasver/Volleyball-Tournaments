@@ -21,20 +21,22 @@ public class TeamRepository : ITeamRepository
     }
     public async Task<IEnumerable<Team>> GetAllAsync(SearchParameters searchParameters)
     {
-        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate).Include(x => x.Players);
+        var queryable = _dbContext.Teams.Where(x => x.Title.Contains(searchParameters.SearchInput)).AsQueryable().OrderByDescending(x => x.CreateDate).Include(x => x.Players);
         return await PagedList<Team>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<IEnumerable<Team>> GetAllUserAsync(SearchParameters searchParameters, string userId)
     {
-        var queryable = _dbContext.Teams.AsQueryable().OrderByDescending(x => x.CreateDate).Include(x => x.Players)
+        var queryable = _dbContext.Teams.Where(x => x.Title.Contains(searchParameters.SearchInput)).AsQueryable().OrderByDescending(x => x.CreateDate).Include(x => x.Players)
             .Where(x => x.OwnerId == userId);
         return await PagedList<Team>.CreateAsync(queryable, searchParameters.PageNumber, searchParameters.PageSize);
     }
 
     public async Task<Team?> GetAsync(Guid teamId)
     {
-        return await _dbContext.Teams.Include(x => x.Players).OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).FirstOrDefaultAsync(x => x.Id == teamId);
+        return await _dbContext.Teams.Include(x => x.Players)
+            .Include(x => x.Managers)
+            .OrderByDescending(x => x.CreateDate).ThenBy(x => x.Id).FirstOrDefaultAsync(x => x.Id == teamId);
     }
 
     public async Task<Team> CreateAsync(Team team)

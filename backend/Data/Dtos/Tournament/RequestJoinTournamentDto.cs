@@ -1,4 +1,6 @@
-﻿namespace Backend.Data.Dtos.Tournament;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Backend.Data.Dtos.Tournament;
 
 public class RequestJoinTournamentDto
 {

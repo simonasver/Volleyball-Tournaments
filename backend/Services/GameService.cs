@@ -1,4 +1,5 @@
 ﻿using Backend.Data.Dtos.Game;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
@@ -840,6 +841,56 @@ public class GameService : IGameService
         try
         {
             await _setRepository.UpdateAsync(set);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> AddManager(Game game, ApplicationUser user)
+    {
+        if (game.OwnerId == user.Id)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Owner cannot be manager");
+        }
+        
+        var manager = game.Managers.FirstOrDefault(x => x.Id == user.Id);
+        if (manager != null)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is already a manager of this resource");
+        }
+        
+        game.Managers.Add(user);
+
+        try
+        {
+            await _gameRepository.UpdateAsync(game);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> RemoveManager(Game game, ApplicationUser user)
+    {
+        if (game.OwnerId == user.Id)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Cannot remove managing permission from the owner");
+        }
+        
+        var manager = game.Managers.FirstOrDefault(x => x.Id == user.Id);
+        if (manager == null)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is not a manager of this resource");
+        }
+        
+        try
+        {
+            await _gameRepository.UpdateAsync(game);
             return ServiceResult<bool>.Success();
         }
         catch (Exception ex)

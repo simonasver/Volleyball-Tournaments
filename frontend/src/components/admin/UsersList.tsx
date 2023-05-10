@@ -27,6 +27,7 @@ import Loader from "../layout/Loader";
 import { getUsers, ban, addRemoveRole } from "../../services/user.service";
 import AddRoleModal from "./AddRoleModal";
 import RemoveRoleModal from "./RemoveRoleModal";
+import SearchFilterInput from "../layout/SearchFilterInput";
 
 enum Modal {
   None = 0,
@@ -37,6 +38,8 @@ enum Modal {
 const UsersList = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
+  const [searchInput, setSearchInput] = React.useState("");
 
   const [modalStatus, setModalStatus] = React.useState(Modal.None);
 
@@ -79,7 +82,7 @@ const UsersList = () => {
 
   React.useEffect(() => {
     const abortController = new AbortController();
-    getUsers(currentPage.pageNumber, currentPage.pageSize)
+    getUsers(currentPage.pageNumber, currentPage.pageSize, searchInput)
       .then((res) => {
         setUsers(res.data);
         setPagination(res.pagination);
@@ -96,7 +99,7 @@ const UsersList = () => {
         setIsLoading(false);
       });
     return () => abortController.abort();
-  }, [currentPage]);
+  }, [currentPage, searchInput]);
 
   const changeBanState = (userId: string, userName: string, state: boolean) => {
     ban(userId, state)
@@ -109,7 +112,7 @@ const UsersList = () => {
             }`,
           })
         );
-        getUsers(currentPage.pageNumber, currentPage.pageSize)
+        getUsers(currentPage.pageNumber, currentPage.pageSize, searchInput)
           .then((res) => {
             setUsers(res.data);
             setPagination(res.pagination);
@@ -153,7 +156,7 @@ const UsersList = () => {
           })
         );
         closeModals();
-        getUsers(currentPage.pageNumber, currentPage.pageSize)
+        getUsers(currentPage.pageNumber, currentPage.pageSize, searchInput)
           .then((res) => {
             setUsers(res.data);
             setPagination(res.pagination);
@@ -208,10 +211,17 @@ const UsersList = () => {
           spacing={1}
           direction="row"
           alignItems="center"
-          justifyContent="flex-start"
+          justifyContent="space-between"
         >
           <Grid item>
             <BackButton title="Admin panel" address={`/admin`} />
+          </Grid>
+          <Grid item>
+            <SearchFilterInput
+              label="Search by username"
+              searchInput={searchInput}
+              onSearchInputChange={setSearchInput}
+            />
           </Grid>
         </Grid>
         <br />

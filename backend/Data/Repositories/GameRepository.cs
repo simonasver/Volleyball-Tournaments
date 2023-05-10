@@ -24,7 +24,7 @@ public class GameRepository : IGameRepository
             queryable = queryable.Where(x => !x.IsPrivate);
         }
 
-        queryable = queryable.OrderByDescending(x => x.CreateDate)
+        queryable = queryable.Where(x => x.Title.Contains(searchParameters.SearchInput)).OrderByDescending(x => x.CreateDate)
             .Include(x => x.TournamentMatch)
             .Include(x => x.Winner)
             .Include(x => x.FirstTeam)
@@ -34,7 +34,7 @@ public class GameRepository : IGameRepository
 
     public async Task<IEnumerable<Game>> GetAllUserAsync(SearchParameters searchParameters, string userId)
     {
-        var queryable = _dbContext.Games.AsQueryable().OrderByDescending(x => x.CreateDate)
+        var queryable = _dbContext.Games.Where(x => x.Title.Contains(searchParameters.SearchInput)).AsQueryable().OrderByDescending(x => x.CreateDate)
             .Where(x => x.OwnerId == userId).Where(x => x.TournamentMatch == null)
             .Include(x => x.Winner)
             .Include(x => x.FirstTeam)
@@ -56,6 +56,7 @@ public class GameRepository : IGameRepository
             .Include(x => x.Winner)
             .Include(x => x.TournamentMatch)
                 .ThenInclude(x => x!.Tournament)
+            .Include(x => x.Managers)
             .FirstOrDefaultAsync(x => x.Id == gameId);
     }
 

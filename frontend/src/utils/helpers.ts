@@ -33,7 +33,12 @@ export function isAdmin(user: User | undefined): boolean {
 
 export function isOwner(user: User | undefined, resourceOwnerId: string): boolean {
   if (user === undefined) return false;
-  return user.roles?.includes(UserRole.Admin) || user.id === resourceOwnerId;
+  return isAdmin(user) || user.id === resourceOwnerId;
+}
+
+export function isManager(user: User | undefined, resourceOwnerId: string, managers: User[]): boolean {
+  if(user === undefined) return false;
+  return isAdmin(user) || user.id === resourceOwnerId || managers.some((x) => x.id === user.id);
 }
 
 export function isGameFull(game: Game): boolean {
@@ -49,3 +54,7 @@ export function formatPaginationDataToQuery(data: { pageNumber: number, pageSize
 }
 
 export const getDefaultPageSize = () => 10;
+
+export function formatSearchInputDataToQuery(searchInput: string): string {
+  return `${searchInput ? `&searchInput=${searchInput}` : ""}`;
+}

@@ -3,7 +3,7 @@ using Backend.Interfaces.Services;
 
 namespace Backend.Data.Entities.Team
 {
-    public class Team : IUserOwnedResource
+    public class Team : IUserManagedResource
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -17,6 +17,7 @@ namespace Backend.Data.Entities.Team
 
         public string OwnerId { get; set; }
         public ApplicationUser Owner { get; set; }
+        public ICollection<ApplicationUser> Managers { get; set; }
     }
     
     public class TeamPlayer

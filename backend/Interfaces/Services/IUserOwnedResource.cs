@@ -1,7 +1,7 @@
-﻿namespace Backend.Interfaces.Services
+﻿namespace Backend.Interfaces.Services;
+
+public interface IUserOwnedResource
 {
-    public interface IUserOwnedResource
-    {
-        public string OwnerId { get; }
-    }
+    public string OwnerId { get; }
 }
+

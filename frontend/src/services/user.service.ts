@@ -1,5 +1,5 @@
 import { User, UserRole } from "../store/auth-slice";
-import { formatPaginationDataToQuery } from "../utils/helpers";
+import { formatPaginationDataToQuery, formatSearchInputDataToQuery } from "../utils/helpers";
 import { PageData } from "../utils/types";
 import api from "./api";
 
@@ -25,8 +25,8 @@ export const editUser = async (
   return res.data;
 };
 
-export const getUsers = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: User[], pagination: PageData }> => {
-  const res = await api.get(`/Users?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getUsers = async (pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: User[], pagination: PageData }> => {
+  const res = await api.get(`/Users?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
   return res.data;
 };
 

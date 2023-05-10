@@ -1,14 +1,14 @@
-import { formatPaginationDataToQuery } from "../utils/helpers";
+import { formatPaginationDataToQuery, formatSearchInputDataToQuery } from "../utils/helpers";
 import { PageData, Team } from "../utils/types";
 import api from "./api";
 
-export const getTeams = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Team[], pagination: PageData }> => {
-  const res = await api.get(`/Teams?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getTeams = async (pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Team[], pagination: PageData }> => {
+  const res = await api.get(`/Teams?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
   return res.data;
 };
 
-export const getUserTeams = async (userId: string, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Team[], pagination: PageData }> => {
-  const res = await api.get(`/Users/${userId}/Teams?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getUserTeams = async (userId: string, pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Team[], pagination: PageData }> => {
+  const res = await api.get(`/Users/${userId}/Teams?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
   return res.data;
 };
 
@@ -61,5 +61,17 @@ export const removePlayerFromTeam = async (
   playerId: string
 ) => {
   const res = await api.delete(`/Teams/${teamId}/Players/${playerId}`);
+  return res.data;
+};
+
+export const addTeamManager = async (teamId: string, playerId: string) => {
+  const res = await api.patch(`/Teams/${teamId}/Managers`, {
+    ManagerId: playerId
+  });
+  return res.data;
+};
+
+export const removeTeamManager = async (teamId: string, playerId: string) => {
+  const res = await api.delete(`/Teams/${teamId}/Managers/${playerId}`);
   return res.data;
 };

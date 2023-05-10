@@ -11,4 +11,6 @@ public class SearchParameters
         get => _pageSize;
         init => _pageSize = value > MaxPageSize ? MaxPageSize : value;
     }
+    
+    public string? SearchInput { get; init; } = "";
 }

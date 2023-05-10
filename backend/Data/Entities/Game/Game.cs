@@ -13,7 +13,7 @@ public enum GameStatus
     Finished
 }
 
-public class Game : IUserOwnedResource
+public class Game : IUserManagedResource
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
@@ -46,6 +46,7 @@ public class Game : IUserOwnedResource
 
     public string OwnerId { get; set; }
     public ApplicationUser Owner { get; set; }
+    public ICollection<ApplicationUser> Managers { get; set; }
 }
 
 public class GameTeam

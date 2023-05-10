@@ -36,12 +36,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         base.OnModelCreating(builder);
 
         builder.Entity<Team>().HasMany(t => t.Players).WithOne(tp => tp.Team).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Team>().HasMany(t => t.Managers).WithMany(u => u.ManagedTeams)
+            .UsingEntity(join => join.ToTable("TeamManagers"));
+        builder.Entity<Team>().HasOne(t => t.Owner).WithMany(u => u.OwnedTeams).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Game>().HasMany(g => g.RequestedTeams).WithMany(t => t.GamesRequestedTo).UsingEntity(join => join.ToTable("GameRequestedTeams"));
         builder.Entity<Game>().HasMany(g => g.Sets).WithOne(s => s.Game).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.FirstTeam).WithOne().HasForeignKey<GameTeam>("GameWhereFirstId").OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.SecondTeam).WithOne().HasForeignKey<GameTeam>("GameWhereSecondId").OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Game>().HasOne(g => g.Winner).WithOne().HasForeignKey<GameTeam>("GameWhereWinnerId").OnDelete(DeleteBehavior.SetNull);
+        builder.Entity<Game>().HasMany(g => g.Managers).WithMany(u => u.ManagedGames)
+            .UsingEntity(join => join.ToTable("GameManagers"));
+        builder.Entity<Game>().HasOne(g => g.Owner).WithMany(u => u.OwnedGames).OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<GameTeam>().HasMany(gt => gt.Players).WithOne(g => g.GameTeam).OnDelete(DeleteBehavior.Cascade);
 
@@ -53,6 +59,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Tournament>().HasMany(t => t.Matches).WithOne(m => m.Tournament)
             .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Tournament>().HasOne(t => t.Winner).WithOne().HasForeignKey<GameTeam>("TournamentWhereWinnerId").OnDelete(DeleteBehavior.SetNull).IsRequired(false);
+        builder.Entity<Tournament>().HasMany(t => t.Managers).WithMany(u => u.ManagedTournaments)
+            .UsingEntity(join => join.ToTable("TournamentManagers"));
+        builder.Entity<Tournament>().HasOne(t => t.Owner).WithMany(u => u.OwnedTournaments)
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.Entity<TournamentMatch>().HasOne(tm => tm.Game).WithOne(g => g.TournamentMatch).HasForeignKey<Game>("TournamentMatchId").OnDelete(DeleteBehavior.Cascade);
         builder.Entity<TournamentMatch>().HasOne(x => x.FirstParent).WithOne().HasForeignKey<TournamentMatch>("FirstParentId").IsRequired(false);

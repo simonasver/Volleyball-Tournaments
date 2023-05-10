@@ -93,9 +93,11 @@ builder.Services.AddScoped<AuthDbSeeder>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(PolicyNames.ResourceOwner, policy => policy.Requirements.Add(new ResourceOwnerRequirement()));
+    options.AddPolicy(PolicyNames.ResourceManager, policy => policy.Requirements.Add(new ResourceManagerRequirement()));
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, ResourceManagerAuthorizationHandler>();
 
 var app = builder.Build();
 

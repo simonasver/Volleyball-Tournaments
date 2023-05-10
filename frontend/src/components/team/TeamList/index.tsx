@@ -15,11 +15,12 @@ import Loader from "../../layout/Loader";
 import TeamSmallCard from "./TeamSmallCard";
 
 interface TeamListProps {
+  searchInput?: string;
   all?: boolean;
 }
 
 const TeamList = (props: TeamListProps) => {
-  const { all } = props;
+  const { all, searchInput } = props;
 
   const navigate = useNavigate();
 
@@ -71,6 +72,7 @@ const TeamList = (props: TeamListProps) => {
           getTeams(
             currentPage?.pageNumber,
             currentPage?.pageSize,
+            searchInput ?? "",
             abortController.signal
           )
             .then((res) => {
@@ -93,6 +95,7 @@ const TeamList = (props: TeamListProps) => {
           user.id,
           currentPage?.pageNumber,
           currentPage?.pageSize,
+          searchInput ?? "",
           abortController.signal
         )
           .then((res) => {
@@ -112,7 +115,7 @@ const TeamList = (props: TeamListProps) => {
       }
     }
     return () => abortController.abort();
-  }, [currentPage]);
+  }, [currentPage, searchInput]);
 
   return (
     <>
@@ -144,7 +147,7 @@ const TeamList = (props: TeamListProps) => {
           <br />
           <br />
           <br />
-          You have no teams yet. Create one!
+          {!searchInput ? "You have no teams yet. Create one!" : "No tournaments found. Try changing your search input."}
         </Typography>
       )}
       {(teams?.length ?? 0) > 0 && (

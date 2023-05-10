@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Alert,
   Button,
@@ -8,18 +7,15 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
 import { Team } from "../../../utils/types";
+import TeamAutocompleteSelect from "../../shared/AutocompleteSearch/TeamAutocompleteSelect";
 
 interface AcceptTeamModalProps {
   errorMessage: string;
   teams: Team[];
-  acceptTeamInput: string;
-  onAcceptTeamInputChange: (value: string) => void;
+  acceptTeamInput: Team | undefined;
+  onAcceptTeamInputChange: (value: Team | undefined) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -49,25 +45,21 @@ const AcceptTeamModal = (props: AcceptTeamModalProps) => {
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to accept</InputLabel>
-          <Select
-            value={acceptTeamInput}
-            label="Team to accept"
-            onChange={(e: SelectChangeEvent<string>) =>
-              onAcceptTeamInputChange(e.target.value)
-            }
-          >
-            {teams.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.title}, {item.players.length} players
-              </MenuItem>
-            ))}
-          </Select>
+          <TeamAutocompleteSelect
+            label={"Team to accept"}
+            data={teams}
+            selectedTeam={acceptTeamInput}
+            onSelectedTeamChange={onAcceptTeamInputChange}
+          />
         </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
-        <Button variant="contained" onClick={onSubmit}>
+        <Button
+          variant="contained"
+          onClick={onSubmit}
+          disabled={!acceptTeamInput}
+        >
           Accept
         </Button>
       </DialogActions>

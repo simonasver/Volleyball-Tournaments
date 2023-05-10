@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Backend.Data.Dtos.Game;
+using Backend.Data.Dtos.Team;
 using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Utils;
@@ -167,11 +168,11 @@ public class GamesController : ControllerBase
 
         if (game.IsPrivate)
         {
-            // Only if it's user owned resource or user is admin
+            // Only if it's user owned resource, user is manager or user is admin
             if (!User.IsInRole(ApplicationUserRoles.Admin))
             {
                 var authorization =
-                    await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                    await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
                 if (!authorization.Succeeded)
                 {
                     return NotFound();
@@ -230,7 +231,7 @@ public class GamesController : ControllerBase
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -265,7 +266,7 @@ public class GamesController : ControllerBase
             return NotFound();
         }
 
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager, or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
@@ -318,11 +319,11 @@ public class GamesController : ControllerBase
             return NotFound();
         }
         
-        // Only if user is team owner or is admin
+        // Only if user is team owner, manager or is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -357,11 +358,11 @@ public class GamesController : ControllerBase
             return NotFound();
         }
 
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager, or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -396,11 +397,11 @@ public class GamesController : ControllerBase
             return NotFound();
         }
 
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -442,11 +443,11 @@ public class GamesController : ControllerBase
             return Forbid();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -483,11 +484,11 @@ public class GamesController : ControllerBase
     
         if (game.IsPrivate)
         {
-            // Only if it's user owned resource or user is admin
+            // Only if it's user owned resource, user is manager or user is admin
             if (!User.IsInRole(ApplicationUserRoles.Admin))
             {
                 var authorization =
-                    await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                    await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
                 if (!authorization.Succeeded)
                 {
                     return NotFound();
@@ -530,11 +531,11 @@ public class GamesController : ControllerBase
             return Forbid();
         }
 
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -577,11 +578,11 @@ public class GamesController : ControllerBase
             return Forbid();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -623,11 +624,11 @@ public class GamesController : ControllerBase
             return StatusCode(logs.ErrorStatus, logs.ErrorMessage);
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Ok(logs.Data!.Where(x => !x.IsPrivate));
@@ -637,6 +638,78 @@ public class GamesController : ControllerBase
         }
 
         return Ok(logs.Data);
+    }
+    
+    [Authorize]
+    [HttpPatch("/api/[controller]/{gameId}/Managers")]
+    public async Task<IActionResult> AddManager(Guid gameId, [FromBody] AddManagerDto addManagerDto)
+    {
+        var gameResult = await _gameService.GetAsync(gameId);
+
+        if (!gameResult.IsSuccess)
+        {
+            return StatusCode(gameResult.ErrorStatus, gameResult.ErrorMessage);
+        }
+
+        var game = gameResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        var userForManager = await _userManager.FindByIdAsync(addManagerDto.ManagerId);
+
+        var result = await _gameService.AddManager(game, userForManager);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("/api/[controller]/{gameId}/Managers/{managerId}")]
+    public async Task<IActionResult> RemoveManager(Guid gameId, string managerId)
+    {
+        var gameResult = await _gameService.GetAsync(gameId);
+
+        if (!gameResult.IsSuccess)
+        {
+            return StatusCode(gameResult.ErrorStatus, gameResult.ErrorMessage);
+        }
+
+        var game = gameResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, game, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        var userForManager = await _userManager.FindByIdAsync(managerId);
+
+        var result = await _gameService.RemoveManager(game, userForManager);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
+        return NoContent();
     }
 }
 

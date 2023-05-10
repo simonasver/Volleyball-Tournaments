@@ -5,9 +5,12 @@ import BackButton from "../../components/layout/BackButton";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../utils/hooks";
 import TournamentList from "../../components/tournament/TournamentList";
+import SearchFilterInput from "../../components/layout/SearchFilterInput";
 
 const MyTournamentsPage = () => {
   const navigate = useNavigate();
+
+  const [searchInput, setSearchInput] = React.useState("");
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -41,6 +44,13 @@ const MyTournamentsPage = () => {
               <BackButton address="/tournaments" title="All tournaments" />
             </Grid>
             <Grid item>
+              <SearchFilterInput
+                label="Search by title"
+                searchInput={searchInput}
+                onSearchInputChange={setSearchInput}
+              />
+            </Grid>
+            <Grid item>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -53,7 +63,7 @@ const MyTournamentsPage = () => {
           </Grid>
         </Grid>
         <br />
-        <TournamentList />
+        <TournamentList searchInput={searchInput} />
       </Grid>
     </Layout>
   );

@@ -22,14 +22,26 @@ import DeleteTeamModal from "./DeleteTeamModal";
 import { useNavigate } from "react-router-dom";
 import {
   addPlayerToTeam,
+  addTeamManager,
   getTeam,
   removePlayerFromTeam,
+  removeTeamManager,
 } from "../../../services/team.service";
 import { Team } from "../../../utils/types";
-import { errorMessageFromAxiosError, isOwner } from "../../../utils/helpers";
+import {
+  errorMessageFromAxiosError,
+  isManager,
+  isOwner,
+} from "../../../utils/helpers";
 import Loader from "../../layout/Loader";
 import { alertActions } from "../../../store/alert-slice";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks";
+import { User } from "../../../store/auth-slice";
+import { getUsers } from "../../../services/user.service";
+import AddManagerModal from "../../shared/ManagerModals/AddManagerModal";
+import RemoveManagerModal from "../../shared/ManagerModals/RemoveManagerModal";
+import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
+import PersonRemoveAlt1OutlinedIcon from "@mui/icons-material/PersonRemoveAlt1Outlined";
 
 interface TeamBigCardProps {
   id: string;
@@ -40,6 +52,8 @@ enum Modal {
   Add = 1,
   Remove = 2,
   Delete = 3,
+  AddManager = 4,
+  RemoveManager = 5,
 }
 
 const TeamBigCard = (props: TeamBigCardProps) => {
@@ -50,6 +64,8 @@ const TeamBigCard = (props: TeamBigCardProps) => {
 
   const user = useAppSelector((state) => state.auth.user);
 
+  const [users, setUsers] = React.useState<User[]>();
+
   const [error, setError] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(true);
   const [team, setTeam] = React.useState<Team>();
@@ -58,9 +74,14 @@ const TeamBigCard = (props: TeamBigCardProps) => {
 
   const [addPlayerInput, setAddPlayerInput] = React.useState("");
   const [removePlayerInput, setRemovePlayerInput] = React.useState("");
+  const [addManagerInput, setAddManagerInput] = React.useState<User>();
+  const [removeManagerInput, setRemoveManagerInput] = React.useState<User>();
+  const [managerSearchInput, setManagerSearchInput] = React.useState("");
 
   const [addPlayerError, setAddPlayerError] = React.useState("");
   const [removePlayerError, setRemovePlayerError] = React.useState("");
+  const [addManagerError, setAddManagerError] = React.useState("");
+  const [removeManagerError, setRemoveManagerError] = React.useState("");
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -85,11 +106,29 @@ const TeamBigCard = (props: TeamBigCardProps) => {
     return () => abortController.abort();
   }, []);
 
+  React.useEffect(() => {
+    const abortController = new AbortController();
+    getUsers(1, 20, managerSearchInput, abortController.signal)
+      .then((res) => {
+        setError("");
+        setUsers(res.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    return () => abortController.abort();
+  }, [managerSearchInput]);
+
   const closeModal = () => {
     setAddPlayerInput("");
     setAddPlayerError("");
     setRemovePlayerInput("");
     setRemovePlayerError("");
+    setAddManagerInput(undefined);
+    setAddManagerError("");
+    setRemoveManagerInput(undefined);
+    setRemoveManagerError("");
+    setManagerSearchInput("");
     setModalStatus(Modal.None);
   };
 
@@ -161,6 +200,42 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       });
   };
 
+  const onAddManagerSubmit = () => {
+    if (!addManagerInput) {
+      return setAddManagerError("Select cannot be empty");
+    }
+    addTeamManager(id, addManagerInput.id)
+      .then(() => {
+        closeModal();
+        const successMessage = `Player ${addManagerInput.userName} was successfully added to ${team?.title} team managers`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        setAddManagerError(errorMessageFromAxiosError(e));
+      });
+  };
+
+  const onRemoveManagerSubmit = () => {
+    if (!removeManagerInput) {
+      return setRemoveManagerError("Select cannot be empty");
+    }
+    removeTeamManager(id, removeManagerInput.id)
+      .then(() => {
+        closeModal();
+        const successMessage = `Player ${removeManagerInput.userName} was successfully removed from ${team?.title} team managers`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+      })
+      .catch((e) => {
+        console.log(e);
+        setRemoveManagerError(errorMessageFromAxiosError(e));
+      });
+  };
+
   return (
     <>
       {error && (
@@ -204,40 +279,70 @@ const TeamBigCard = (props: TeamBigCardProps) => {
           </CardContent>
           <CardActions>
             <Box sx={{ flexGrow: 1 }}>
-              <IconButton
-                centerRipple={false}
-                onClick={() => setModalStatus(Modal.Add)}
-              >
-                <Tooltip title="Add player">
-                  <PersonAddAlt1Icon />
-                </Tooltip>
-              </IconButton>
-              <IconButton
-                centerRipple={false}
-                onClick={() => setModalStatus(Modal.Remove)}
-              >
-                <Tooltip title="Remove player">
-                  <PersonRemoveIcon />
-                </Tooltip>
-              </IconButton>
+              {isManager(user, team.ownerId, team.managers) && (
+                <IconButton
+                  centerRipple={false}
+                  onClick={() => setModalStatus(Modal.Add)}
+                >
+                  <Tooltip title="Add player">
+                    <PersonAddAlt1Icon />
+                  </Tooltip>
+                </IconButton>
+              )}
+              {isManager(user, team.ownerId, team.managers) && (
+                <IconButton
+                  centerRipple={false}
+                  onClick={() => setModalStatus(Modal.Remove)}
+                >
+                  <Tooltip title="Remove player">
+                    <PersonRemoveIcon />
+                  </Tooltip>
+                </IconButton>
+              )}
             </Box>
-            <IconButton
-              centerRipple={false}
-              onClick={() => navigate(`/editteam/${id}`)}
-            >
-              <Tooltip title="Edit team">
-                <EditIcon />
-              </Tooltip>
-            </IconButton>
-            <IconButton
-              centerRipple={false}
-              color="error"
-              onClick={() => setModalStatus(Modal.Delete)}
-            >
-              <Tooltip title="Remove team">
-                <DeleteForeverIcon />
-              </Tooltip>
-            </IconButton>
+            {isManager(user, team.ownerId, team.managers) && (
+              <IconButton
+                centerRipple={false}
+                onClick={() => navigate(`/editteam/${id}`)}
+              >
+                <Tooltip title="Edit team">
+                  <EditIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+            {isOwner(user, team.ownerId) && (
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.AddManager)}
+                color="warning"
+              >
+                <Tooltip title="Add manager">
+                  <PersonAddAltOutlinedIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+            {isOwner(user, team.ownerId) && (
+              <IconButton
+                centerRipple={false}
+                onClick={() => setModalStatus(Modal.RemoveManager)}
+                color="warning"
+              >
+                <Tooltip title="Remove manager">
+                  <PersonRemoveAlt1OutlinedIcon />
+                </Tooltip>
+              </IconButton>
+            )}
+            {isOwner(user, team.ownerId) && (
+              <IconButton
+                centerRipple={false}
+                color="error"
+                onClick={() => setModalStatus(Modal.Delete)}
+              >
+                <Tooltip title="Remove team">
+                  <DeleteForeverIcon />
+                </Tooltip>
+              </IconButton>
+            )}
           </CardActions>
         </Card>
       )}
@@ -264,6 +369,30 @@ const TeamBigCard = (props: TeamBigCardProps) => {
         <DeleteTeamModal
           teamId={id}
           teamTitle={team?.title ?? ""}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.AddManager && (
+        <AddManagerModal
+          errorMessage={addManagerError}
+          users={users?.filter((x) => x.id !== user?.id && x.id !== team?.ownerId) ?? []}
+          addManagerInput={addManagerInput}
+          onAddManagerInputChange={setAddManagerInput}
+          searchInput={managerSearchInput}
+          onSearchInputChange={setManagerSearchInput}
+          onSubmit={onAddManagerSubmit}
+          onClose={closeModal}
+        />
+      )}
+      {modalStatus === Modal.RemoveManager && (
+        <RemoveManagerModal
+          errorMessage={removeManagerError}
+          users={team?.managers ?? []}
+          removeManagerInput={removeManagerInput}
+          onRemoveManagerInputChange={setRemoveManagerInput}
+          searchInput={managerSearchInput}
+          onSearchInputChange={setManagerSearchInput}
+          onSubmit={onRemoveManagerSubmit}
           onClose={closeModal}
         />
       )}

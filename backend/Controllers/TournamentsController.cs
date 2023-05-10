@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.Data.Dtos.Team;
 using Backend.Data.Dtos.Tournament;
 using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Tournament;
@@ -163,11 +164,11 @@ public class TournamentsController : ControllerBase
 
         if (tournament.IsPrivate)
         {
-            // Only if it's user owned resource or user is admin
+            // Only if it's user owned resource, user is manager or user is admin
             if (!User.IsInRole(ApplicationUserRoles.Admin))
             {
                 var authorization =
-                    await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                    await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
                 if (!authorization.Succeeded)
                 {
                     return NotFound();
@@ -222,11 +223,11 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -314,11 +315,11 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
         
-        // Only if user is team owner or is admin
+        // Only if user is team owner, is manager or is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, team, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -353,11 +354,11 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -392,11 +393,11 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -431,11 +432,11 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
         
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -480,11 +481,11 @@ public class TournamentsController : ControllerBase
 
         if (tournament.IsPrivate)
         {
-            // Only if it's user owned resource or user is admin
+            // Only if it's user owned resource, user is manager or user is admin
             if (!User.IsInRole(ApplicationUserRoles.Admin))
             {
                 var authorization =
-                    await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                    await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
                 if (!authorization.Succeeded)
                 {
                     return NotFound();
@@ -513,11 +514,11 @@ public class TournamentsController : ControllerBase
             return NotFound();
         }
 
-        // Only if it's user owned resource or user is admin
+        // Only if it's user owned resource, user is manager or user is admin
         if (!User.IsInRole(ApplicationUserRoles.Admin))
         {
             var authorization =
-                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
             if (!authorization.Succeeded)
             {
                 return Forbid();
@@ -553,5 +554,77 @@ public class TournamentsController : ControllerBase
         }
         
         return Ok();
+    }
+    
+    [Authorize]
+    [HttpPatch("/api/[controller]/{tournamentId}/Managers")]
+    public async Task<IActionResult> AddManager(Guid tournamentId, [FromBody] AddManagerDto addManagerDto)
+    {
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        var userForManager = await _userManager.FindByIdAsync(addManagerDto.ManagerId);
+
+        var result = await _tournamentService.AddManager(tournament, userForManager);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("/api/[controller]/{tournamentId}/Managers/{managerId}")]
+    public async Task<IActionResult> RemoveManager(Guid tournamentId, string managerId)
+    {
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceOwner);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+
+        var userForManager = await _userManager.FindByIdAsync(managerId);
+
+        var result = await _tournamentService.RemoveManager(tournament, userForManager);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
+        return NoContent();
     }
 }

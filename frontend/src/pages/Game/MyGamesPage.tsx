@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Grid, Typography } from "@mui/material";
+import { Button, Grid, TextField, Typography } from "@mui/material";
 import Layout from "../../components/layout/Layout";
 import GameList from "../../components/game/GameList";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import BackButton from "../../components/layout/BackButton";
 
 const MyGamesPage = () => {
   const navigate = useNavigate();
+
+  const [searchInput, setSearchInput] = React.useState("");
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -41,6 +43,17 @@ const MyGamesPage = () => {
               <BackButton address="/games" title="All games" />
             </Grid>
             <Grid item>
+              <TextField
+                size="small"
+                label="Search by title"
+                variant="outlined"
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearchInput(event.target.value)
+                }
+                value={searchInput}
+              />
+            </Grid>
+            <Grid item>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -53,7 +66,7 @@ const MyGamesPage = () => {
           </Grid>
         </Grid>
         <br />
-        <GameList />
+        <GameList searchInput={searchInput} />
       </Grid>
     </Layout>
   );

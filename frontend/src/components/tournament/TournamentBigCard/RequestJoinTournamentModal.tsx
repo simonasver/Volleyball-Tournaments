@@ -8,18 +8,15 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
 } from "@mui/material";
 import { Team } from "../../../utils/types";
+import TeamAutocompleteSelect from "../../shared/AutocompleteSearch/TeamAutocompleteSelect";
 
 interface RequestJoinTournamentModalProps {
   errorMessage: string;
   teams: Team[];
-  joinTeamInput: string;
-  onJoinTournamentInputChange: (value: string) => void;
+  joinTeamInput: Team | undefined;
+  onJoinTournamentInputChange: (value: Team | undefined) => void;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -49,25 +46,21 @@ const RequestJoinTournamentModal = (props: RequestJoinTournamentModalProps) => {
         </DialogContentText>
         <br />
         <FormControl fullWidth>
-          <InputLabel>Team to join</InputLabel>
-          <Select
-            value={joinTeamInput}
-            label="Team to join"
-            onChange={(e: SelectChangeEvent<string>) =>
-              onJoinTournamentInputChange(e.target.value)
-            }
-          >
-            {teams.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.title}, {item.players.length} players
-              </MenuItem>
-            ))}
-          </Select>
+          <TeamAutocompleteSelect
+            label="Team to join with"
+            data={teams}
+            selectedTeam={joinTeamInput}
+            onSelectedTeamChange={onJoinTournamentInputChange}
+          />
         </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
-        <Button variant="contained" onClick={onSubmit}>
+        <Button
+          variant="contained"
+          onClick={onSubmit}
+          disabled={!joinTeamInput}
+        >
           Join
         </Button>
       </DialogActions>

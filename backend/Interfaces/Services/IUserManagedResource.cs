@@ -1,6 +1,8 @@
+using Backend.Data.Entities.Auth;
+
 namespace Backend.Interfaces.Services;
 
-public interface IUserManagerResource : IUserOwnedResource
+public interface IUserManagedResource : IUserOwnedResource
 {
-    public ICollection<string> ManagerIds { get; }
+    public ICollection<ApplicationUser> Managers { get; }
 }

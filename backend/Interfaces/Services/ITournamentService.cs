@@ -1,4 +1,5 @@
 ﻿using Backend.Data.Dtos.Tournament;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
@@ -22,4 +23,7 @@ public interface ITournamentService
     public Task<ServiceResult<bool>> StartAsync(Tournament tournament);
     public Task<ServiceResult<bool>> MoveBracketAsync(Tournament tournament, Guid matchId);
     public Task<ServiceResult<bool>> GenerateAsync(int? teamAmount, string userId);
+    
+    public Task<ServiceResult<bool>> AddManager(Tournament tournament, ApplicationUser user);
+    public Task<ServiceResult<bool>> RemoveManager(Tournament tournament, ApplicationUser user);
 }

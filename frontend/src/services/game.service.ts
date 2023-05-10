@@ -1,14 +1,14 @@
-import { formatPaginationDataToQuery } from "../utils/helpers";
+import { formatPaginationDataToQuery, formatSearchInputDataToQuery } from "../utils/helpers";
 import { Game, GameScore, GameSet, Log, PageData } from "../utils/types";
 import api from "./api";
 
-export const getGames = async (pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Game[], pagination: PageData }> => {
-  const res = await api.get(`/Games?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getGames = async (pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Game[], pagination: PageData }> => {
+  const res = await api.get(`/Games?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
   return res.data;
 };
 
-export const getUserGames = async (userId: string, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<{ data: Game[], pagination: PageData }> => {
-  const res = await api.get(`/Users/${userId}/Games?${formatPaginationDataToQuery({ pageNumber, pageSize })}`, { signal: signal });
+export const getUserGames = async (userId: string, pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Game[], pagination: PageData }> => {
+  const res = await api.get(`/Users/${userId}/Games?${formatPaginationDataToQuery({ pageNumber, pageSize })}${formatSearchInputDataToQuery(searchInput)}`, { signal: signal });
   return res.data;
 };
 
@@ -132,5 +132,17 @@ export const changeGameSetStats = async (gameId: string, setId: string, playerId
 
 export const getGameLogs = async (gameId: string, signal?: AbortSignal): Promise<Log[]> => {
   const res = await api.get(`/Games/${gameId}/Logs`, { signal: signal });
+  return res.data;
+};
+
+export const addGameManager = async (teamId: string, playerId: string) => {
+  const res = await api.patch(`/Games/${teamId}/Managers`, {
+    ManagerId: playerId
+  });
+  return res.data;
+};
+
+export const removeGameManager = async (teamId: string, playerId: string) => {
+  const res = await api.delete(`/Games/${teamId}/Managers/${playerId}`);
   return res.data;
 };
