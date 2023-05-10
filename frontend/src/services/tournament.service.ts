@@ -1,5 +1,5 @@
 import { formatPaginationDataToQuery, formatSearchInputDataToQuery } from "../utils/helpers";
-import { PageData, Tournament, TournamentMatch } from "../utils/types";
+import { GameTeam, PageData, Tournament, TournamentMatch } from "../utils/types";
 import api from "./api";
 
 export const getTournaments = async (pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {
@@ -124,14 +124,22 @@ export const joinTournament = async (tournamentId: string, teamId: string) => {
     return res.data;
   };
 
-  export const addTournamentManager = async (teamId: string, playerId: string) => {
-    const res = await api.patch(`/Tournaments/${teamId}/Managers`, {
+  export const addTournamentManager = async (tournamenId: string, playerId: string) => {
+    const res = await api.patch(`/Tournaments/${tournamenId}/Managers`, {
       ManagerId: playerId
     });
     return res.data;
   };
   
-  export const removeTournamentManager = async (teamId: string, playerId: string) => {
-    const res = await api.delete(`/Tournaments/${teamId}/Managers/${playerId}`);
+  export const removeTournamentManager = async (tournamentId: string, playerId: string) => {
+    const res = await api.delete(`/Tournaments/${tournamentId}/Managers/${playerId}`);
+    return res.data;
+  };
+
+  export const reorderTeams = async (tournamentId: string, numbers: { [id: string]: number }) => {
+    console.log(numbers);
+    const res = await api.patch(`/Tournaments/${tournamentId}/AcceptedTeams/Order`, {
+      UpdatedNumbers: numbers
+    });
     return res.data;
   };

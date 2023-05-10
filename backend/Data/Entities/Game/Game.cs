@@ -60,6 +60,7 @@ public class GameTeam
     public ICollection<GameTeamPlayer> Players { get; set; }
     
     public Tournament.Tournament? Tournament { get; set; }
+    public int? TournamentNumber { get; set; }
 
     public GameTeam Copy()
     {

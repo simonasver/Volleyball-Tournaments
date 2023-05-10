@@ -1,5 +1,6 @@
 ﻿using Backend.Data.Dtos.Tournament;
 using Backend.Data.Entities.Auth;
+using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
@@ -26,4 +27,5 @@ public interface ITournamentService
     
     public Task<ServiceResult<bool>> AddManager(Tournament tournament, ApplicationUser user);
     public Task<ServiceResult<bool>> RemoveManager(Tournament tournament, ApplicationUser user);
+    public Task<ServiceResult<bool>> ReorderTeams(Tournament tournament, Dictionary<Guid, int> numbers);
 }

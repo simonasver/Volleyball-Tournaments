@@ -545,6 +545,7 @@ public class TournamentService : ITournamentService
         }
         
         tournament.Managers.Add(user);
+        tournament.LastEditDate = DateTime.Now;
 
         try
         {
@@ -569,6 +570,30 @@ public class TournamentService : ITournamentService
         {
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is not a manager of this resource");
         }
+        
+        tournament.LastEditDate = DateTime.Now;
+        tournament.Managers = tournament.Managers.Where(x => x.Id != user.Id).ToList();
+
+        try
+        {
+            await _tournamentRepository.UpdateAsync(tournament);
+            return ServiceResult<bool>.Success();
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    public async Task<ServiceResult<bool>> ReorderTeams(Tournament tournament, Dictionary<Guid, int> numbers)
+    {
+        if (tournament.Status >= TournamentStatus.Started)
+        {
+            return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Tournament is already started");
+        }
+
+        tournament = TournamentUtils.ReorderTeams(tournament, numbers);
+        tournament.LastEditDate = DateTime.Now;
         
         try
         {

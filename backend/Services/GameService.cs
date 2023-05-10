@@ -863,6 +863,7 @@ public class GameService : IGameService
         }
         
         game.Managers.Add(user);
+        game.LastEditDate = DateTime.Now;
 
         try
         {
@@ -887,7 +888,10 @@ public class GameService : IGameService
         {
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is not a manager of this resource");
         }
-        
+
+        game.Managers = game.Managers.Where(x => x.Id != user.Id).ToList();
+        game.LastEditDate = DateTime.Now;
+
         try
         {
             await _gameRepository.UpdateAsync(game);

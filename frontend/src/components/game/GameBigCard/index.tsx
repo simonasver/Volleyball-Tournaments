@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Avatar,
   Card,
   CardActions,
   CardContent,
@@ -11,6 +12,9 @@ import {
   Divider,
   Grid,
   IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
   Tab,
   Table,
   TableBody,
@@ -597,6 +601,13 @@ const GameBigCard = (props: GameBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        getUsers(1, 20, managerSearchInput)
+          .then((res) => {
+            setUsers(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -615,6 +626,13 @@ const GameBigCard = (props: GameBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        getUsers(1, 20, managerSearchInput)
+          .then((res) => {
+            setUsers(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -703,7 +721,17 @@ const GameBigCard = (props: GameBigCardProps) => {
                               : "default"
                           }
                         >
-                          {game.firstTeam.title}
+                          <ListItem>
+                            <ListItemText primary={game.firstTeam.title} />
+                            <ListItemAvatar
+                              sx={{ paddingLeft: "16px", minWidth: "0px" }}
+                            >
+                              <Avatar
+                                alt={game.firstTeam.title}
+                                src={game.firstTeam.pictureUrl}
+                              />
+                            </ListItemAvatar>
+                          </ListItem>
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -794,7 +822,15 @@ const GameBigCard = (props: GameBigCardProps) => {
                               : "default"
                           }
                         >
-                          {game.secondTeam.title}
+                          <ListItem>
+                            <ListItemAvatar>
+                              <Avatar
+                                alt={game.secondTeam.title}
+                                src={game.secondTeam.pictureUrl}
+                              />
+                            </ListItemAvatar>
+                            <ListItemText primary={game.secondTeam.title} />
+                          </ListItem>
                         </Typography>
                       </Grid>
                     </Grid>
@@ -852,14 +888,14 @@ const GameBigCard = (props: GameBigCardProps) => {
               <Typography variant="body2" color="text.secondary">
                 Created at: {new Date(game.createDate).toLocaleString()}
               </Typography>
-              {isOwner(user, game.ownerId) && (
+              {isManager(user, game.ownerId, game.managers) && (
                 <Typography variant="body2" color="text.secondary">
                   Last edited at: {new Date(game.lastEditDate).toLocaleString()}
                 </Typography>
               )}
               <Divider />
               <GameSets
-                isOwner={isOwner(user, game.ownerId)}
+                isOwner={isManager(user, game.ownerId, game.managers)}
                 sets={sets ?? []}
                 basic={game.basic}
                 onChangeScore={onChangeScoreOpen}
@@ -1052,7 +1088,10 @@ const GameBigCard = (props: GameBigCardProps) => {
       {modalStatus === Modal.AddManager && (
         <AddManagerModal
           errorMessage={addManagerError}
-          users={users?.filter((x) => x.id !== user?.id && x.id !== game?.ownerId) ?? []}
+          users={
+            users?.filter((x) => x.id !== user?.id && x.id !== game?.ownerId) ??
+            []
+          }
           addManagerInput={addManagerInput}
           onAddManagerInputChange={setAddManagerInput}
           searchInput={managerSearchInput}

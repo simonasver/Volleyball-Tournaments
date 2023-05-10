@@ -37,7 +37,7 @@ const RemoveManagerModal = (props: RemoveManagerModalProps) => {
 
   return (
     <Dialog open onClose={onClose} fullWidth>
-      <DialogTitle>Remove user as from managers</DialogTitle>
+      <DialogTitle>Remove user from managers</DialogTitle>
       <DialogContent>
         {errorMessage && (
           <>
@@ -46,7 +46,7 @@ const RemoveManagerModal = (props: RemoveManagerModalProps) => {
           </>
         )}
         <DialogContentText>
-        Select user to remove managing permissions for the team (edit, add players, remove players)
+        Select user to remove managing permissions
         </DialogContentText>
         <br />
         <FormControl fullWidth>

@@ -50,6 +50,7 @@ import {
   joinTournament,
   removeTeamFromTournament,
   removeTournamentManager,
+  reorderTeams,
   startTournament,
 } from "../../../services/tournament.service";
 import { getUserTeams } from "../../../services/team.service";
@@ -66,6 +67,7 @@ import RemoveManagerModal from "../../shared/ManagerModals/RemoveManagerModal";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import PersonRemoveAlt1OutlinedIcon from "@mui/icons-material/PersonRemoveAlt1Outlined";
 import { getUsers } from "../../../services/user.service";
+import TournamentTeamList from "./TournamentTeamList";
 
 interface TournamentBigCardProps {
   id: string;
@@ -276,7 +278,6 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
       dispatch(
         alertActions.changeAlert({ type: "success", message: successMessage })
       );
-
       getTournament(id)
         .then((res) => {
           setError("");
@@ -351,6 +352,13 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        getUsers(1, 20, managerSearchInput)
+          .then((res) => {
+            setUsers(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -369,10 +377,44 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        getUsers(1, 20, managerSearchInput)
+          .then((res) => {
+            setUsers(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
         setRemoveManagerError(errorMessageFromAxiosError(e));
+      });
+  };
+
+  const onReorderTeams = (teams: GameTeam[]) => {
+    if (!tournament) {
+      return;
+    }
+    const keyVal: { [id: string]: number } = {};
+    teams.reduce((prev, curr, currIndex) => (keyVal[curr.id]=currIndex, prev), {});
+    reorderTeams(tournament?.id, keyVal)
+      .then(() => {
+        getTournament(id)
+          .then((res) => {
+            setError("");
+            setTournament(res);
+            setTeamsExpand(true);
+          })
+          .catch((e) => {
+            console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+        const errorMessage = errorMessageFromAxiosError(e);
+        setError(errorMessage);
       });
   };
 
@@ -435,7 +477,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
               <Typography variant="body2" color="text.secondary">
                 Created at: {new Date(tournament.createDate).toLocaleString()}
               </Typography>
-              {isOwner(user, tournament.ownerId) && (
+              {isManager(user, tournament.ownerId, tournament.managers) && (
                 <Typography variant="body2" color="text.secondary">
                   Last edited at:{" "}
                   {new Date(tournament.lastEditDate).toLocaleString()}
@@ -460,13 +502,23 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {tournament.acceptedTeams
-                    .filter((x) => !x.duplicate)
-                    .map((item, index) => (
-                      <Typography key={item.id}>
-                        {index + 1}. {item.title}
-                      </Typography>
-                    ))}
+                  {tournament.acceptedTeams &&
+                    tournament.acceptedTeams.length > 0 && (
+                      <TournamentTeamList
+                        isOwner={isManager(
+                          user,
+                          tournament.ownerId,
+                          tournament.managers
+                        )}
+                        canReorder={
+                          tournament.status < TournamentStatus.Started
+                        }
+                        teams={tournament.acceptedTeams}
+                        onChangeTeamOrder={(teams: GameTeam[]) =>
+                          onReorderTeams(teams)
+                        }
+                      />
+                    )}
                   {(!tournament.acceptedTeams ||
                     tournament.acceptedTeams.length === 0) && (
                     <Typography>No teams in this tournament yet!</Typography>
@@ -643,7 +695,11 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
       {modalStatus === Modal.AddManager && (
         <AddManagerModal
           errorMessage={addManagerError}
-          users={users?.filter((x) => x.id !== user?.id && x.id !== tournament?.ownerId) ?? []}
+          users={
+            users?.filter(
+              (x) => x.id !== user?.id && x.id !== tournament?.ownerId
+            ) ?? []
+          }
           addManagerInput={addManagerInput}
           onAddManagerInputChange={setAddManagerInput}
           searchInput={managerSearchInput}

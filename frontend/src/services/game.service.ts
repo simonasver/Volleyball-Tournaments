@@ -135,14 +135,14 @@ export const getGameLogs = async (gameId: string, signal?: AbortSignal): Promise
   return res.data;
 };
 
-export const addGameManager = async (teamId: string, playerId: string) => {
-  const res = await api.patch(`/Games/${teamId}/Managers`, {
+export const addGameManager = async (gameId: string, playerId: string) => {
+  const res = await api.patch(`/Games/${gameId}/Managers`, {
     ManagerId: playerId
   });
   return res.data;
 };
 
-export const removeGameManager = async (teamId: string, playerId: string) => {
-  const res = await api.delete(`/Games/${teamId}/Managers/${playerId}`);
+export const removeGameManager = async (gameId: string, playerId: string) => {
+  const res = await api.delete(`/Games/${gameId}/Managers/${playerId}`);
   return res.data;
 };

@@ -42,6 +42,7 @@ import AddManagerModal from "../../shared/ManagerModals/AddManagerModal";
 import RemoveManagerModal from "../../shared/ManagerModals/RemoveManagerModal";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import PersonRemoveAlt1OutlinedIcon from "@mui/icons-material/PersonRemoveAlt1Outlined";
+import TeamPlayerList from "./TeamPlayerList";
 
 interface TeamBigCardProps {
   id: string;
@@ -211,6 +212,13 @@ const TeamBigCard = (props: TeamBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        getUsers(1, 20, managerSearchInput)
+          .then((res) => {
+            setUsers(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -229,6 +237,13 @@ const TeamBigCard = (props: TeamBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
+        getUsers(1, 20, managerSearchInput)
+          .then((res) => {
+            setUsers(res.data);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -259,19 +274,14 @@ const TeamBigCard = (props: TeamBigCardProps) => {
             <Typography variant="body2" color="text.secondary">
               Created at: {new Date(team.createDate).toLocaleString()}
             </Typography>
-            {isOwner(user, team.ownerId) && (
+            {isManager(user, team.ownerId, team.managers) && (
               <Typography variant="body2" color="text.secondary">
                 Last edited at: {new Date(team.lastEditDate).toLocaleString()}
               </Typography>
             )}
             <br />
             <Typography variant="h6">Players:</Typography>
-            {team.players &&
-              team.players.map((item) => (
-                <Typography key={item.id} variant="body1">
-                  • {item.name}
-                </Typography>
-              ))}
+            {team.players && <TeamPlayerList players={team.players} />}
             {!team.players ||
               (team.players && team.players.length === 0 && (
                 <Typography>No players yet. Add some!</Typography>
@@ -375,7 +385,10 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       {modalStatus === Modal.AddManager && (
         <AddManagerModal
           errorMessage={addManagerError}
-          users={users?.filter((x) => x.id !== user?.id && x.id !== team?.ownerId) ?? []}
+          users={
+            users?.filter((x) => x.id !== user?.id && x.id !== team?.ownerId) ??
+            []
+          }
           addManagerInput={addManagerInput}
           onAddManagerInputChange={setAddManagerInput}
           searchInput={managerSearchInput}

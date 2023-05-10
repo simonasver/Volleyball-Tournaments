@@ -46,7 +46,7 @@ const AddManagerModal = (props: AddManagerModalProps) => {
           </>
         )}
         <DialogContentText>
-        Select user to give managing permissions for the team (edit, add players, remove players)
+        Select user to give managing permissions for the resource
         </DialogContentText>
         <br />
         <FormControl fullWidth>

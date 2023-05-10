@@ -14,7 +14,8 @@ public static class TournamentUtils
             Title = team.Title,
             ProfilePicture = team.PictureUrl,
             Description = team.Description,
-            Players = new List<GameTeamPlayer>()
+            Players = new List<GameTeamPlayer>(),
+            TournamentNumber = tournament.AcceptedTeams.Count
         };
         foreach (var teamPlayer in team.Players)
         {
@@ -334,5 +335,18 @@ public static class TournamentUtils
         tournamentMatch.Game.Description = "Tournament " + tournamentMatch.Tournament.Title + " match in round " + tournamentMatch.Round +
                                            " between " + tournamentMatch.Game.FirstTeam.Title + " vs " + tournamentMatch.Game.SecondTeam.Title;
         return tournamentMatch.Game;
+    }
+
+    public static Tournament ReorderTeams(Tournament tournament, Dictionary<Guid, int> numbers)
+    {
+        foreach (var keyValuePair in numbers)
+        {
+            tournament.AcceptedTeams.FirstOrDefault(x => x.Id == keyValuePair.Key).TournamentNumber =
+                keyValuePair.Value;
+        }
+
+        // tournament.AcceptedTeams = teams;
+
+        return tournament;
     }
 }

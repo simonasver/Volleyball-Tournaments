@@ -39,7 +39,7 @@ public class TournamentRepository : ITournamentRepository
         return await _dbContext.Tournaments
             .Include(x => x.RequestedTeams)
                 .ThenInclude(x => x.Players)
-            .Include(x => x.AcceptedTeams)
+            .Include(x => x.AcceptedTeams.OrderBy(child => child.TournamentNumber))
                 .ThenInclude(x => x.Players)
             .Include(x => x.Winner)
             .Include(x => x.Managers)

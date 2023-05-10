@@ -627,4 +627,38 @@ public class TournamentsController : ControllerBase
         
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPatch("/api/[controller]/{tournamentId}/AcceptedTeams/Order")]
+    public async Task<IActionResult> Reorder(Guid tournamentId, [FromBody] ReorderTeamsDto reorderTeamsDto)
+    {
+        var tournamentResult = await _tournamentService.GetAsync(tournamentId);
+
+        if (!tournamentResult.IsSuccess)
+        {
+            return StatusCode(tournamentResult.ErrorStatus, tournamentResult.ErrorMessage);
+        }
+
+        var tournament = tournamentResult.Data!;
+        
+        // Only if it's user owned resource, or user is admin
+        if (!User.IsInRole(ApplicationUserRoles.Admin))
+        {
+            var authorization =
+                await _authorizationService.AuthorizeAsync(User, tournament, PolicyNames.ResourceManager);
+            if (!authorization.Succeeded)
+            {
+                return Forbid();
+            }
+        }
+        
+        var result = await _tournamentService.ReorderTeams(tournament, reorderTeamsDto.UpdatedNumbers);
+
+        if (!result.IsSuccess)
+        {
+            return StatusCode(result.ErrorStatus, result.ErrorMessage);
+        }
+        
+        return NoContent();
+    }
 }

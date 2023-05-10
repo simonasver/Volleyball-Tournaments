@@ -221,6 +221,7 @@ public class TeamService : ITeamService
         }
         
         team.Managers.Add(user);
+        team.LastEditDate = DateTime.Now;
 
         try
         {
@@ -245,6 +246,9 @@ public class TeamService : ITeamService
         {
             return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "This user is not a manager of this resource");
         }
+        
+        team.LastEditDate = DateTime.Now;
+        team.Managers = team.Managers.Where(x => x.Id != user.Id).ToList();
         
         try
         {
