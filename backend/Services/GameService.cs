@@ -849,7 +849,7 @@ public class GameService : IGameService
         }
     }
 
-    public async Task<ServiceResult<bool>> AddManager(Game game, ApplicationUser user)
+    public async Task<ServiceResult<bool>> AddManagerAsync(Game game, ApplicationUser user)
     {
         if (game.OwnerId == user.Id)
         {
@@ -876,7 +876,7 @@ public class GameService : IGameService
         }
     }
 
-    public async Task<ServiceResult<bool>> RemoveManager(Game game, ApplicationUser user)
+    public async Task<ServiceResult<bool>> RemoveManagerAsync(Game game, ApplicationUser user)
     {
         if (game.OwnerId == user.Id)
         {

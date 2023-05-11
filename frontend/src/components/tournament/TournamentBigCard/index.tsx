@@ -352,12 +352,19 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        getUsers(1, 20, managerSearchInput)
+        getTournament(id)
           .then((res) => {
-            setUsers(res.data);
+            setError("");
+            setTournament(res);
+            setIsLoading(false);
           })
           .catch((e) => {
             console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
           });
       })
       .catch((e) => {
@@ -377,12 +384,19 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        getUsers(1, 20, managerSearchInput)
+        getTournament(id)
           .then((res) => {
-            setUsers(res.data);
+            setError("");
+            setTournament(res);
+            setIsLoading(false);
           })
           .catch((e) => {
             console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
           });
       })
       .catch((e) => {
@@ -396,9 +410,17 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
       return;
     }
     const keyVal: { [id: string]: number } = {};
-    teams.reduce((prev, curr, currIndex) => (keyVal[curr.id]=currIndex, prev), {});
+    teams.reduce(
+      (prev, curr, currIndex) => ((keyVal[curr.id] = currIndex), prev),
+      {}
+    );
     reorderTeams(tournament?.id, keyVal)
       .then(() => {
+        const successMessage = `Tournament ${tournament.title} teams were successfully reordered`;
+        dispatch(
+          alertActions.changeAlert({ type: "success", message: successMessage })
+        );
+
         getTournament(id)
           .then((res) => {
             setError("");
@@ -695,11 +717,7 @@ const TournamentBigCard = (props: TournamentBigCardProps) => {
       {modalStatus === Modal.AddManager && (
         <AddManagerModal
           errorMessage={addManagerError}
-          users={
-            users?.filter(
-              (x) => x.id !== user?.id && x.id !== tournament?.ownerId
-            ) ?? []
-          }
+          users={users?.filter((x) => x.id !== tournament?.ownerId) ?? []}
           addManagerInput={addManagerInput}
           onAddManagerInputChange={setAddManagerInput}
           searchInput={managerSearchInput}

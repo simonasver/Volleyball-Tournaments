@@ -25,6 +25,6 @@ public interface IGameService
     public Task<ServiceResult<bool>> ChangePlayerSetStatsAsync(ChangeSetPlayerStatsDto changeSetPlayerStatsDto, Game game,
         Guid setId, Guid playerId, string userId);
 
-    public Task<ServiceResult<bool>> AddManager(Game game, ApplicationUser user);
-    public Task<ServiceResult<bool>> RemoveManager(Game game, ApplicationUser user);
+    public Task<ServiceResult<bool>> AddManagerAsync(Game game, ApplicationUser user);
+    public Task<ServiceResult<bool>> RemoveManagerAsync(Game game, ApplicationUser user);
 }

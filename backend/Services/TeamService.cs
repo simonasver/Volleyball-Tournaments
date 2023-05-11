@@ -207,7 +207,7 @@ public class TeamService : ITeamService
         return ServiceResult<bool>.Failure(StatusCodes.Status400BadRequest, "Player doesn't exist");
     }
     
-    public async Task<ServiceResult<bool>> AddManager(Team team, ApplicationUser user)
+    public async Task<ServiceResult<bool>> AddManagerAsync(Team team, ApplicationUser user)
     {
         if (team.OwnerId == user.Id)
         {
@@ -234,7 +234,7 @@ public class TeamService : ITeamService
         }
     }
 
-    public async Task<ServiceResult<bool>> RemoveManager(Team team, ApplicationUser user)
+    public async Task<ServiceResult<bool>> RemoveManagerAsync(Team team, ApplicationUser user)
     {
         if (team.OwnerId == user.Id)
         {

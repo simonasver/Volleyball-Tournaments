@@ -62,7 +62,8 @@ public static class TournamentUtils
                     CreateDate = DateTime.Now,
                     LastEditDate = DateTime.Now,
                     Status = GameStatus.New,
-                    OwnerId = tournament.OwnerId
+                    OwnerId = tournament.OwnerId,
+                    Managers = tournament.Managers
                 },
             }, roundCount);
         return games;
@@ -90,7 +91,8 @@ public static class TournamentUtils
                 CreateDate = DateTime.Now,
                 LastEditDate = DateTime.Now,
                 Status = GameStatus.New,
-                OwnerId = tournament.OwnerId
+                OwnerId = tournament.OwnerId,
+                Managers = tournament.Managers
             },
         };
     }
@@ -124,7 +126,8 @@ public static class TournamentUtils
                         CreateDate = DateTime.Now,
                         LastEditDate = DateTime.Now,
                         Status = GameStatus.New,
-                        OwnerId = tournament.OwnerId
+                        OwnerId = tournament.OwnerId,
+                        Managers = tournament.Managers
                     },
                 }, currentRound - 1));
 
@@ -150,7 +153,8 @@ public static class TournamentUtils
                         CreateDate = DateTime.Now,
                         LastEditDate = DateTime.Now,
                         Status = GameStatus.New,
-                        OwnerId = tournament.OwnerId
+                        OwnerId = tournament.OwnerId,
+                        Managers = tournament.Managers
                     },
                 }, currentRound - 1));
 

@@ -601,12 +601,19 @@ const GameBigCard = (props: GameBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        getUsers(1, 20, managerSearchInput)
+        getGame(id)
           .then((res) => {
-            setUsers(res.data);
+            setError("");
+            setGame(res);
+            setIsLoading(false);
           })
           .catch((e) => {
             console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
           });
       })
       .catch((e) => {
@@ -626,12 +633,19 @@ const GameBigCard = (props: GameBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        getUsers(1, 20, managerSearchInput)
+        getGame(id)
           .then((res) => {
-            setUsers(res.data);
+            setError("");
+            setGame(res);
+            setIsLoading(false);
           })
           .catch((e) => {
             console.log(e);
+            const errorMessage = errorMessageFromAxiosError(e);
+            setError(errorMessage);
+            if (errorMessage) {
+              setIsLoading(false);
+            }
           });
       })
       .catch((e) => {
@@ -1088,10 +1102,7 @@ const GameBigCard = (props: GameBigCardProps) => {
       {modalStatus === Modal.AddManager && (
         <AddManagerModal
           errorMessage={addManagerError}
-          users={
-            users?.filter((x) => x.id !== user?.id && x.id !== game?.ownerId) ??
-            []
-          }
+          users={users?.filter((x) => x.id !== game?.ownerId) ?? []}
           addManagerInput={addManagerInput}
           onAddManagerInputChange={setAddManagerInput}
           searchInput={managerSearchInput}

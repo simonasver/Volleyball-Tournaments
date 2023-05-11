@@ -531,7 +531,7 @@ public class TournamentService : ITournamentService
         }
     }
     
-    public async Task<ServiceResult<bool>> AddManager(Tournament tournament, ApplicationUser user)
+    public async Task<ServiceResult<bool>> AddManagerAsync(Tournament tournament, ApplicationUser user)
     {
         if (tournament.OwnerId == user.Id)
         {
@@ -558,7 +558,7 @@ public class TournamentService : ITournamentService
         }
     }
 
-    public async Task<ServiceResult<bool>> RemoveManager(Tournament tournament, ApplicationUser user)
+    public async Task<ServiceResult<bool>> RemoveManagerAsync(Tournament tournament, ApplicationUser user)
     {
         if (tournament.OwnerId == user.Id)
         {
@@ -585,7 +585,7 @@ public class TournamentService : ITournamentService
         }
     }
 
-    public async Task<ServiceResult<bool>> ReorderTeams(Tournament tournament, Dictionary<Guid, int> numbers)
+    public async Task<ServiceResult<bool>> ReorderTeamsAsync(Tournament tournament, Dictionary<Guid, int> numbers)
     {
         if (tournament.Status >= TournamentStatus.Started)
         {

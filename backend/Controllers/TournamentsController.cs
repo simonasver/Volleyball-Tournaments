@@ -582,7 +582,7 @@ public class TournamentsController : ControllerBase
 
         var userForManager = await _userManager.FindByIdAsync(addManagerDto.ManagerId);
 
-        var result = await _tournamentService.AddManager(tournament, userForManager);
+        var result = await _tournamentService.AddManagerAsync(tournament, userForManager);
 
         if (!result.IsSuccess)
         {
@@ -618,7 +618,7 @@ public class TournamentsController : ControllerBase
 
         var userForManager = await _userManager.FindByIdAsync(managerId);
 
-        var result = await _tournamentService.RemoveManager(tournament, userForManager);
+        var result = await _tournamentService.RemoveManagerAsync(tournament, userForManager);
 
         if (!result.IsSuccess)
         {
@@ -652,7 +652,7 @@ public class TournamentsController : ControllerBase
             }
         }
         
-        var result = await _tournamentService.ReorderTeams(tournament, reorderTeamsDto.UpdatedNumbers);
+        var result = await _tournamentService.ReorderTeamsAsync(tournament, reorderTeamsDto.UpdatedNumbers);
 
         if (!result.IsSuccess)
         {

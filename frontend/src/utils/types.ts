@@ -7,7 +7,6 @@ export interface Tournament {
   description: string;
   singleThirdPlace: boolean;
   basic: boolean;
-  type: TournamentType;
   pointsToWin: number;
   pointsToWinLastSet: number;
   pointDifferenceToWin: number;
@@ -39,17 +38,10 @@ export interface TournamentMatch {
   tournament: Tournament;
 }
 
-export enum TournamentType {
-  SingleElimination = 0,
-  DoubleElimination = 1,
-  RoundRobin = 2
-}
-
 export enum TournamentStatus {
   Open = 0,
-  Closed = 1,
-  Started = 2,
-  Finished = 3
+  Started = 1,
+  Finished = 2
 }
 
 export interface Game {

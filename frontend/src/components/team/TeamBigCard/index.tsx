@@ -212,13 +212,13 @@ const TeamBigCard = (props: TeamBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        getUsers(1, 20, managerSearchInput)
-          .then((res) => {
-            setUsers(res.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        getTeam(id)
+        .then((res) => {
+          setTeam(res);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
       })
       .catch((e) => {
         console.log(e);
@@ -237,13 +237,13 @@ const TeamBigCard = (props: TeamBigCardProps) => {
         dispatch(
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
-        getUsers(1, 20, managerSearchInput)
-          .then((res) => {
-            setUsers(res.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        getTeam(id)
+        .then((res) => {
+          setTeam(res);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
       })
       .catch((e) => {
         console.log(e);
@@ -386,7 +386,7 @@ const TeamBigCard = (props: TeamBigCardProps) => {
         <AddManagerModal
           errorMessage={addManagerError}
           users={
-            users?.filter((x) => x.id !== user?.id && x.id !== team?.ownerId) ??
+            users?.filter((x) => x.id !== team?.ownerId) ??
             []
           }
           addManagerInput={addManagerInput}

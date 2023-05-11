@@ -340,7 +340,7 @@ public class TeamsController : ControllerBase
 
         var userForManager = await _userManager.FindByIdAsync(addManagerDto.ManagerId);
 
-        var result = await _teamService.AddManager(team, userForManager);
+        var result = await _teamService.AddManagerAsync(team, userForManager);
 
         if (!result.IsSuccess)
         {
@@ -376,7 +376,7 @@ public class TeamsController : ControllerBase
 
         var userForManager = await _userManager.FindByIdAsync(managerId);
 
-        var result = await _teamService.RemoveManager(team, userForManager);
+        var result = await _teamService.RemoveManagerAsync(team, userForManager);
 
         if (!result.IsSuccess)
         {

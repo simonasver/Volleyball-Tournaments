@@ -8,7 +8,6 @@ namespace Backend.Data.Entities.Tournament;
 public enum TournamentStatus
 {
     Open,
-    Closed,
     Started,
     Finished
 }

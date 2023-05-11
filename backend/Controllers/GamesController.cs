@@ -666,7 +666,7 @@ public class GamesController : ControllerBase
 
         var userForManager = await _userManager.FindByIdAsync(addManagerDto.ManagerId);
 
-        var result = await _gameService.AddManager(game, userForManager);
+        var result = await _gameService.AddManagerAsync(game, userForManager);
 
         if (!result.IsSuccess)
         {
@@ -702,7 +702,7 @@ public class GamesController : ControllerBase
 
         var userForManager = await _userManager.FindByIdAsync(managerId);
 
-        var result = await _gameService.RemoveManager(game, userForManager);
+        var result = await _gameService.RemoveManagerAsync(game, userForManager);
 
         if (!result.IsSuccess)
         {
