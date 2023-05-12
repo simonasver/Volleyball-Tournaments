@@ -41,7 +41,7 @@ const CreateTournamentForm = () => {
 
   const [currentTab, setCurrentTab] = React.useState<number>(0);
 
-  const [currentPreset, setCurrentPreset] = React.useState(GamePreset.Regular);
+  const [currentPreset, setCurrentPreset] = React.useState(GamePreset.Indoors);
 
   const user = useAppSelector((state) => state.auth.user);
 
@@ -58,7 +58,7 @@ const CreateTournamentForm = () => {
   const onChangePreset = (event: React.SyntheticEvent, newValue: number) => {
     switch (newValue) {
       case 0:
-        setCurrentPreset(GamePreset.Regular);
+        setCurrentPreset(GamePreset.Indoors);
         setPointsToWin(25);
         setPointsToWinLastSet(15);
         setPointDifferenceToWin(2);
@@ -233,7 +233,7 @@ const CreateTournamentForm = () => {
         <div hidden={currentTab !== 1}>
           <br />
           <Tabs value={currentPreset} onChange={onChangePreset}>
-            <Tab label="Regular" />
+            <Tab label="Indoors" />
             <Tab label="Beach" />
             <Tab label="Custom" />
           </Tabs>

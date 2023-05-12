@@ -39,7 +39,7 @@ const CreateGameForm = () => {
 
   const user = useAppSelector((state) => state.auth.user);
 
-  const [currentPreset, setCurrentPreset] = React.useState(GamePreset.Regular);
+  const [currentPreset, setCurrentPreset] = React.useState(GamePreset.Indoors);
 
   React.useEffect(() => {
     if (!user) {
@@ -50,7 +50,7 @@ const CreateGameForm = () => {
   const onChangePreset = (event: React.SyntheticEvent, newValue: number) => {
     switch(newValue) {
       case 0:
-        setCurrentPreset(GamePreset.Regular);
+        setCurrentPreset(GamePreset.Indoors);
         setPointsToWin(25);
         setPointsToWinLastSet(15);
         setPointDifferenceToWin(2);
@@ -194,7 +194,7 @@ const CreateGameForm = () => {
         />
         <br />
         <Tabs value={currentPreset} onChange={onChangePreset}>
-          <Tab label="Regular" />
+          <Tab label="Indoors" />
           <Tab label="Beach" />
           <Tab label="Custom" />
         </Tabs>

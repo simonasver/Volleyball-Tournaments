@@ -742,7 +742,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                             >
                               <Avatar
                                 alt={game.firstTeam.title}
-                                src={game.firstTeam.pictureUrl}
+                                src={game.firstTeam.profilePicture}
                               />
                             </ListItemAvatar>
                           </ListItem>
@@ -840,7 +840,7 @@ const GameBigCard = (props: GameBigCardProps) => {
                             <ListItemAvatar>
                               <Avatar
                                 alt={game.secondTeam.title}
-                                src={game.secondTeam.pictureUrl}
+                                src={game.secondTeam.profilePicture}
                               />
                             </ListItemAvatar>
                             <ListItemText primary={game.secondTeam.title} />

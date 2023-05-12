@@ -55,8 +55,8 @@ export interface Game {
   pointDifferenceToWin: number;
   maxSets: number;
   playersPerTeam: number;
-  firstTeam: Team;
-  secondTeam: Team;
+  firstTeam: GameTeam;
+  secondTeam: GameTeam;
   sets: GameSet[];
   firstTeamScore: number;
   secondTeamScore: number;
@@ -165,7 +165,7 @@ export interface TeamPlayer {
 }
 
 export enum GamePreset {
-  Regular = 0,
+  Indoors = 0,
   Beach = 1,
   None = 2
 }

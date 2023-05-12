@@ -8,7 +8,7 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import { GameStatus, GameTeam, Team } from "../../../utils/types";
+import { GameStatus, GameTeam } from "../../../utils/types";
 
 interface GameSmallCardProps {
   id: string;
@@ -18,8 +18,8 @@ interface GameSmallCardProps {
   createDate: string;
   status: GameStatus;
   winner: GameTeam;
-  firstTeam: Team;
-  secondTeam: Team;
+  firstTeam: GameTeam;
+  secondTeam: GameTeam;
   onButtonPress: () => void;
 }
 
