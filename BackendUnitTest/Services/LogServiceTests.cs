@@ -41,7 +41,7 @@ public class LogServiceTests
     }
 
     [Test]
-    public async Task CreateLogAsyncWithoutMessage_Returns400()
+    public async Task CreateLogAsync_WithoutMessage_Returns400()
     {
         _logRepository.Setup(x => x.CreateAsync(It.IsAny<Log>())).ReturnsAsync((Log log) => log);
 

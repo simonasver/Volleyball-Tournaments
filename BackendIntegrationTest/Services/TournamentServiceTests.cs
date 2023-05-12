@@ -93,7 +93,7 @@ public class TournamentServiceTests
     }
     
     [Test, Order(2)]
-    public async Task UpdateAsyncWithoutParameters_Succeeds()
+    public async Task UpdateAsync_WithoutParameters_Succeeds()
     {
         var result = await _tournamentService.UpdateAsync(_addedTournament);
         
@@ -101,7 +101,7 @@ public class TournamentServiceTests
     }
     
     [Test, Order(3)]
-    public async Task UpdateAsyncWithParameters_Succeeds()
+    public async Task UpdateAsync_WithParameters_Succeeds()
     {
         var result = await _tournamentService.UpdateAsync(new EditTournamentDto
         {
@@ -197,7 +197,7 @@ public class TournamentServiceTests
     }
 
     [Test, Order(11)]
-    public async Task GetAsyncWithWrongId_Returns404()
+    public async Task GetAsync_WithWrongId_Returns404()
     {
         var result = await _tournamentService.GetAsync(new Guid());
         

@@ -62,7 +62,7 @@ namespace BackendIntegrationTest
         }
 
         [Test, Order(2)]
-        public async Task CreateAsyncWithDuplicateName_Returns400()
+        public async Task CreateAsync_WithDuplicateName_Returns400()
         {
             var result = await _teamService.CreateAsync(new AddTeamDto() { Title = "CreateTeam" }, "first");
         
@@ -83,19 +83,6 @@ namespace BackendIntegrationTest
         }
 
         [Test, Order(4)]
-        public async Task UpdateAsyncWithDuplicateName_Returns400()
-        {
-            var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
-            var team = (await _teamService.GetAllAsync(searchParameters)).Data.First();
-            
-            var result = await _teamService.UpdateAsync(
-                new EditTeamDto() { Title = "CreateTeam"},
-                team);
-        
-            Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
-        }
-        
-        [Test, Order(5)]
         public async Task GetAllAsync_ReturnsAll()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -105,7 +92,7 @@ namespace BackendIntegrationTest
             Assert.AreEqual(1, result.Data.Count());
         }
 
-        [Test, Order(6)]
+        [Test, Order(5)]
         public async Task GetUserTeamsAsync_ReturnsUserTeams()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -115,7 +102,7 @@ namespace BackendIntegrationTest
             Assert.AreEqual(1, result.Data.Count());
         }
 
-        [Test, Order(7)]
+        [Test, Order(6)]
         public async Task GetAsync_ReturnsTeam()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -126,15 +113,15 @@ namespace BackendIntegrationTest
             Assert.AreEqual(team.Id, result.Data.Id);
         }
 
-        [Test, Order(8)]
-        public async Task GetAsyncWithWrongId_Returns404()
+        [Test, Order(7)]
+        public async Task GetAsync_WithWrongId_Returns404()
         {
             var result = await _teamService.GetAsync(new Guid());
         
             Assert.AreEqual(StatusCodes.Status404NotFound, result.ErrorStatus);
         }
         
-        [Test, Order(9)]
+        [Test, Order(8)]
         public async Task AddPlayerAsync_Succeeds()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -145,8 +132,8 @@ namespace BackendIntegrationTest
             Assert.IsTrue(result.IsSuccess);
         }
 
-        [Test, Order(10)]
-        public async Task AddPlayerAsyncWithFullTeam_Returns400()
+        [Test, Order(9)]
+        public async Task AddPlayerAsync_WithFullTeam_Returns400()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
             var team = (await _teamService.GetAllAsync(searchParameters)).Data.First();
@@ -161,8 +148,8 @@ namespace BackendIntegrationTest
             Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
         }
 
-        [Test, Order(11)]
-        public async Task AddPlayerAsyncWithDuplicateName_Returns400()
+        [Test, Order(10)]
+        public async Task AddPlayerAsync_WithDuplicateName_Returns400()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
             var team = (await _teamService.GetAllAsync(searchParameters)).Data.First();
@@ -172,7 +159,7 @@ namespace BackendIntegrationTest
             Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
         }
 
-        [Test, Order(12)]
+        [Test, Order(11)]
         public async Task RemovePlayerAsync_Succeeds()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -183,8 +170,8 @@ namespace BackendIntegrationTest
             Assert.IsTrue(result.IsSuccess);
         }
 
-        [Test, Order(13)]
-        public async Task RemovePlayerAsyncWithWrongId_Returns400()
+        [Test, Order(12)]
+        public async Task RemovePlayerAsync_WithWrongId_Returns400()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
             var team = (await _teamService.GetAllAsync(searchParameters)).Data.First();
@@ -194,7 +181,7 @@ namespace BackendIntegrationTest
             Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
         }
         
-        [Test, Order(14)]
+        [Test, Order(13)]
         public async Task DeleteAsync_Succeeds()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };

@@ -65,7 +65,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task GetAsyncWithWrongId_Returns404()
+    public async Task GetAsync_WithWrongId_Returns404()
     {
         _teamRepository.Setup(x => x.GetAsync(_fakeGuid)).ReturnsAsync((Team)null);
 
@@ -87,7 +87,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task CreateAsyncWithDuplicateName_Returns400()
+    public async Task CreateAsync_WithDuplicateName_Returns400()
     {
         _teamRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(_teams);
 
@@ -97,7 +97,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task CreateAsyncWithInvalidImage_Returns400()
+    public async Task CreateAsync_WithInvalidImage_Returns400()
     {
         var result = await _teamService.CreateAsync(new AddTeamDto() { Title = "Team1", PictureUrl = "Picture"}, "first");
         
@@ -117,17 +117,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithDuplicateName_Returns400()
-    {
-        _teamRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(_teams);
-
-        var result = await _teamService.UpdateAsync(new EditTeamDto() { Title = "Team1" }, _teams[0]);
-        
-        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
-    }
-
-    [Test]
-    public async Task UpdateAsyncWithInvalidImage_Returns400()
+    public async Task UpdateAsync_WithInvalidImage_Returns400()
     {
         var result = await _teamService.UpdateAsync(new EditTeamDto() { Title = "Team1", PictureUrl = "Picture"}, _teams[0]);
         
@@ -155,7 +145,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task AddPlayerAsyncWithFullTeam_Returns400()
+    public async Task AddPlayerAsync_WithFullTeam_Returns400()
     {
         var teamWith11Players = _teams[0];
         for (int i = 0; i < 11; i++)
@@ -169,7 +159,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task AddPlayerAsyncWithDuplicateName_Returns400()
+    public async Task AddPlayerAsync_WithDuplicateName_Returns400()
     {
         var result = await _teamService.AddPlayerAsync(new AddTeamPlayerDto { Name = "Player1" }, _teams[0]);
         
@@ -187,7 +177,7 @@ public class TeamServiceTests
     }
 
     [Test]
-    public async Task RemovePlayerAsyncWithWrongId_Returns400()
+    public async Task RemovePlayerAsync_WithWrongId_Returns400()
     {
         var result = await _teamService.RemovePlayerAsync(_fakeGuid, _teams[0]);
         

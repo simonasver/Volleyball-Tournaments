@@ -79,7 +79,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task GetAsyncWithWrongId_Returns404()
+    public async Task GetAsync_WithWrongId_Returns404()
     {
         var tournament = _tournaments[0];
         _tournamentRepository.Setup(x => x.GetAsync(tournament.Id)).ReturnsAsync((Tournament?)null);
@@ -113,7 +113,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task CreateAsyncWithWrongMaxSets_Returns400()
+    public async Task CreateAsync_WithWrongMaxSets_Returns400()
     {
         _tournamentRepository.Setup(x => x.CreateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -124,7 +124,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task CreateAsyncWithInvalidPicture_Returns400()
+    public async Task CreateAsync_WithInvalidPicture_Returns400()
     {
         _tournamentRepository.Setup(x => x.CreateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -135,7 +135,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithoutParameters_Succeeds()
+    public async Task UpdateAsync_WithoutParameters_Succeeds()
     {
         var tournament = _tournaments[0];
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
@@ -147,7 +147,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithParameters_Succeeds()
+    public async Task UpdateAsync_WithParameters_Succeeds()
     {
         var tournament = _tournaments[0];
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
@@ -173,7 +173,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithParametersWithFinishedStatus_Returns400()
+    public async Task UpdateAsync_WithParametersWithFinishedStatus_Returns400()
     {
         var tournament = _tournaments[0];
         tournament.Status = TournamentStatus.Finished;
@@ -186,7 +186,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithParametersWithInvalidMaxSets_Returns400()
+    public async Task UpdateAsync_WithParametersWithInvalidMaxSets_Returns400()
     {
         var tournament = _tournaments[0];
         tournament.Status = TournamentStatus.Finished;
@@ -199,7 +199,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithParametersWithInvalidPicture_Returns400()
+    public async Task UpdateAsync_WithParametersWithInvalidPicture_Returns400()
     {
         var tournament = _tournaments[0];
         tournament.Status = TournamentStatus.Finished;
@@ -249,7 +249,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncAlreadyRequested_Returns400()
+    public async Task TeamRequestJoinAsync_AlreadyRequested_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -263,7 +263,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncInvalidPlayerCount_Returns400()
+    public async Task TeamRequestJoinAsync_InvalidPlayerCount_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -279,7 +279,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncNoPlayers_Returns400()
+    public async Task TeamRequestJoinAsync_NoPlayers_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -312,7 +312,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncTournamentFull_Returns400()
+    public async Task AddTeamAsync_TournamentFull_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -328,7 +328,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncNotRequested_Returns400()
+    public async Task AddTeamAsync_NotRequested_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -344,7 +344,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncInvalidPlayerCount_Returns400()
+    public async Task AddTeamAsync_InvalidPlayerCount_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -375,7 +375,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task RemoveTeamAsyncTournamentStarted_Returns400()
+    public async Task RemoveTeamAsync_TournamentStarted_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -404,7 +404,7 @@ public class TournamentServiceTests
     }
     
     [Test]
-    public async Task StartAsyncSingleThirdPlace_Succeeds()
+    public async Task StartAsync_SingleThirdPlace_Succeeds()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -419,7 +419,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task StartAsyncAlreadyStarted_Returns400()
+    public async Task StartAsync_AlreadyStarted_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -433,7 +433,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task StartAsyncAlreadyFinished_Returns400()
+    public async Task StartAsync_AlreadyFinished_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -447,7 +447,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task StartAsyncInvalidTeamCount_Returns400()
+    public async Task StartAsync_InvalidTeamCount_Returns400()
     {
         _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);
@@ -484,7 +484,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task MoveBracketAsyncFromFinalRound_Returns400()
+    public async Task MoveBracketAsync_FromFinalRound_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -510,7 +510,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task MoveBracketAsyncHasHaveOpponent_Returns400()
+    public async Task MoveBracketAsync_HasHaveOpponent_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -536,7 +536,7 @@ public class TournamentServiceTests
     }
     
     [Test]
-    public async Task MoveBracketAsyncWillHaveOpponent_Returns400()
+    public async Task MoveBracketAsync_WillHaveOpponent_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -565,7 +565,7 @@ public class TournamentServiceTests
     }
     
     [Test]
-    public async Task MoveBracketAsyncAlreadyMovedDownFirstTeamFirstParent_Returns400()
+    public async Task MoveBracketAsync_AlreadyMovedDownFirstTeamFirstParent_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -594,7 +594,7 @@ public class TournamentServiceTests
     }
     
     [Test]
-    public async Task MoveBracketAsyncAlreadyMovedDownFirstTeamSecondParent_Returns400()
+    public async Task MoveBracketAsync_AlreadyMovedDownFirstTeamSecondParent_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -623,7 +623,7 @@ public class TournamentServiceTests
     }
     
     [Test]
-    public async Task MoveBracketAsyncAlreadyMovedDownSecondTeamFirstParent_Returns400()
+    public async Task MoveBracketAsync_AlreadyMovedDownSecondTeamFirstParent_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -652,7 +652,7 @@ public class TournamentServiceTests
     }
     
     [Test]
-    public async Task MoveBracketAsyncAlreadyMovedDownSecondTeamSecondParent_Returns400()
+    public async Task MoveBracketAsync_AlreadyMovedDownSecondTeamSecondParent_Returns400()
     {
         _tournamentMatchRepository.Setup(x => x.UpdateAsync(It.IsAny<TournamentMatch>()))
             .ReturnsAsync((TournamentMatch tournamentMatch) => tournamentMatch);
@@ -692,7 +692,7 @@ public class TournamentServiceTests
     }
 
     [Test]
-    public async Task GenerateAsyncInvalidTeamCount_Returns400()
+    public async Task GenerateAsync_InvalidTeamCount_Returns400()
     {
         _tournamentRepository.Setup(x => x.CreateAsync(It.IsAny<Tournament>()))
             .ReturnsAsync((Tournament tournament) => tournament);

@@ -137,7 +137,6 @@ export const joinTournament = async (tournamentId: string, teamId: string) => {
   };
 
   export const reorderTeams = async (tournamentId: string, numbers: { [id: string]: number }) => {
-    console.log(numbers);
     const res = await api.patch(`/Tournaments/${tournamentId}/AcceptedTeams/Order`, {
       UpdatedNumbers: numbers
     });

@@ -213,12 +213,12 @@ const TeamBigCard = (props: TeamBigCardProps) => {
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
         getTeam(id)
-        .then((res) => {
-          setTeam(res);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+          .then((res) => {
+            setTeam(res);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -238,12 +238,12 @@ const TeamBigCard = (props: TeamBigCardProps) => {
           alertActions.changeAlert({ type: "success", message: successMessage })
         );
         getTeam(id)
-        .then((res) => {
-          setTeam(res);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+          .then((res) => {
+            setTeam(res);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
       })
       .catch((e) => {
         console.log(e);
@@ -385,10 +385,7 @@ const TeamBigCard = (props: TeamBigCardProps) => {
       {modalStatus === Modal.AddManager && (
         <AddManagerModal
           errorMessage={addManagerError}
-          users={
-            users?.filter((x) => x.id !== team?.ownerId) ??
-            []
-          }
+          users={users?.filter((x) => x.id !== team?.ownerId) ?? []}
           addManagerInput={addManagerInput}
           onAddManagerInputChange={setAddManagerInput}
           searchInput={managerSearchInput}

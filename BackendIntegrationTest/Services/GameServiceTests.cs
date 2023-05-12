@@ -140,7 +140,7 @@ public class GameServiceTests
     }
 
     [Test, Order(7)]
-    public async Task TeamRequestJoinAsyncAlreadyRequested_Returns400()
+    public async Task TeamRequestJoinAsync_AlreadyRequested_Returns400()
     {
         var game = await _gameRepository.GetAsync(_addedGame.Id);
 
@@ -160,7 +160,7 @@ public class GameServiceTests
     }
     
     [Test, Order(9)]
-    public async Task RemoveTeamAsyncWithOneTeam_Succeeds()
+    public async Task RemoveTeamAsync_WithOneTeam_Succeeds()
     {
         var game = await _gameRepository.GetAsync(_addedGame.Id);
 
@@ -194,7 +194,7 @@ public class GameServiceTests
     }
     
     [Test, Order(12)]
-    public async Task ChangePlayerSetScoreAsyncFirstTeamLastSetIncrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_FirstTeamLastSetIncrease_Succeeds()
     {
         var game = await _gameRepository.GetAsync(_addedGame.Id);
         
@@ -205,7 +205,7 @@ public class GameServiceTests
     }
     
     [Test, Order(13)]
-    public async Task ChangePlayerSetStatsAsyncKillsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_KillsIncrease_Succeeds()
     {
         var game = await _gameRepository.GetAsync(_addedGame.Id);
 

@@ -103,7 +103,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task CreateAsyncWithEvenSetNumber_Returns400()
+    public async Task CreateAsync_WithEvenSetNumber_Returns400()
     {
         var result = await _gameService.CreateAsync(
             new AddGameDto()
@@ -116,7 +116,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task CreateAsyncWithInvalidImage_Returns400()
+    public async Task CreateAsync_WithInvalidImage_Returns400()
     {
         var result = await _gameService.CreateAsync(
             new AddGameDto()
@@ -145,7 +145,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncFinishedGame_Returns400()
+    public async Task UpdateAsync_FinishedGame_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -161,7 +161,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithEvenMaxSets_Returns400()
+    public async Task UpdateAsync_WithEvenMaxSets_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -177,7 +177,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithInvalidPicture_Returns400()
+    public async Task UpdateAsync_WithInvalidPicture_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -193,7 +193,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithTournamentChangePointsToWin_Returns400()
+    public async Task UpdateAsync_WithTournamentChangePointsToWin_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -209,7 +209,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithTournamentChangePointsToWinLastSet_Returns400()
+    public async Task UpdateAsync_WithTournamentChangePointsToWinLastSet_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -225,7 +225,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task UpdateAsyncWithTournamentChangePointDifferenceToWin_Returns400()
+    public async Task UpdateAsync_WithTournamentChangePointDifferenceToWin_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -252,7 +252,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task DeleteAsyncTournamentGame_Returns400()
+    public async Task DeleteAsync_TournamentGame_Returns400()
     {
         var result = await _gameService.DeleteAsync(Helpers.GetGameWithTournament());
         
@@ -270,7 +270,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncTournamentGame_Returns400()
+    public async Task TeamRequestJoinAsync_TournamentGame_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -280,7 +280,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncAlreadyRequested_Returns400()
+    public async Task TeamRequestJoinAsync_AlreadyRequested_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -292,7 +292,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncWrongPlayerNumber_Returns400()
+    public async Task TeamRequestJoinAsync_WrongPlayerNumber_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -302,7 +302,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task TeamRequestJoinAsyncNoPlayers_Returns400()
+    public async Task TeamRequestJoinAsync_NoPlayers_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -324,7 +324,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncWithTournament_Returns400()
+    public async Task AddTeamAsync_WithTournament_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -334,7 +334,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncWithoutRequest_Returns400()
+    public async Task AddTeamAsync_WithoutRequest_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
         
@@ -344,7 +344,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncWrongPlayerCount_Returns400()
+    public async Task AddTeamAsync_WrongPlayerCount_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
         
@@ -357,7 +357,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task AddTeamAsyncGameIsFull_Returns400()
+    public async Task AddTeamAsync_GameIsFull_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
         
@@ -371,7 +371,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task RemoveTeamAsyncWithOneTeam_Succeeds()
+    public async Task RemoveTeamAsync_WithOneTeam_Succeeds()
     {
         _gameTeamRepository.Setup(x => x.DeleteAsync(It.IsAny<Guid>()));
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
@@ -385,7 +385,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task RemoveTeamAsyncWithTwoTeams_Succeeds()
+    public async Task RemoveTeamAsync_WithTwoTeams_Succeeds()
     {
         _gameTeamRepository.Setup(x => x.DeleteAsync(It.IsAny<Guid>()));
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
@@ -400,7 +400,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task RemoveTeamAsyncWithTournament_Returns400()
+    public async Task RemoveTeamAsync_WithTournament_Returns400()
     {
         _gameTeamRepository.Setup(x => x.DeleteAsync(It.IsAny<Guid>()));
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
@@ -413,7 +413,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task RemoveTeamAsyncFromStarted_Returns400()
+    public async Task RemoveTeamAsync_FromStarted_Returns400()
     {
         _gameTeamRepository.Setup(x => x.DeleteAsync(It.IsAny<Guid>()));
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
@@ -427,7 +427,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task RemoveTeamAsyncFirstTeamWithoutExisting_Returns400()
+    public async Task RemoveTeamAsync_FirstTeamWithoutExisting_Returns400()
     {
         _gameTeamRepository.Setup(x => x.DeleteAsync(It.IsAny<Guid>()));
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
@@ -440,7 +440,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task RemoveTeamAsyncSecondTeamWithoutExisting_Returns400()
+    public async Task RemoveTeamAsyncSecondTeam_WithoutExisting_Returns400()
     {
         _gameTeamRepository.Setup(x => x.DeleteAsync(It.IsAny<Guid>()));
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
@@ -473,7 +473,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task StartAsyncAlreadyStarted_Returns400()
+    public async Task StartAsync_AlreadyStarted_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -493,7 +493,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task StartAsyncAlreadyFinished_Returns400()
+    public async Task StartAsync_AlreadyFinished_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -513,7 +513,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task StartAsyncNotReady_Returns400()
+    public async Task StartAsync_NotReady_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -533,7 +533,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task StartAsyncFirstTeamWrongPlayerCount_Returns400()
+    public async Task StartAsync_FirstTeamWrongPlayerCount_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -554,7 +554,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task StartAsyncSecondTeamWrongPlayerCount_Returns400()
+    public async Task StartAsync_SecondTeamWrongPlayerCount_Returns400()
     {
         _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
 
@@ -587,7 +587,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task ChangePlayerSetScoreAsyncFirstTeamLastSetIncrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_FirstTeamLastSetIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -606,7 +606,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task ChangePlayerSetScoreAsyncSecondTeamLastSetIncrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_SecondTeamLastSetIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -625,7 +625,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task ChangePlayerSetScoreAsyncFirstTeamDecrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_FirstTeamDecrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -641,7 +641,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetScoreAsyncSecondTeamDecrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_SecondTeamDecrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -657,7 +657,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetScoreAsyncFirstTeamDecreaseWithScore0_Returns400()
+    public async Task ChangePlayerSetScoreAsync_FirstTeamDecreaseWithScore0_Returns400()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -673,7 +673,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetScoreAsyncFirstTeamNotLastSetIncrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_FirstTeamNotLastSetIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -710,7 +710,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetScoreAsyncSecondTeamNotLastSetIncrease_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_SecondTeamNotLastSetIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -747,7 +747,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task ChangePlayerSetScoreAsyncWithTournamentFirstTeamLastRound_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_WithTournamentFirstTeamLastRound_Succeeds()
     {
         var tournament = _tournaments[0];
         tournament.FinalRound = 1;
@@ -788,7 +788,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetScoreAsyncWithTournamentSecondTeamLastRound_Succeeds()
+    public async Task ChangePlayerSetScoreAsync_WithTournamentSecondTeamLastRound_Succeeds()
     {
         var tournament = _tournaments[0];
         tournament.FinalRound = 1;
@@ -829,7 +829,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task ChangePlayerSetStatsAsyncKillsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_KillsIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -852,7 +852,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncErrorsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_ErrorsIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -875,7 +875,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncAttemptsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_AttemptsIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -898,7 +898,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncSuccessfulBlocksIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_SuccessfulBlocksIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -921,7 +921,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncBlocksIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_BlocksIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -944,7 +944,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncTouchesIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_TouchesIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -967,7 +967,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncBlockingErrorsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_BlockingErrorsIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -990,7 +990,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncAcesIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_AcesIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -1013,7 +1013,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncServingErrorsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_ServingErrorsIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -1036,7 +1036,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncTotalServesIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_TotalServesIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -1059,7 +1059,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncSuccessfulDigsIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_SuccessfulDigsIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -1082,7 +1082,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncBallTouchesIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_BallTouchesIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);
@@ -1105,7 +1105,7 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task ChangePlayerSetStatsAsyncBallMissesIncrease_Succeeds()
+    public async Task ChangePlayerSetStatsAsync_BallMissesIncrease_Succeeds()
     {
         _logService.Setup(x => x.CreateLogAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(),
             It.IsAny<Tournament?>(), It.IsAny<Game?>())).ReturnsAsync(ServiceResult<bool>.Success);

@@ -83,7 +83,7 @@ public class LogServiceTests
     }
     
     [Test, Order(2)]
-    public async Task CreateLogAsyncGame_Succeeds()
+    public async Task CreateLogAsync_Game_Succeeds()
     {
         var gameResult = await _gameService.CreateAsync(addGameDto: new AddGameDto
         {
@@ -108,7 +108,7 @@ public class LogServiceTests
     }
     
     [Test, Order(3)]
-    public async Task CreateLogAsyncTournament_Succeeds()
+    public async Task CreateLogAsync_Tournament_Succeeds()
     {
         var tournamentResult = await _tournamentService.CreateAsync(new AddTournamentDto
         {
