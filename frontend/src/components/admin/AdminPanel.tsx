@@ -65,7 +65,7 @@ const AdminPanel = () => {
         >
           Users
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           sx={{
             size: { xs: "small", md: "medium" },
@@ -76,7 +76,7 @@ const AdminPanel = () => {
           onClick={() => setModalStatus(Modal.Generate)}
         >
           Generate tournaments
-        </Button>
+        </Button> */}
       </Stack>
       {modalStatus === Modal.Generate && (
         <GenerateTournamentModal
