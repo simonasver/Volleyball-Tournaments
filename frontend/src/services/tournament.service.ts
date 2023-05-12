@@ -1,5 +1,5 @@
 import { formatPaginationDataToQuery, formatSearchInputDataToQuery } from "../utils/helpers";
-import { GameTeam, PageData, Tournament, TournamentMatch } from "../utils/types";
+import { PageData, Tournament, TournamentMatch } from "../utils/types";
 import api from "./api";
 
 export const getTournaments = async (pageNumber: number, pageSize: number, searchInput: string, signal?: AbortSignal): Promise<{ data: Tournament[], pagination: PageData }> => {

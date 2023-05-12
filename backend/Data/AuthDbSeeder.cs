@@ -5,10 +5,12 @@ namespace Backend.Data;
 
 public class AuthDbSeeder
 {
+    private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public AuthDbSeeder(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+    public AuthDbSeeder(IConfiguration configuration, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
+        _configuration = configuration;
         _userManager = userManager;
         _roleManager = roleManager;
     }
@@ -35,16 +37,21 @@ public class AuthDbSeeder
     {
         var newAdminUser = new ApplicationUser()
         {
-            UserName = "admin",
-            FullName = "Admin admin",
-            Email = "admin@admin.com",
+            UserName = _configuration["DefaultAdminUser:Username"],
+            FullName = _configuration["DefaultAdminUser:Username"],
+            Email = _configuration["DefaultAdminUser:Email"],
             RegisterDate = DateTime.Now,
         };
+
+        if (string.IsNullOrEmpty(newAdminUser.UserName))
+        {
+            return;
+        }
 
         var existingAdminUser = await _userManager.FindByNameAsync(newAdminUser.UserName);
         if (existingAdminUser == null)
         {
-            var createAdminUserResult = await _userManager.CreateAsync(newAdminUser, "123Admin123!");
+            var createAdminUserResult = await _userManager.CreateAsync(newAdminUser, _configuration["DefaultAdminUser:Password"]);
             if (createAdminUserResult.Succeeded)
             {
                 await _userManager.AddToRolesAsync(newAdminUser, ApplicationUserRoles.All);

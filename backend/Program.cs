@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(frontEndOrigins, policy =>
     {
-        policy.WithOrigins("http://localhost:3000").AllowCredentials().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Pagination");
+        policy.WithOrigins(builder.Configuration["FrontendAddress"]).AllowCredentials().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Pagination");
     });
 });
 

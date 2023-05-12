@@ -9,7 +9,7 @@ export const injectStore = (storeToInject: Store<RootState>) => {
   store = storeToInject;
 };
 
-const apiUrl = "https://localhost:7067/api";
+const apiUrl = process.env.REACT_APP_SERVER_API;
 
 const instance = axios.create({
   baseURL: apiUrl,
