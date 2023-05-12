@@ -374,7 +374,7 @@ const GameBigCard = (props: GameBigCardProps) => {
     setId?: string,
     playerId?: string
   ) => {
-    if (type !== GameScore.Score) {
+    if (type !== GameScore.Score && !fast) {
       return onChangePlayerStats(type, change, fast, setId, playerId);
     }
     changeGameSetScore(
@@ -993,7 +993,7 @@ const GameBigCard = (props: GameBigCardProps) => {
             </Box>
             {isManager(user, game.ownerId, game.managers) &&
               !game.tournamentMatch &&
-              game.status < GameStatus.Started && (
+              game.status < GameStatus.Ready && (
                 <IconButton
                   centerRipple={false}
                   color="success"
