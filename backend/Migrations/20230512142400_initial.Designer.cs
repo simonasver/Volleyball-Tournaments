@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230501095948_initial")]
+    [Migration("20230512142400_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -22,7 +22,52 @@ namespace Backend.Migrations
                 .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Backend.Auth.Model.ApplicationUser", b =>
+            modelBuilder.Entity("ApplicationUserGame", b =>
+                {
+                    b.Property<Guid>("ManagedGamesId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ManagersId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("ManagedGamesId", "ManagersId");
+
+                    b.HasIndex("ManagersId");
+
+                    b.ToTable("GameManagers", (string)null);
+                });
+
+            modelBuilder.Entity("ApplicationUserTeam", b =>
+                {
+                    b.Property<Guid>("ManagedTeamsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ManagersId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("ManagedTeamsId", "ManagersId");
+
+                    b.HasIndex("ManagersId");
+
+                    b.ToTable("TeamManagers", (string)null);
+                });
+
+            modelBuilder.Entity("ApplicationUserTournament", b =>
+                {
+                    b.Property<Guid>("ManagedTournamentsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ManagersId")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("ManagedTournamentsId", "ManagersId");
+
+                    b.HasIndex("ManagersId");
+
+                    b.ToTable("TournamentManagers", (string)null);
+                });
+
+            modelBuilder.Entity("Backend.Data.Entities.Auth.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
@@ -214,6 +259,9 @@ namespace Backend.Migrations
                     b.Property<Guid?>("TournamentId")
                         .HasColumnType("char(36)");
 
+                    b.Property<int?>("TournamentNumber")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("TournamentWhereWinnerId")
                         .HasColumnType("char(36)");
 
@@ -370,7 +418,7 @@ namespace Backend.Migrations
                     b.ToTable("SetPlayers");
                 });
 
-            modelBuilder.Entity("Backend.Data.Entities.Log", b =>
+            modelBuilder.Entity("Backend.Data.Entities.Log.Log", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -419,9 +467,6 @@ namespace Backend.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("GameId")
-                        .HasColumnType("char(36)");
-
                     b.Property<DateTime>("LastEditDate")
                         .HasColumnType("datetime(6)");
 
@@ -436,16 +481,9 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("TournamentId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
-
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("TournamentId");
 
                     b.ToTable("Teams");
                 });
@@ -568,6 +606,21 @@ namespace Backend.Migrations
                     b.HasIndex("TournamentId");
 
                     b.ToTable("TournamentMatches");
+                });
+
+            modelBuilder.Entity("GameTeam", b =>
+                {
+                    b.Property<Guid>("GamesRequestedToId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("RequestedTeamsId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("GamesRequestedToId", "RequestedTeamsId");
+
+                    b.HasIndex("RequestedTeamsId");
+
+                    b.ToTable("GameRequestedTeams", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -698,10 +751,70 @@ namespace Backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TeamTournament", b =>
+                {
+                    b.Property<Guid>("RequestedTeamsId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("TournamentsRequestedToId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("RequestedTeamsId", "TournamentsRequestedToId");
+
+                    b.HasIndex("TournamentsRequestedToId");
+
+                    b.ToTable("TournamentRequestedTeams", (string)null);
+                });
+
+            modelBuilder.Entity("ApplicationUserGame", b =>
+                {
+                    b.HasOne("Backend.Data.Entities.Game.Game", null)
+                        .WithMany()
+                        .HasForeignKey("ManagedGamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ManagersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ApplicationUserTeam", b =>
+                {
+                    b.HasOne("Backend.Data.Entities.Team.Team", null)
+                        .WithMany()
+                        .HasForeignKey("ManagedTeamsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ManagersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ApplicationUserTournament", b =>
+                {
+                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", null)
+                        .WithMany()
+                        .HasForeignKey("ManagedTournamentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ManagersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Backend.Data.Entities.Game.Game", b =>
                 {
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
-                        .WithMany()
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", "Owner")
+                        .WithMany("OwnedGames")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -798,14 +911,14 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Backend.Data.Entities.Log", b =>
+            modelBuilder.Entity("Backend.Data.Entities.Log.Log", b =>
                 {
                     b.HasOne("Backend.Data.Entities.Game.Game", "Game")
                         .WithMany()
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -825,19 +938,11 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Team.Team", b =>
                 {
-                    b.HasOne("Backend.Data.Entities.Game.Game", null)
-                        .WithMany("RequestedTeams")
-                        .HasForeignKey("GameId");
-
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
-                        .WithMany()
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", "Owner")
+                        .WithMany("OwnedTeams")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", null)
-                        .WithMany("RequestedTeams")
-                        .HasForeignKey("TournamentId");
 
                     b.Navigation("Owner");
                 });
@@ -855,8 +960,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Entities.Tournament.Tournament", b =>
                 {
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", "Owner")
-                        .WithMany()
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", "Owner")
+                        .WithMany("OwnedTournaments")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -887,6 +992,21 @@ namespace Backend.Migrations
                     b.Navigation("Tournament");
                 });
 
+            modelBuilder.Entity("GameTeam", b =>
+                {
+                    b.HasOne("Backend.Data.Entities.Game.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesRequestedToId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entities.Team.Team", null)
+                        .WithMany()
+                        .HasForeignKey("RequestedTeamsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -898,7 +1018,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", null)
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -907,7 +1027,7 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", null)
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -922,7 +1042,7 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", null)
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -931,18 +1051,40 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Backend.Auth.Model.ApplicationUser", null)
+                    b.HasOne("Backend.Data.Entities.Auth.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TeamTournament", b =>
+                {
+                    b.HasOne("Backend.Data.Entities.Team.Team", null)
+                        .WithMany()
+                        .HasForeignKey("RequestedTeamsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Entities.Tournament.Tournament", null)
+                        .WithMany()
+                        .HasForeignKey("TournamentsRequestedToId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Backend.Data.Entities.Auth.ApplicationUser", b =>
+                {
+                    b.Navigation("OwnedGames");
+
+                    b.Navigation("OwnedTeams");
+
+                    b.Navigation("OwnedTournaments");
+                });
+
             modelBuilder.Entity("Backend.Data.Entities.Game.Game", b =>
                 {
                     b.Navigation("FirstTeam");
-
-                    b.Navigation("RequestedTeams");
 
                     b.Navigation("SecondTeam");
 
@@ -971,8 +1113,6 @@ namespace Backend.Migrations
                     b.Navigation("AcceptedTeams");
 
                     b.Navigation("Matches");
-
-                    b.Navigation("RequestedTeams");
 
                     b.Navigation("Winner");
                 });

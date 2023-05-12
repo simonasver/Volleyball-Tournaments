@@ -207,6 +207,34 @@ namespace Backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Teams",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Title = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PictureUrl = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreateDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LastEditDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    OwnerId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Teams", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Teams_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Tournaments",
                 columns: table => new
                 {
@@ -246,6 +274,79 @@ namespace Backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "TeamManagers",
+                columns: table => new
+                {
+                    ManagedTeamsId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ManagersId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeamManagers", x => new { x.ManagedTeamsId, x.ManagersId });
+                    table.ForeignKey(
+                        name: "FK_TeamManagers_AspNetUsers_ManagersId",
+                        column: x => x.ManagersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TeamManagers_Teams_ManagedTeamsId",
+                        column: x => x.ManagedTeamsId,
+                        principalTable: "Teams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "TeamPlayers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TeamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeamPlayers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeamPlayers_Teams_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Teams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "TournamentManagers",
+                columns: table => new
+                {
+                    ManagedTournamentsId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ManagersId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TournamentManagers", x => new { x.ManagedTournamentsId, x.ManagersId });
+                    table.ForeignKey(
+                        name: "FK_TournamentManagers_AspNetUsers_ManagersId",
+                        column: x => x.ManagersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TournamentManagers_Tournaments_ManagedTournamentsId",
+                        column: x => x.ManagedTournamentsId,
+                        principalTable: "Tournaments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "TournamentMatches",
                 columns: table => new
                 {
@@ -272,6 +373,31 @@ namespace Backend.Migrations
                     table.ForeignKey(
                         name: "FK_TournamentMatches_Tournaments_TournamentId",
                         column: x => x.TournamentId,
+                        principalTable: "Tournaments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "TournamentRequestedTeams",
+                columns: table => new
+                {
+                    RequestedTeamsId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    TournamentsRequestedToId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TournamentRequestedTeams", x => new { x.RequestedTeamsId, x.TournamentsRequestedToId });
+                    table.ForeignKey(
+                        name: "FK_TournamentRequestedTeams_Teams_RequestedTeamsId",
+                        column: x => x.RequestedTeamsId,
+                        principalTable: "Teams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TournamentRequestedTeams_Tournaments_TournamentsRequestedToId",
+                        column: x => x.TournamentsRequestedToId,
                         principalTable: "Tournaments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -326,6 +452,57 @@ namespace Backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "GameManagers",
+                columns: table => new
+                {
+                    ManagedGamesId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ManagersId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameManagers", x => new { x.ManagedGamesId, x.ManagersId });
+                    table.ForeignKey(
+                        name: "FK_GameManagers_AspNetUsers_ManagersId",
+                        column: x => x.ManagersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GameManagers_Games_ManagedGamesId",
+                        column: x => x.ManagedGamesId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "GameRequestedTeams",
+                columns: table => new
+                {
+                    GamesRequestedToId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    RequestedTeamsId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameRequestedTeams", x => new { x.GamesRequestedToId, x.RequestedTeamsId });
+                    table.ForeignKey(
+                        name: "FK_GameRequestedTeams_Games_GamesRequestedToId",
+                        column: x => x.GamesRequestedToId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GameRequestedTeams_Teams_RequestedTeamsId",
+                        column: x => x.RequestedTeamsId,
+                        principalTable: "Teams",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "GameTeams",
                 columns: table => new
                 {
@@ -338,6 +515,7 @@ namespace Backend.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Duplicate = table.Column<bool>(type: "tinyint(1)", nullable: true),
                     TournamentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
+                    TournamentNumber = table.Column<int>(type: "int", nullable: true),
                     GameWhereFirstId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     GameWhereSecondId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     GameWhereWinnerId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
@@ -418,46 +596,6 @@ namespace Backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Teams",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Title = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PictureUrl = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreateDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    LastEditDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    OwnerId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    GameId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
-                    TournamentId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Teams", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Teams_AspNetUsers_OwnerId",
-                        column: x => x.OwnerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Teams_Games_GameId",
-                        column: x => x.GameId,
-                        principalTable: "Games",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Teams_Tournaments_TournamentId",
-                        column: x => x.TournamentId,
-                        principalTable: "Tournaments",
-                        principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "GameTeamPlayers",
                 columns: table => new
                 {
@@ -518,27 +656,6 @@ namespace Backend.Migrations
                         name: "FK_Sets_Games_GameId",
                         column: x => x.GameId,
                         principalTable: "Games",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "TeamPlayers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TeamId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeamPlayers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TeamPlayers_Teams_TeamId",
-                        column: x => x.TeamId,
-                        principalTable: "Teams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -616,6 +733,16 @@ namespace Backend.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameManagers_ManagersId",
+                table: "GameManagers",
+                column: "ManagersId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GameRequestedTeams_RequestedTeamsId",
+                table: "GameRequestedTeams",
+                column: "RequestedTeamsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Games_OwnerId",
@@ -703,14 +830,14 @@ namespace Backend.Migrations
                 column: "WinnerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TeamManagers_ManagersId",
+                table: "TeamManagers",
+                column: "ManagersId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TeamPlayers_TeamId",
                 table: "TeamPlayers",
                 column: "TeamId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Teams_GameId",
-                table: "Teams",
-                column: "GameId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Teams_OwnerId",
@@ -718,9 +845,9 @@ namespace Backend.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Teams_TournamentId",
-                table: "Teams",
-                column: "TournamentId");
+                name: "IX_TournamentManagers_ManagersId",
+                table: "TournamentManagers",
+                column: "ManagersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TournamentMatches_FirstParentId",
@@ -738,6 +865,11 @@ namespace Backend.Migrations
                 name: "IX_TournamentMatches_TournamentId",
                 table: "TournamentMatches",
                 column: "TournamentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TournamentRequestedTeams_TournamentsRequestedToId",
+                table: "TournamentRequestedTeams",
+                column: "TournamentsRequestedToId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tournaments_OwnerId",
@@ -764,6 +896,12 @@ namespace Backend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "GameManagers");
+
+            migrationBuilder.DropTable(
+                name: "GameRequestedTeams");
+
+            migrationBuilder.DropTable(
                 name: "GameTeamPlayers");
 
             migrationBuilder.DropTable(
@@ -773,7 +911,16 @@ namespace Backend.Migrations
                 name: "SetPlayers");
 
             migrationBuilder.DropTable(
+                name: "TeamManagers");
+
+            migrationBuilder.DropTable(
                 name: "TeamPlayers");
+
+            migrationBuilder.DropTable(
+                name: "TournamentManagers");
+
+            migrationBuilder.DropTable(
+                name: "TournamentRequestedTeams");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
