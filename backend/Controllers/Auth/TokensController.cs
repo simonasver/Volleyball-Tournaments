@@ -28,18 +28,18 @@ public class TokensController : ControllerBase
         {
             return BadRequest("User Name or password is invalid");
         }
-
-        if (user.Banned)
-        {
-            return Forbid();
-        }
-
+        
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
         if (!isPasswordValid)
         {
             return BadRequest("User Name or password is invalid");
         }
 
+        if (user.Banned)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "User does not have access to the system");
+        }
+        
         var roles = await _userManager.GetRolesAsync(user);
         var accessToken = _jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
         var refreshToken = _jwtTokenService.CreateRefreshToken();
@@ -83,7 +83,7 @@ public class TokensController : ControllerBase
         
         if (user.Banned)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden, "User does not have access to the system");
         }
 
         var roles = await _userManager.GetRolesAsync(user);
