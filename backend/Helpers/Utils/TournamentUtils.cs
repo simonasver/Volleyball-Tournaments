@@ -349,8 +349,6 @@ public static class TournamentUtils
                 keyValuePair.Value;
         }
 
-        // tournament.AcceptedTeams = teams;
-
         return tournament;
     }
 }

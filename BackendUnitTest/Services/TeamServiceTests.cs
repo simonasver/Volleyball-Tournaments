@@ -1,4 +1,5 @@
 using Backend.Data.Dtos.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
 using Backend.Data.Repositories;
@@ -180,6 +181,84 @@ public class TeamServiceTests
     public async Task RemovePlayerAsync_WithWrongId_Returns400()
     {
         var result = await _teamService.RemovePlayerAsync(_fakeGuid, _teams[0]);
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task AddManager_Succeeds()
+    {
+        _teamRepository.Setup(x => x.UpdateAsync(It.IsAny<Team>())).ReturnsAsync((Team team) => team);
+
+        var team = _teams[0];
+        team.Managers = new List<ApplicationUser>();
+        
+        var result = await _teamService.AddManagerAsync(team, new ApplicationUser { Id = "second" });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+
+    [Test]
+    public async Task AddManager_IsOwner_Returns400()
+    {
+        _teamRepository.Setup(x => x.UpdateAsync(It.IsAny<Team>())).ReturnsAsync((Team team) => team);
+
+        var team = _teams[0];
+        team.Managers = new List<ApplicationUser>();
+        
+        var result = await _teamService.AddManagerAsync(team, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task AddManager_AlreadyManager_Returns400()
+    {
+        _teamRepository.Setup(x => x.UpdateAsync(It.IsAny<Team>())).ReturnsAsync((Team team) => team);
+
+        var team = _teams[0];
+        team.Managers = new List<ApplicationUser>{ new() { Id = "first" } };
+        
+        var result = await _teamService.AddManagerAsync(team, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task RemoveManager_Succeeds()
+    {
+        _teamRepository.Setup(x => x.UpdateAsync(It.IsAny<Team>())).ReturnsAsync((Team team) => team);
+
+        var team = _teams[0];
+        team.Managers = new List<ApplicationUser>{ new() { Id = "second" } };
+        
+        var result = await _teamService.RemoveManagerAsync(team, new ApplicationUser { Id = "second" });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test]
+    public async Task RemoveManager_IsOwner_Returns400()
+    {
+        _teamRepository.Setup(x => x.UpdateAsync(It.IsAny<Team>())).ReturnsAsync((Team team) => team);
+
+        var team = _teams[0];
+        team.Managers = new List<ApplicationUser>();
+        
+        var result = await _teamService.RemoveManagerAsync(team, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+    
+    [Test]
+    public async Task RemoveManager_IsNotManager_Succeeds()
+    {
+        _teamRepository.Setup(x => x.UpdateAsync(It.IsAny<Team>())).ReturnsAsync((Team team) => team);
+
+        var team = _teams[0];
+        team.Managers = new List<ApplicationUser>();
+        
+        var result = await _teamService.RemoveManagerAsync(team, new ApplicationUser { Id = "second" });
         
         Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
     }

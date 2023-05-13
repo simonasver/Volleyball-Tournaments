@@ -1,4 +1,5 @@
 using Backend.Data.Dtos.Game;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
@@ -1125,5 +1126,83 @@ public class GameServiceTests
             _fakeGuid, _fakeGuid, "first");
         
         Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test]
+    public async Task AddManager_Succeeds()
+    {
+        _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
+
+        var game = _games[0];
+        game.Managers = new List<ApplicationUser>();
+        
+        var result = await _gameService.AddManagerAsync(game, new ApplicationUser { Id = "second" });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+
+    [Test]
+    public async Task AddManager_IsOwner_Returns400()
+    {
+        _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
+
+        var game = _games[0];
+        game.Managers = new List<ApplicationUser>();
+        
+        var result = await _gameService.AddManagerAsync(game, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task AddManager_AlreadyManager_Returns400()
+    {
+        _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
+
+        var game = _games[0];
+        game.Managers = new List<ApplicationUser>{ new() { Id = "first" }};
+        
+        var result = await _gameService.AddManagerAsync(game, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task RemoveManager_Succeeds()
+    {
+        _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
+
+        var game = _games[0];
+        game.Managers = new List<ApplicationUser>{ new() { Id = "second" }};
+        
+        var result = await _gameService.RemoveManagerAsync(game, new ApplicationUser { Id = "second" });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test]
+    public async Task RemoveManager_IsOwner_Returns400()
+    {
+        _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
+
+        var game = _games[0];
+        game.Managers = new List<ApplicationUser>{ new() { Id = "first" }};
+        
+        var result = await _gameService.RemoveManagerAsync(game, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+    
+    [Test]
+    public async Task RemoveManager_IsNotManager_Succeeds()
+    {
+        _gameRepository.Setup(x => x.UpdateAsync(It.IsAny<Game>())).ReturnsAsync((Game game) => game);
+
+        var game = _games[0];
+        game.Managers = new List<ApplicationUser>{ new() { Id = "first" }};
+        
+        var result = await _gameService.RemoveManagerAsync(game, new ApplicationUser { Id = "second" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
     }
 }

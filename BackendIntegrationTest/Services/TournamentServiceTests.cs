@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Data.Dtos.Tournament;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
 using Backend.Data.Entities.Utils;
@@ -27,6 +28,9 @@ public class TournamentServiceTests
     private Team _joinedTeam1;
     private Team _joinedTeam2;
     private Team _joinedTeam3;
+
+    private Guid _addedNotOwnerUserGuid;
+    private ApplicationUser _addedNotOwnerUser;
     
     [OneTimeSetUp]
     public async Task Setup()
@@ -49,6 +53,39 @@ public class TournamentServiceTests
         _dbContext.Database.ExecuteSql(
             $"INSERT INTO aspnetusers (Id, UserName, FullName, Email, RefreshTokenExpiration, RegisterDate, LastLoginDate, Banned, EmailConfirmed, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount) VALUES ({"first"}, {"admin"}, {"Admin admin"}, {"admin@admin.com"}, {DateTime.Now}, {DateTime.Now}, {DateTime.Now}, {false}, {false}, {false}, {false}, {false}, {0})");
         
+        _addedNotOwnerUserGuid = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        _addedNotOwnerUser = new ApplicationUser
+        {
+            Id = _addedNotOwnerUserGuid.ToString(),
+            UserName = "notadmin",
+            NormalizedUserName = null,
+            Email = "notadmin@admin.com",
+            NormalizedEmail = null,
+            EmailConfirmed = false,
+            PasswordHash = null,
+            SecurityStamp = null,
+            ConcurrencyStamp = null,
+            PhoneNumber = null,
+            PhoneNumberConfirmed = false,
+            TwoFactorEnabled = false,
+            LockoutEnd = null,
+            LockoutEnabled = false,
+            AccessFailedCount = 0,
+            RefreshToken = null,
+            RefreshTokenExpiration = default,
+            ProfilePictureUrl = null,
+            FullName = "not",
+            RegisterDate = default,
+            LastLoginDate = default,
+            Banned = false,
+            OwnedTeams = null,
+            OwnedGames = null,
+            OwnedTournaments = null,
+            ManagedTeams = null,
+            ManagedGames = null,
+            ManagedTournaments = null
+        };
+
         _gameTeamRepository = new GameTeamRepository(_dbContext);
         _tournamentRepository = new TournamentRepository(_dbContext);
         _tournamentMatchRepository = new TournamentMatchRepository(_dbContext);
@@ -153,7 +190,7 @@ public class TournamentServiceTests
     }
     
     [Test, Order(7)]
-    public async Task StartAsync_Succeeds()
+    public async Task ReorderTeams_Succeeds()
     {
         await _tournamentService.TeamRequestJoinAsync(_addedTournament, _joinedTeam1);
         await _tournamentService.TeamRequestJoinAsync(_addedTournament, _joinedTeam2);
@@ -163,12 +200,39 @@ public class TournamentServiceTests
         await _tournamentService.AddTeamAsync(new AddTeamToTournamentDto { TeamId = _joinedTeam3.Id },
             _addedTournament);
         
-        var result = await _tournamentService.StartAsync(_addedTournament);
+        var updatedTournament = (await _tournamentService.GetAsync(_addedTournament.Id)).Data;
+
+        var result =
+            await _tournamentService.ReorderTeamsAsync(_addedTournament, new Dictionary<Guid, int> { { updatedTournament.AcceptedTeams[0].Id, 2 } });
         
         Assert.IsTrue(result.IsSuccess);
     }
     
     [Test, Order(8)]
+    public async Task StartAsync_Succeeds()
+    {
+        var result = await _tournamentService.StartAsync(_addedTournament);
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+
+    [Test, Order(9)]
+    public async Task AddManager_Succeeds()
+    {
+        var result = await _tournamentService.AddManagerAsync(_addedTournament, _addedNotOwnerUser);
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test, Order(10)]
+    public async Task RemoveManager_Succeeds()
+    {
+        var result = await _tournamentService.RemoveManagerAsync(_addedTournament, _addedNotOwnerUser);
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test, Order(11)]
     public async Task GetAllAsync_ReturnsAllTournaments()
     {
         var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -178,7 +242,7 @@ public class TournamentServiceTests
         Assert.AreEqual(1, result.Data.Count());
     }
 
-    [Test, Order(9)]
+    [Test, Order(12)]
     public async Task GetUserTournamentsAsync_ReturnsAllUserTournaments()
     {
         var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };
@@ -188,7 +252,7 @@ public class TournamentServiceTests
         Assert.AreEqual(1, result.Data.Count());
     }
 
-    [Test, Order(10)]
+    [Test, Order(13)]
     public async Task GetAsync_ReturnsTournament()
     {
         var result = await _tournamentService.GetAsync(_addedTournament.Id);
@@ -196,7 +260,7 @@ public class TournamentServiceTests
         Assert.AreEqual(_addedTournament.Id, result.Data.Id);
     }
 
-    [Test, Order(11)]
+    [Test, Order(14)]
     public async Task GetAsync_WithWrongId_Returns404()
     {
         var result = await _tournamentService.GetAsync(new Guid());
@@ -204,7 +268,7 @@ public class TournamentServiceTests
         Assert.AreEqual(StatusCodes.Status404NotFound, result.ErrorStatus);
     }
 
-    [Test, Order(12)]
+    [Test, Order(15)]
     public async Task GetTournamentMatchesAsync_ReturnsTournamentMatches()
     {
         var result = await _tournamentService.GetTournamentMatchesAsync(_addedTournament.Id, true);
@@ -212,7 +276,7 @@ public class TournamentServiceTests
         Assert.AreEqual(3, result.Data.Count());
     }
     
-    [Test, Order(13)]
+    [Test, Order(16)]
     public async Task MoveBracketAsync_Succeeds()
     {
         var matches = await _tournamentService.GetTournamentMatchesAsync(_addedTournament.Id, true);
@@ -221,7 +285,7 @@ public class TournamentServiceTests
         Assert.IsTrue(result.IsSuccess);
     }
     
-    [Test, Order(14)]
+    [Test, Order(17)]
     public async Task DeleteAsync_Succeeds()
     {
         var result = await _tournamentService.DeleteAsync(_addedTournament);

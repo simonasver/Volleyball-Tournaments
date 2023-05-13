@@ -1,5 +1,6 @@
 using System.Collections;
 using Backend.Data.Dtos.Tournament;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Tournament;
@@ -698,6 +699,115 @@ public class TournamentServiceTests
             .ReturnsAsync((Tournament tournament) => tournament);
 
         var result = await _tournamentService.GenerateAsync(300, "user");
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+    
+    [Test]
+    public async Task AddManager_Succeeds()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.Managers = new List<ApplicationUser>();
+        
+        var result = await _tournamentService.AddManagerAsync(tournament, new ApplicationUser { Id = "second" });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+
+    [Test]
+    public async Task AddManager_IsOwner_Returns400()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.OwnerId = "first";
+        tournament.Managers = new List<ApplicationUser>();
+        
+        var result = await _tournamentService.AddManagerAsync(tournament, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task AddManager_AlreadyManager_Returns400()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.Managers = new List<ApplicationUser>{ new() { Id = "first" }};
+        
+        var result = await _tournamentService.AddManagerAsync(tournament, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task RemoveManager_Succeeds()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.Managers = new List<ApplicationUser>{ new() { Id = "second" }};
+        
+        var result = await _tournamentService.RemoveManagerAsync(tournament, new ApplicationUser { Id = "second" });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test]
+    public async Task RemoveManager_IsOwner_Returns400()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.OwnerId = "first";
+        tournament.Managers = new List<ApplicationUser>{ new() { Id = "first" }};
+        
+        var result = await _tournamentService.RemoveManagerAsync(tournament, new ApplicationUser { Id = "first" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+    
+    [Test]
+    public async Task RemoveManager_IsNotManager_Succeeds()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.Managers = new List<ApplicationUser>{ new () { Id = "first" }};
+        
+        var result = await _tournamentService.RemoveManagerAsync(tournament, new ApplicationUser { Id = "second" });
+        
+        Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
+    }
+
+    [Test]
+    public async Task ReorderTeams_Succeeds()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.AcceptedTeams = new List<GameTeam> { new() { Id = _fakeGuid }, new() { Id = new Guid() } };
+
+        var result =
+            await _tournamentService.ReorderTeamsAsync(tournament, new Dictionary<Guid, int> { { _fakeGuid, 2 } });
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+
+    [Test]
+    public async Task ReorderTeams_TournamentStarted_Returns400()
+    {
+        _tournamentRepository.Setup(x => x.UpdateAsync(It.IsAny<Tournament>())).ReturnsAsync((Tournament tournament) => tournament);
+
+        var tournament = _tournaments[0];
+        tournament.AcceptedTeams = new List<GameTeam> { new() { Id = _fakeGuid }, new() { Id = new Guid() } };
+        tournament.Status = TournamentStatus.Started;
+
+        var result =
+            await _tournamentService.ReorderTeamsAsync(tournament, new Dictionary<Guid, int> { { _fakeGuid, 2 } });
         
         Assert.AreEqual(StatusCodes.Status400BadRequest, result.ErrorStatus);
     }

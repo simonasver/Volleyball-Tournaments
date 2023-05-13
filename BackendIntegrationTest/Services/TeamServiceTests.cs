@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Data.Dtos.Team;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
 using Backend.Data.Repositories;
@@ -19,6 +20,11 @@ namespace BackendIntegrationTest
         private ApplicationDbContext _dbContext;
         private ITeamRepository _teamRepository;
         private ITeamService _teamService;
+
+        private Team _addedTeam;
+
+        private Guid _addedNotOwnerUserGuid;
+        private ApplicationUser _addedNotOwnerUser;
 
         [OneTimeSetUp]
         public void Setup()
@@ -41,6 +47,39 @@ namespace BackendIntegrationTest
             _dbContext.Database.ExecuteSql(
                 $"INSERT INTO aspnetusers (Id, UserName, FullName, Email, RefreshTokenExpiration, RegisterDate, LastLoginDate, Banned, EmailConfirmed, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount) VALUES ({"first"}, {"admin"}, {"Admin admin"}, {"admin@admin.com"}, {DateTime.Now}, {DateTime.Now}, {DateTime.Now}, {false}, {false}, {false}, {false}, {false}, {0})");
 
+            _addedNotOwnerUserGuid = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+            _addedNotOwnerUser = new ApplicationUser
+            {
+                Id = _addedNotOwnerUserGuid.ToString(),
+                UserName = "notadmin",
+                NormalizedUserName = null,
+                Email = "notadmin@admin.com",
+                NormalizedEmail = null,
+                EmailConfirmed = false,
+                PasswordHash = null,
+                SecurityStamp = null,
+                ConcurrencyStamp = null,
+                PhoneNumber = null,
+                PhoneNumberConfirmed = false,
+                TwoFactorEnabled = false,
+                LockoutEnd = null,
+                LockoutEnabled = false,
+                AccessFailedCount = 0,
+                RefreshToken = null,
+                RefreshTokenExpiration = default,
+                ProfilePictureUrl = null,
+                FullName = "not",
+                RegisterDate = default,
+                LastLoginDate = default,
+                Banned = false,
+                OwnedTeams = null,
+                OwnedGames = null,
+                OwnedTournaments = null,
+                ManagedTeams = null,
+                ManagedGames = null,
+                ManagedTournaments = null
+            };
+            
             _teamRepository = new TeamRepository(_dbContext);
             _teamService = new TeamService(_teamRepository);
         }
@@ -57,6 +96,7 @@ namespace BackendIntegrationTest
             var result = await _teamService.CreateAsync(
                 new AddTeamDto() { Title = "CreateTeam" },
                 "first");
+            _addedTeam = result.Data;
         
             Assert.AreEqual("CreateTeam", result.Data.Title);
         }
@@ -182,6 +222,22 @@ namespace BackendIntegrationTest
         }
         
         [Test, Order(13)]
+        public async Task AddManager_Succeeds()
+        {
+            var result = await _teamService.AddManagerAsync(_addedTeam, _addedNotOwnerUser);
+        
+            Assert.IsTrue(result.IsSuccess);
+        }
+    
+        [Test, Order(14)]
+        public async Task RemoveManager_Succeeds()
+        {
+            var result = await _teamService.RemoveManagerAsync(_addedTeam, _addedNotOwnerUser);
+        
+            Assert.IsTrue(result.IsSuccess);
+        }
+        
+        [Test, Order(15)]
         public async Task DeleteAsync_Succeeds()
         {
             var searchParameters = new SearchParameters() { PageNumber = 1, PageSize = 10 };

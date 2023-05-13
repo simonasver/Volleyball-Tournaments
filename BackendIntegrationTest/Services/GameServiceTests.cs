@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Data.Dtos.Game;
+using Backend.Data.Entities.Auth;
 using Backend.Data.Entities.Game;
 using Backend.Data.Entities.Team;
 using Backend.Data.Entities.Utils;
@@ -30,6 +31,9 @@ public class GameServiceTests
     private Team _joinedTeam1;
     private Team _joinedTeam2;
 
+    private Guid _addedNotOwnerUserGuid;
+    private ApplicationUser _addedNotOwnerUser;
+
     [OneTimeSetUp]
     public async Task Setup()
     {
@@ -51,6 +55,39 @@ public class GameServiceTests
         _dbContext.Database.ExecuteSql(
             $"INSERT INTO aspnetusers (Id, UserName, FullName, Email, RefreshTokenExpiration, RegisterDate, LastLoginDate, Banned, EmailConfirmed, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnabled, AccessFailedCount) VALUES ({"first"}, {"admin"}, {"Admin admin"}, {"admin@admin.com"}, {DateTime.Now}, {DateTime.Now}, {DateTime.Now}, {false}, {false}, {false}, {false}, {false}, {0})");
 
+        _addedNotOwnerUserGuid = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+        _addedNotOwnerUser = new ApplicationUser
+        {
+            Id = _addedNotOwnerUserGuid.ToString(),
+            UserName = "notadmin",
+            NormalizedUserName = null,
+            Email = "notadmin@admin.com",
+            NormalizedEmail = null,
+            EmailConfirmed = false,
+            PasswordHash = null,
+            SecurityStamp = null,
+            ConcurrencyStamp = null,
+            PhoneNumber = null,
+            PhoneNumberConfirmed = false,
+            TwoFactorEnabled = false,
+            LockoutEnd = null,
+            LockoutEnabled = false,
+            AccessFailedCount = 0,
+            RefreshToken = null,
+            RefreshTokenExpiration = default,
+            ProfilePictureUrl = null,
+            FullName = "not",
+            RegisterDate = default,
+            LastLoginDate = default,
+            Banned = false,
+            OwnedTeams = null,
+            OwnedGames = null,
+            OwnedTournaments = null,
+            ManagedTeams = null,
+            ManagedGames = null,
+            ManagedTournaments = null
+        };
+        
         _gameRepository = new GameRepository(_dbContext);
         _gameTeamRepository = new GameTeamRepository(_dbContext);
         _setRepository = new SetRepository(_dbContext);
@@ -216,6 +253,22 @@ public class GameServiceTests
     }
     
     [Test, Order(14)]
+    public async Task AddManager_Succeeds()
+    {
+        var result = await _gameService.AddManagerAsync(_addedGame, _addedNotOwnerUser);
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test, Order(15)]
+    public async Task RemoveManager_Succeeds()
+    {
+        var result = await _gameService.RemoveManagerAsync(_addedGame, _addedNotOwnerUser);
+        
+        Assert.IsTrue(result.IsSuccess);
+    }
+    
+    [Test, Order(16)]
     public async Task DeleteAsync_Succeeds()
     {
         var result = await _gameService.DeleteAsync(_addedGame);
