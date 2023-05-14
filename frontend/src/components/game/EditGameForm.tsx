@@ -56,6 +56,7 @@ const EditGameForm = () => {
         .then((res) => {
           setError("");
           setTitle(res.title);
+          setPictureUrl(res.pictureUrl);
           setDescription(res.description);
           setIsBasic(res.basic);
           setPointsToWin(res.pointsToWin);
@@ -88,36 +89,62 @@ const EditGameForm = () => {
     if (!gameId) {
       return navigate("/", { replace: true });
     }
-    editGame(
-      gameId,
-      title,
-      pictureUrl,
-      description,
-      isBasic,
-      pointsToWin,
-      pointsToWinLastSet,
-      pointDifferenceToWin,
-      maxSets,
-      limitPlayers ? playersPerTeam : 0,
-      isPrivate
-    )
-      .then(() => {
-        const successMessage = `Game ${title} was successfully updated`;
-        dispatch(
-          alertActions.changeAlert({ type: "success", message: successMessage })
-        );
-        return navigate(`/game/${gameId}`, { replace: true });
-      })
-      .catch((e) => {
-        console.log(e);
-        setError(errorMessageFromAxiosError(e));
-        dispatch(
-          alertActions.changeAlert({
-            type: "error",
-            message: errorMessageFromAxiosError(e),
-          })
-        );
-      });
+    if(!isTournamentGame) {
+      editGame(
+        gameId,
+        title,
+        pictureUrl,
+        description,
+        isBasic,
+        pointsToWin,
+        pointsToWinLastSet,
+        pointDifferenceToWin,
+        maxSets,
+        limitPlayers ? playersPerTeam : 0,
+        isPrivate
+      )
+        .then(() => {
+          const successMessage = `Game ${title} was successfully updated`;
+          dispatch(
+            alertActions.changeAlert({ type: "success", message: successMessage })
+          );
+          return navigate(`/game/${gameId}`, { replace: true });
+        })
+        .catch((e) => {
+          console.log(e);
+          setError(errorMessageFromAxiosError(e));
+          dispatch(
+            alertActions.changeAlert({
+              type: "error",
+              message: errorMessageFromAxiosError(e),
+            })
+          );
+        });
+    } else {
+      editGame(
+        gameId,
+        title,
+        pictureUrl,
+        description,
+      )
+        .then(() => {
+          const successMessage = `Game ${title} was successfully updated`;
+          dispatch(
+            alertActions.changeAlert({ type: "success", message: successMessage })
+          );
+          return navigate(`/game/${gameId}`, { replace: true });
+        })
+        .catch((e) => {
+          console.log(e);
+          setError(errorMessageFromAxiosError(e));
+          dispatch(
+            alertActions.changeAlert({
+              type: "error",
+              message: errorMessageFromAxiosError(e),
+            })
+          );
+        });
+    }
   };
 
   return (
@@ -225,7 +252,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1 }}
           fullWidth
-          disabled={gameStatus >= GameStatus.Started}
+          disabled={gameStatus >= GameStatus.Started || isTournamentGame}
         />
         <br />
         <br />
@@ -239,7 +266,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 0 }}
           fullWidth
-          disabled={gameStatus >= GameStatus.Started}
+          disabled={gameStatus >= GameStatus.Started || isTournamentGame}
         />
         <br />
         <br />
@@ -253,7 +280,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 0, max: 10 }}
           fullWidth
-          disabled={gameStatus >= GameStatus.Started}
+          disabled={gameStatus >= GameStatus.Started || isTournamentGame}
         />
         <br />
         <br />
@@ -267,7 +294,7 @@ const EditGameForm = () => {
           variant="outlined"
           inputProps={{ min: 1, max: 5 }}
           fullWidth
-          disabled={gameStatus >= GameStatus.Started}
+          disabled={gameStatus >= GameStatus.Started || isTournamentGame}
         />
         <br />
         <br />

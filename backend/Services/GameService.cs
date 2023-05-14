@@ -605,6 +605,7 @@ public class GameService : IGameService
                     else
                     {
                         nextSet.Status = GameStatus.Started;
+                        nextSet.StartDate = DateTime.Now;
                         try
                         {
                             await _setRepository.UpdateAsync(nextSet);

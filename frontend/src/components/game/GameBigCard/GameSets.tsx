@@ -52,7 +52,7 @@ const GameSets = (props: GameSetsProps) => {
                   secondTeamScore={set.secondTeamScore}
                   players={set.players}
                   status={set.status}
-                  startDate={new Date(set.startDate).toDateString()}
+                  startDate={new Date(set.startDate).toLocaleString()}
                   winner={
                     set.winner
                       ? set.winner.id === set.firstTeam.id
